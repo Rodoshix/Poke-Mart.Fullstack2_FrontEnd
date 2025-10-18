@@ -1,35 +1,31 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Routes, Route, Navigate } from "react-router-dom";
+import { Header } from "./components/layout/Header.jsx";
+import { Footer } from "./components/layout/Footer.jsx";
 
-function App() {
-  const [count, setCount] = useState(0)
+// IMPORTA EL HOME REAL
+import HomePage from "@/pages/tienda/HomePage.jsx";
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+// (opcional) stubs temporales para las otras rutas
+const CatalogPage = () => <h1 className="h3">Catálogo</h1>;
+const ReviewsPage = () => <h1 className="h3">Reseñas</h1>;
+const CartPage    = () => <h1 className="h3">Carrito</h1>;
+const LoginPage   = () => <h1 className="h3">Login</h1>;
+const NotFound    = () => <div className="text-center"><h1 className="display-4">404</h1></div>;
 
-export default App
+export default () => (
+  <div className="d-flex flex-column min-vh-100 app-shell">
+    <Header cartCount={0} />
+    <main className="my-4 flex-grow-1 app-main">
+      <Routes>
+        <Route path="/" element={<HomePage />} /> {/* <- AQUÍ EL HOME REAL */}
+        <Route path="/catalogo" element={<CatalogPage />} />
+        <Route path="/reseñas" element={<ReviewsPage />} />
+        <Route path="/carrito" element={<CartPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/404" element={<NotFound />} />
+        <Route path="*" element={<Navigate to="/404" replace />} />
+      </Routes>
+    </main>
+    <Footer />
+  </div>
+);

@@ -66,3 +66,61 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* --- Layout base: ocupa toda la altura y evita scroll horizontal --- */
+html, body, #root { height: 100%; }
+#root { display: flex; flex-direction: column; }
+html, body { overflow-x: hidden; }
+
+/* --- Navbar fijo arriba y por encima de TODO --- */
+.site-header .navbar {
+  position: fixed;     /* <- fijo, no sticky */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1100;
+}
+
+/* Compensar el alto del navbar para que el contenido no quede debajo */
+body { padding-top: 64px; }            /* altura aprox. del navbar */
+@media (min-width: 992px) { body { padding-top: 72px; } }
+
+/* --- Main y Footer que “fluyen” debajo del header --- */
+.app-shell { min-height: 100vh; display: flex; flex-direction: column; }
+.app-main  { flex: 1; position: relative; z-index: 1; } /* encima de los bordes fijos */
+
+/* Por si los bordes fijos quisieran tapar algo en z-index */
+.site-footer { position: relative; z-index: 1; }
+
+/* Layout base */
+html, body, #root { height: 100%; }
+#root { display: flex; flex-direction: column; }
+html, body { overflow-x: hidden; }
+
+/* Navbar fijo arriba (sigue igual) */
+.site-header .navbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1100;
+}
+/* Compensar alto del header */
+body { padding-top: 64px; }
+@media (min-width: 992px) { body { padding-top: 72px; } }
+
+/* Shell */
+.app-shell { min-height: 100vh; display: flex; flex-direction: column; }
+.app-main  { flex: 1; position: relative; z-index: 1; }
+
+/* --- FIX: Footer “full-bleed” (fondo llega a ambos bordes) --- */
+/* En móviles/tablet el gutter puede dejar un espacio. Esto rompe el gutter para el fondo,
+   pero conserva el contenido centrado porque adentro sigues usando .container */
+@media (max-width: 991.98px) {
+  .site-footer {
+    margin-left: calc(51,5% - 42vw);
+    margin-right: calc(50% - 50vw);
+    width: 100vw;
+  }
+}
+
+/* Por si los bordes fijos del home se superponen */
+.site-footer { position: relative; z-index: 1; }
