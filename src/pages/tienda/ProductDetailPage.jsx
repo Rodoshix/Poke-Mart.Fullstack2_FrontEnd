@@ -7,15 +7,16 @@ import { RelatedProducts } from "@/components/catalog/RelatedProducts.jsx";
 import { Reviews } from "@/components/reviews/Reviews.jsx";
 import "@/assets/styles/product-detail.css";
 
+import { addItem, getAvailableStock } from "@/lib/cartStore";
+
 const PLACEHOLDER = "/src/assets/img/tienda/productos/poke-Ball.png";
+
 const resolveImg = (path) => {
   let clean = String(path ?? "").trim();
   if (!clean) return PLACEHOLDER;
   if (/^https?:\/\//i.test(clean)) return clean;
-
   clean = clean.replace(/^(?:\.\/|\.\.\/)+/, "").replace(/^\/+/, "");
   if (/^src\/assets\//.test(clean)) return `/${clean}`;
-
   if (/^(tienda|img|assets\/img)\//.test(clean)) {
     clean = `src/assets/${clean.replace(/^assets\//, "")}`;
     return `/${clean}`;
@@ -26,22 +27,10 @@ const resolveImg = (path) => {
 const money = (n) => `$${Number(n ?? 0).toLocaleString("es-CL")}`;
 const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
-const fallbackCart = {
-  addItem: () => ({ added: 0, available: 0, cart: [] }),
-  getCount: () => parseInt(localStorage.getItem("cartCount") || "0", 10),
-  getAvailableStock: (_id, baseStock) => {
-    const base = Number(baseStock);
-    return Number.isFinite(base) ? Math.max(base, 0) : 0;
-  },
-};
-
 export default function ProductDetailPage() {
   const { id } = useParams();
-  const cartStore =
-    (typeof window !== "undefined" && window.cartStore) || fallbackCart;
 
   const rawProducts = productsData ?? [];
-
   const all = useMemo(
     () =>
       rawProducts.map((p) => ({
@@ -74,51 +63,44 @@ export default function ProductDetailPage() {
     while (imgs.length < 4) imgs.push(PLACEHOLDER);
     return imgs;
   }, [product]);
-
   const [mainSrc, setMainSrc] = useState(gallery[0]);
   useEffect(() => setMainSrc(gallery[0]), [gallery]);
 
-  const getAvailable = (p) =>
-    cartStore.getAvailableStock?.(
-      String(p?.id ?? ""),
-      Number(p?.stock ?? 0)
-    ) ?? Math.max(0, Number(p?.stock ?? 0));
+  // Stock disponible (NO mutar product.stock)
+  const computeAvailable = (p) =>
+    getAvailableStock(String(p?.id ?? ""), Number(p?.stock ?? 0));
 
-  const [available, setAvailable] = useState(
-    product ? getAvailable(product) : 0
-  );
-
+  const [available, setAvailable] = useState(product ? computeAvailable(product) : 0);
   useEffect(() => {
-    if (product) setAvailable(getAvailable(product));
+    if (product) setAvailable(computeAvailable(product));
   }, [product]);
-
-  const [qty, setQty] = useState(1);
-  const maxQty = 99;
 
   useEffect(() => {
     const handler = () => {
-      if (product) setAvailable(getAvailable(product));
+      if (product) setAvailable(computeAvailable(product));
     };
-    if (typeof window !== "undefined") {
-      window.addEventListener("cart:updated", handler);
-      return () => window.removeEventListener("cart:updated", handler);
-    }
+    window.addEventListener("cart:updated", handler);
+    return () => window.removeEventListener("cart:updated", handler);
   }, [product]);
+  const [qty, setQty] = useState(1);
+  const MAX_QTY = 99;
 
   const addToCart = () => {
     if (!product || available <= 0) return;
-    const desired = clamp(parseInt(qty || 1, 10), 1, maxQty);
+    const desired = clamp(parseInt(qty || 1, 10), 1, MAX_QTY);
     const amount = Math.min(desired, available);
-    let result = { added: amount, available: available - amount };
-    if (cartStore && typeof cartStore.addItem === "function") {
-      result = cartStore.addItem(product, amount);
-    }
-    if (!result.added) {
-      setAvailable(result.available ?? available);
-      return;
-    }
-    setAvailable(result.available ?? Math.max(0, available - result.added));
-    setQty(1);
+
+    if (amount <= 0) return;
+
+    const res = addItem(product, amount);
+
+    const nextAvail =
+      typeof res?.available === "number"
+        ? Math.max(0, res.available)
+        : computeAvailable(product);
+
+    setAvailable(nextAvail);
+    setQty(nextAvail === 0 ? 0 : 1);
   };
 
   const related = useMemo(() => {
@@ -224,25 +206,19 @@ export default function ProductDetailPage() {
                 id="qty"
                 type="number"
                 min={available > 0 ? 1 : 0}
-                max={Math.min(available, 99)}
+                max={Math.min(available, MAX_QTY)}
                 value={available > 0 ? qty : 0}
                 disabled={available <= 0}
-                onChange={(e) =>
-                  setQty(
-                    clamp(
-                      parseInt(e.target.value || "1", 10),
-                      1,
-                      Math.min(available, 99)
-                    )
-                  )
-                }
+                onChange={(e) => {
+                  const raw = parseInt(e.target.value || "0", 10);
+                  const next = clamp(raw, available > 0 ? 1 : 0, Math.min(available, MAX_QTY));
+                  setQty(next);
+                }}
                 className="form-control"
                 style={{ maxWidth: "100px" }}
               />
               <button
-                className={`btn flex-grow-1 ${
-                  available > 0 ? "btn-primary" : "btn-outline-secondary"
-                }`}
+                className={`btn flex-grow-1 ${available > 0 ? "btn-primary" : "btn-outline-secondary"}`}
                 disabled={available <= 0}
                 onClick={addToCart}
               >

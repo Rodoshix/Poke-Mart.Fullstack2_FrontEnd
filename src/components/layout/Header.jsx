@@ -1,12 +1,22 @@
+// src/components/layout/Header.jsx
 import AuthMenu from "@/components/auth/AuthMenu.jsx";
-
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getAuth, getProfile } from "@/components/auth/session.js";
 import { showCartGuardModal, CartGuardModal } from "@/components/auth/CartGuardModal.jsx";
 
+import { getCount } from "@/lib/cartStore";
+
 export const Header = () => {
   const [q, setQ] = useState("");
+  const [cartCount, setCartCount] = useState(() => {
+    try {
+      return getCount();
+    } catch {
+      return parseInt(localStorage.getItem("cartCount") || "0", 10);
+    }
+  });
+
   const navigate = useNavigate();
 
   const handleSearch = (e) => {
@@ -27,6 +37,23 @@ export const Header = () => {
       navigate("/carrito");
     }
   };
+
+  useEffect(() => {
+    const update = () => {
+      try {
+        setCartCount(getCount());
+      } catch {
+        setCartCount(parseInt(localStorage.getItem("cartCount") || "0", 10));
+      }
+    };
+    window.addEventListener("cart:updated", update);
+    window.addEventListener("storage", update);
+    update();
+    return () => {
+      window.removeEventListener("cart:updated", update);
+      window.removeEventListener("storage", update);
+    };
+  }, []);
 
   return (
     <header className="site-header">
@@ -74,19 +101,21 @@ export const Header = () => {
               </li>
             </ul>
 
-            <form className="d-none d-lg-flex me-3" onSubmit={handleSearch}>
+            <form className="d-none d-lg-flex me-3" onSubmit={handleSearch} role="search">
               <input
                 className="form-control me-2"
                 type="search"
                 placeholder="Buscar ítem, MT…"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
+                aria-label="Buscar"
               />
               <button className="btn btn-outline-primary" type="submit">Buscar</button>
             </form>
 
             <div className="site-nav__actions d-flex align-items-center gap-3">
               <AuthMenu />
+
               <button
                 className="site-nav__cart btn btn-outline-primary position-relative"
                 onClick={handleCartClick}
@@ -94,8 +123,13 @@ export const Header = () => {
                 type="button"
               >
                 <span className="site-nav__cart-icon" aria-hidden="true">🛒</span>
-                <span className="site-nav__cart-badge badge text-bg-danger position-absolute top-0 start-100 translate-middle rounded-pill" id="cartCount" aria-live="polite">
-                  0
+                <span
+                  className="site-nav__cart-badge badge text-bg-danger position-absolute top-0 start-100 translate-middle rounded-pill"
+                  id="cartCount"
+                  aria-live="polite"
+                  style={{ minWidth: 18 }}
+                >
+                  {cartCount}
                 </span>
               </button>
             </div>
