@@ -4,6 +4,7 @@ import { Footer } from "./components/layout/Footer.jsx";
 
 import HomePage from "@/pages/tienda/HomePage.jsx";
 import CatalogPage from "@/pages/tienda/CatalogPage.jsx";
+import ProductDetailPage from "@/pages/tienda/ProductDetailPage.jsx";
 
 const ReviewsPage = () => <h1 className="h3">Reseñas</h1>;
 const CartPage    = () => <h1 className="h3">Carrito</h1>;
@@ -17,6 +18,7 @@ export default () => (
       <Routes>
         <Route path="/" element={<HomePage />} /> {/* <- AQUÍ EL HOME REAL */}
         <Route path="/catalogo" element={<CatalogPage />} />
+        <Route path="/producto/:id" element={<ProductDetailPage />} />
         <Route path="/reseñas" element={<ReviewsPage />} />
         <Route path="/carrito" element={<CartPage />} />
         <Route path="/login" element={<LoginPage />} />

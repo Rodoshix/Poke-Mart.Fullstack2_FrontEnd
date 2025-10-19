@@ -29,7 +29,6 @@ const HomePage = () => {
   useEffect(() => {
     let alive = true;
     setLoading(true);
-    // simulamos una carga asíncrona corta
     const t = setTimeout(() => {
       if (!alive) return;
       const destacados = pickFeatured(productsData || []);
@@ -62,7 +61,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* DESTACADOS */}
       <section className="product-grid container py-5">
         <header className="product-grid__header d-flex justify-content-between align-items-center mb-4">
           <h2 className="product-grid__title h3 m-0">Productos destacados</h2>

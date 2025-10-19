@@ -132,6 +132,8 @@ const CatalogPage = () => {
                             Limpiar
                         </button>
                     </div>
+
+                    <div> </div> {/* espaciador */}
                 </form>
             </section>
 
@@ -141,11 +143,9 @@ const CatalogPage = () => {
                         <div className="products__empty col-12 text-center">No encontramos productos.</div>
                     ) : (
                         items.map((p) => (
-                            <div key={p.id} className="col-12 col-sm-6 col-lg-3 d-flex">
-                                <Link to={`/producto/${encodeURIComponent(p.id)}`} className="w-100 text-decoration-none text-reset">
-                                    <ProductCard product={p} />
-                                </Link>
-                            </div>
+  <div key={p.id} className="col-12 col-sm-6 col-lg-3 d-flex">
+    <ProductCard product={p} />
+  </div>
                         ))
                     )}
                 </div>

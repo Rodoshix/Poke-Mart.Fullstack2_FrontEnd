@@ -16,7 +16,9 @@ body {
   z-index: 1100;
 }
 
-body { padding-top: var(72px); }
+/* Se setea desde Header.jsx (fallback 72px) */
+:root { --header-h: 72px; }
+body { padding-top: var(--header-h); }
 
 .site-footer{
   position: relative;
