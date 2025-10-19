@@ -65,11 +65,8 @@ body { font-family: 'Roboto', sans-serif; }
   .site-main{ padding-left: 1rem; padding-right: 1rem; }
 }
 
-/* Evitar scroll horizontal */
 html, body { overflow-x: hidden; }
 
-/* Sombra del header */
 .site-header .site-nav { box-shadow: 0 2px 8px rgba(0,0,0,.35); }
 
-/* Asegurar contenido por encima del fondo decorativo */
 .site-main { position: relative; z-index: 1; }

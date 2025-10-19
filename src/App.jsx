@@ -5,10 +5,10 @@ import { Footer } from "./components/layout/Footer.jsx";
 import HomePage from "@/pages/tienda/HomePage.jsx";
 import CatalogPage from "@/pages/tienda/CatalogPage.jsx";
 import ProductDetailPage from "@/pages/tienda/ProductDetailPage.jsx";
+import LoginPage from "@/pages/tienda/LoginPage.jsx";
 
 const ReviewsPage = () => <h1 className="h3">Reseñas</h1>;
 const CartPage    = () => <h1 className="h3">Carrito</h1>;
-const LoginPage   = () => <h1 className="h3">Login</h1>;
 const NotFound    = () => <div className="text-center"><h1 className="display-4">404</h1></div>;
 
 export default () => (
@@ -16,7 +16,7 @@ export default () => (
     <Header cartCount={0} />
     <main className="my-4 flex-grow-1 app-main">
       <Routes>
-        <Route path="/" element={<HomePage />} /> {/* <- AQUÍ EL HOME REAL */}
+        <Route path="/" element={<HomePage />} />
         <Route path="/catalogo" element={<CatalogPage />} />
         <Route path="/producto/:id" element={<ProductDetailPage />} />
         <Route path="/reseñas" element={<ReviewsPage />} />

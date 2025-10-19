@@ -1,8 +1,9 @@
+import AuthMenu from "@/components/auth/AuthMenu.jsx";
+
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { getAuth, getProfile } from "@/components/auth/session.js";
 import { showCartGuardModal, CartGuardModal } from "@/components/auth/CartGuardModal.jsx";
-import { AuthMenu } from "@/components/auth/AuthMenu.jsx";
 
 export const Header = () => {
   const [q, setQ] = useState("");

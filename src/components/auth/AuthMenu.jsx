@@ -1,63 +1,72 @@
-import { useEffect, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
-import { getAuth, getProfile, clearAuth } from "./session.js";
+// src/components/auth/AuthMenu.jsx
+import { Link, useNavigate } from "react-router-dom";
+import useAuthSession from "@/hooks/useAuthSession";
+import { clearAuth } from "@/components/auth/session";
 
-export const AuthMenu = () => {
-  const [sessionOK, setSessionOK] = useState(false);
-  const [profile, setProfile] = useState(null);
+function getDisplayName(profile) {
+  const name = [profile?.nombre, profile?.apellido].filter(Boolean).join(" ").trim();
+  return name || profile?.username || "Usuario";
+}
+function getInitial(profile) {
+  const base = getDisplayName(profile);
+  return base?.charAt(0)?.toUpperCase() || "U";
+}
+
+export default function AuthMenu() {
   const navigate = useNavigate();
+  const { session, profile } = useAuthSession();
+  const isLogged = !!session && !!profile;
 
-  useEffect(() => {
-    const auth = getAuth();
-    const prof = getProfile();
-    setSessionOK(!!auth && !!prof);
-    setProfile(prof);
-  }, []);
-
-  const handleLogout = () => {
-    clearAuth();
-    navigate("/");
-  };
-
-  if (!sessionOK) {
+  if (!isLogged) {
     return (
-      <div>
-        <NavLink className="site-nav__auth-link link-secondary me-2" to="/login">Iniciar sesión</NavLink>
-        <span className="text-body-secondary">|</span>
-        <NavLink className="site-nav__auth-link link-secondary ms-2" to="/registro">Registrar usuario</NavLink>
+      <div className="header-auth d-flex align-items-center">
+        <Link
+          to="/login"
+          className="btn btn-sm btn-outline-primary rounded-pill auth-btn"
+          title="Iniciar sesión"
+        >
+          <i className="bi bi-box-arrow-in-right" aria-hidden="true"></i>
+          <span className="btn-label">Iniciar sesión</span>
+        </Link>
+
+        <span className="auth-divider mx-2">|</span>
+
+        <Link
+          to="/registro"
+          className="btn btn-sm btn-primary rounded-pill auth-btn"
+          title="Registrar usuario"
+        >
+          <i className="bi bi-person-plus" aria-hidden="true"></i>
+          <span className="btn-label">Registrar</span>
+        </Link>
       </div>
     );
   }
 
-  const displayName = profile?.nombre || profile?.username || "Usuario";
+  const name = getDisplayName(profile);
   const email = profile?.email || "";
-  const initial = displayName.charAt(0).toUpperCase();
 
   return (
-    <div className="dropdown">
+    <div className="header-auth d-flex align-items-center gap-2">
+      <div className="auth-chip d-flex align-items-center">
+        <div className="auth-avatar" aria-hidden="true">{getInitial(profile)}</div>
+        <div className="auth-meta">
+          <div className="auth-name" title={name}>{name}</div>
+          <div className="auth-email" title={email}>{email}</div>
+        </div>
+      </div>
+
       <button
-        className="btn btn-light border-0 d-flex align-items-center gap-2"
-        type="button"
-        id="userMenuBtn"
-        data-bs-toggle="dropdown"
-        aria-expanded="false"
+        className="btn btn-sm btn-outline-danger rounded-pill auth-btn"
+        title="Cerrar sesión"
+        onClick={() => {
+          clearAuth();
+          navigate("/", { replace: true });
+        }}
       >
-        <div
-          className="rounded-circle bg-primary text-white d-flex justify-content-center align-items-center"
-          style={{ width: 32, height: 32 }}
-        >
-          {initial}
-        </div>
-        <div className="text-start">
-          <div className="fw-semibold lh-1">{displayName}</div>
-          <small className="text-muted d-block text-truncate" style={{ maxWidth: 160 }} title={email}>
-            {email}
-          </small>
-        </div>
+        <i className="bi bi-box-arrow-right" aria-hidden="true"></i>
+        <span className="btn-label">Cerrar sesión</span>
       </button>
-      <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuBtn">
-        <li><button className="dropdown-item" type="button" onClick={handleLogout}>Cerrar sesión</button></li>
-      </ul>
     </div>
   );
-};
+}

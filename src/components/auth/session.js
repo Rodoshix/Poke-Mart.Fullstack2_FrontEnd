@@ -1,6 +1,15 @@
+// src/components/auth/session.js
 const AUTH_KEY = "pm_session";
 const PROFILE_KEY = "pm_session_profile";
 const SESSION_DURATION = 60 * 60 * 1000; // 1 hora
+
+// Evento global para que otros componentes reaccionen (mismo tab)
+const emitAuthChange = () => {
+  try {
+    window.dispatchEvent(new Event("pm:authchange"));
+  } catch {
+  }
+};
 
 export const getAuth = () => {
   try {
@@ -33,8 +42,13 @@ export const getProfile = () => {
   }
 };
 
-export const setAuth = ({ token, expiresAt = Date.now() + SESSION_DURATION, profile }) => {
+export const setAuth = ({
+  token,
+  expiresAt = Date.now() + SESSION_DURATION,
+  profile,
+}) => {
   sessionStorage.setItem(AUTH_KEY, JSON.stringify({ token, expiresAt }));
+
   if (profile) {
     try {
       const encoded = btoa(JSON.stringify(profile));
@@ -44,10 +58,14 @@ export const setAuth = ({ token, expiresAt = Date.now() + SESSION_DURATION, prof
     }
     window.sessionProfile = profile;
   }
+
+  emitAuthChange();
 };
 
 export const clearAuth = () => {
   sessionStorage.removeItem(AUTH_KEY);
   sessionStorage.removeItem(PROFILE_KEY);
   window.sessionProfile = null;
+
+  emitAuthChange();
 };
