@@ -1,17 +1,12 @@
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
 
-/**
- * Props opcionales:
- * - onSubscribe?: (email: string) => void
- */
 export function Footer({ onSubscribe }) {
   const [email, setEmail] = useState("");
 
   const handleSubscribe = (e) => {
     e.preventDefault();
     if (!email) return;
-    // callback opcional hacia arriba; si no existe, solo hace un alert suave
     if (typeof onSubscribe === "function") onSubscribe(email);
     else alert(`¡Gracias por suscribirte, ${email}!`);
     setEmail("");
@@ -27,8 +22,6 @@ export function Footer({ onSubscribe }) {
               Siempre a tu lado, donde quiera que vayas.
             </p>
           </div>
-
-          {/* Enlaces rápidos (usa NavLink para SPA) */}
           <nav
             className="site-footer__col col-6 col-lg-4"
             aria-label="Enlaces rápidos"
@@ -56,8 +49,6 @@ export function Footer({ onSubscribe }) {
               </li>
             </ul>
           </nav>
-
-          {/* Newsletter */}
           <div className="site-footer__col col-6 col-lg-4">
             <form className="newsletter site-footer__newsletter" onSubmit={handleSubscribe} noValidate>
               <label className="newsletter__label form-label" htmlFor="emailNews">

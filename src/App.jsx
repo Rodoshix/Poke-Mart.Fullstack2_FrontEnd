@@ -2,11 +2,9 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { Header } from "./components/layout/Header.jsx";
 import { Footer } from "./components/layout/Footer.jsx";
 
-// IMPORTA EL HOME REAL
 import HomePage from "@/pages/tienda/HomePage.jsx";
+import CatalogPage from "@/pages/tienda/CatalogPage.jsx";
 
-// (opcional) stubs temporales para las otras rutas
-const CatalogPage = () => <h1 className="h3">Catálogo</h1>;
 const ReviewsPage = () => <h1 className="h3">Reseñas</h1>;
 const CartPage    = () => <h1 className="h3">Carrito</h1>;
 const LoginPage   = () => <h1 className="h3">Login</h1>;

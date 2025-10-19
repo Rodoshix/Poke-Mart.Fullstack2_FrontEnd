@@ -56,7 +56,6 @@ body{
   .site-main{ padding-inline:1rem; }
 }
 
-/* Modal estilo “Poké” (usa tu CartGuardModal existente) */
 .poke-modal .modal-content{
   background:rgba(20,20,20,.85); color:#fff; border:1px solid rgba(255,255,255,.2);
   border-radius:18px; backdrop-filter:blur(12px);
@@ -68,19 +67,16 @@ body{
 .poke-modal .btn-secondary{ background:transparent; color:#fff; border-color:rgba(255,255,255,.25) }
 .poke-modal .btn-secondary:hover{ background:rgba(255,255,255,.08) }
 
-/* Hero: separaciones cómodas en móvil */
 .hero { background:#f3f6fb; }
 .hero .container { padding-left: .75rem; padding-right: .75rem; }
 @media (min-width: 768px){
   .hero .container { padding-left: 1rem; padding-right: 1rem; }
 }
 
-/* Carrusel responsive */
 .hero-carousel img { width:100%; height:auto; max-height: 360px; object-fit: cover; }
 @media (max-width: 768px){ .hero-carousel img { max-height: 250px; } }
 
-/* Cards: que el contenido no “pegue” los bordes en pantallas chicas */
 .product-card .card-body { padding: .75rem .75rem 1rem; }
 
-/* Bordes laterales: ya los ocultas <992px; asegura que el main esté encima */
+/* Bordes laterales: asegura que el main esté encima */
 .site-main { position: relative; z-index: 1; }

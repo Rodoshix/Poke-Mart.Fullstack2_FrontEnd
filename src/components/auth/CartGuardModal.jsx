@@ -1,6 +1,5 @@
-// src/components/auth/CartGuardModal.jsx
 import { useEffect, useRef } from "react";
-import Modal from "bootstrap/js/dist/modal"; // <- importa la clase
+import Modal from "bootstrap/js/dist/modal";
 
 let modalInstance = null;
 
@@ -8,7 +7,6 @@ export const CartGuardModal = () => {
   const elRef = useRef(null);
 
   useEffect(() => {
-    // Crea (o reutiliza) la instancia para este elemento
     modalInstance = Modal.getOrCreateInstance(elRef.current, { backdrop: "static" });
     return () => {
       modalInstance?.dispose();

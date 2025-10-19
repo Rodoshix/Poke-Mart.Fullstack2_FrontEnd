@@ -1,12 +1,11 @@
 // src/pages/HomePage.jsx
 import { useEffect, useMemo, useState } from "react";
-import productsData from "@/data/productos.json";           // ajusta si tu JSON está en otra ruta
+import productsData from "@/data/productos.json";
 import "@/assets/styles/home.css";
 
 import { HeroCarousel } from "@/components/ui/HeroCarousel.jsx";
 import { ProductCard } from "@/components/catalog/ProductCard.jsx";
 
-// util: seleccionar destacados igual que en tu versión anterior
 const pickFeatured = (data) => {
   const pokeballs = data.filter(p => p.categoria === "Poké Balls").slice(0, 2);
   const curacion  = data.filter(p => p.categoria === "Curación").slice(0, 2);
@@ -18,7 +17,6 @@ const HomePage = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // imágenes (según tu estructura)
   const leftBorder  = "/src/assets/img/background-logo.png";
   const rightBorder = "/src/assets/img/background-logo.png";
 
@@ -28,11 +26,10 @@ const HomePage = () => {
     { src: "/src/assets/img/tienda/world/pokemon_worldmap2.png",  alt: "Región de Johto para explorar" },
   ]), []);
 
-  // carga de destacados (desde el JSON importado)
   useEffect(() => {
     let alive = true;
     setLoading(true);
-    // simulamos una carga asíncrona corta para respetar el patrón con useEffect
+    // simulamos una carga asíncrona corta
     const t = setTimeout(() => {
       if (!alive) return;
       const destacados = pickFeatured(productsData || []);
@@ -44,11 +41,9 @@ const HomePage = () => {
 
   return (
     <main className="site-main">
-      {/* bordes laterales */}
       <img src={leftBorder} className="left-border" alt="" aria-hidden="true" decoding="async" loading="lazy" />
       <img src={rightBorder} className="right-border" alt="" aria-hidden="true" decoding="async" loading="lazy" />
 
-      {/* HERO */}
       <section className="hero container py-5">
         <div className="row align-items-center g-4">
           <div className="hero__content col-12 col-lg-6">
