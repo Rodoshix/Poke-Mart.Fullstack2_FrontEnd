@@ -9,7 +9,7 @@ import products from "@/data/productos.json";
 
 const SHIPPING_THRESHOLD = 1000;
 const SHIPPING_COST = 4990;
-const FALLBACK_IMAGE = "assets/img/tienda/productos/poke-Ball.png";
+const FALLBACK_IMAGE = "/src/assets/img/tienda/productos/poke-Ball.png";
 
 const money = (v) =>
   new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP" }).format(v ?? 0);
@@ -19,17 +19,25 @@ const clamp = (value, min, max) => {
   return Math.max(min, Math.min(max, v));
 };
 
-const resolveImg = (path) => {
-  let p = (path ?? "").toString().trim();
-  if (!p) return FALLBACK_IMAGE;
-  if (/^https?:\/\//i.test(p)) return p;
-  p = p.replace(/^(?:\.\/|\.\.\/)+/, "").replace(/^\/+/, "");
-  p = p.replace(/^src\/(assets\/.*)$/i, "$1");
-  if (p.startsWith("assets/")) return p;
-  const i = p.indexOf("assets/");
-  if (i !== -1) return p.slice(i);
-  return `assets/${p}`;
-};
+function resolveImg(path) {
+  const raw = (path ?? "").toString().trim();
+  if (!raw) return FALLBACK_IMAGE;
+
+  if (/^https?:\/\//i.test(raw)) return raw;
+
+  let p = raw.replace(/^(?:\.\/|\.\.\/)+/, "").replace(/^\/+/, "");
+
+  if (/^\/?src\/assets\//i.test(raw)) return raw.startsWith("/") ? raw : `/${raw}`;
+
+  if (/^assets\//i.test(p)) return `/src/${p}`;
+
+  if (/^(img|tienda)\//i.test(p)) return `/src/assets/img/${p}`;
+
+  const i = p.toLowerCase().indexOf("assets/");
+  if (i !== -1) return `/src/${p.slice(i)}`;
+
+  return `/src/assets/${p}`;
+}
 
 export default function CartPage() {
   const navigate = useNavigate();
@@ -144,7 +152,9 @@ export default function CartPage() {
 
                     <div className="cart-item__price">
                       <div className="qty mb-2">
-                        <button className="qty__btn" onClick={() => dec(item.id)} aria-label="Disminuir">−</button>
+                        <button className="qty__btn" onClick={() => dec(item.id)} aria-label="Disminuir">
+                          −
+                        </button>
                         <input
                           className="qty__value"
                           type="number"
@@ -153,7 +163,9 @@ export default function CartPage() {
                           value={item.qty}
                           onChange={(e) => changeQty(item.id, e.target.value)}
                         />
-                        <button className="qty__btn" onClick={() => inc(item.id)} aria-label="Aumentar">+</button>
+                        <button className="qty__btn" onClick={() => inc(item.id)} aria-label="Aumentar">
+                          +
+                        </button>
                       </div>
                       <div className="fw-semibold mb-1">{money(subtotalItem)}</div>
                       <button className="cart-item__remove" onClick={() => remove(item.id)}>
@@ -179,7 +191,9 @@ export default function CartPage() {
                   className="progress-bar"
                   role="progressbar"
                   style={{
-                    width: `${subtotal >= SHIPPING_THRESHOLD ? 100 : Math.min(100, Math.round((subtotal / SHIPPING_THRESHOLD) * 100))}%`,
+                    width: `${
+                      subtotal >= SHIPPING_THRESHOLD ? 100 : Math.min(100, Math.round((subtotal / SHIPPING_THRESHOLD) * 100))
+                    }%`,
                   }}
                 />
               </div>
@@ -222,7 +236,12 @@ export default function CartPage() {
                 Confirmar compra
               </button>
               <div className="mt-3">
-                <button id="clearCart" className="btn btn-outline-secondary w-100 btn-sm" disabled={!totalItems} onClick={clear}>
+                <button
+                  id="clearCart"
+                  className="btn btn-outline-secondary w-100 btn-sm"
+                  disabled={!totalItems}
+                  onClick={clear}
+                >
                   Vaciar carrito
                 </button>
               </div>

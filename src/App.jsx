@@ -7,6 +7,8 @@ import CatalogPage from "@/pages/tienda/CatalogPage.jsx";
 import ProductDetailPage from "@/pages/tienda/ProductDetailPage.jsx";
 import LoginPage from "@/pages/tienda/LoginPage.jsx";
 import CartPage from "@/pages/tienda/CartPage.jsx";
+import NosotrosPage from "@/pages/tienda/NosotrosPage.jsx";
+import ContactoPage from "@/pages/tienda/ContactoPage.jsx";
 
 const ReviewsPage = () => <h1 className="h3">Reseñas</h1>;
 const NotFound    = () => <div className="text-center"><h1 className="display-4">404</h1></div>;
@@ -21,6 +23,8 @@ export default () => (
         <Route path="/producto/:id" element={<ProductDetailPage />} />
         <Route path="/reseñas" element={<ReviewsPage />} />
         <Route path="/carrito" element={<CartPage />} />
+        <Route path="/nosotros" element={<NosotrosPage />} />
+        <Route path="/contacto" element={<ContactoPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/404" element={<NotFound />} />
         <Route path="*" element={<Navigate to="/404" replace />} />
