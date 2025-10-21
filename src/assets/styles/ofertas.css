@@ -1,0 +1,57 @@
+/* src/assets/styles/tienda/ofertas.css */
+.page--ofertas { background: #f6f8fb; }
+
+.offer-card {
+  background: #fff;
+  border: 1px solid #e9eef5;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.04);
+  display: flex;
+  flex-direction: column;
+}
+
+.offer-card__media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: #f6f8fb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.offer-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.offer-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: #ef4444;
+  color: #fff;
+  font-weight: 700;
+  border-radius: 999px;
+  font-size: .85rem;
+  padding: 4px 8px;
+}
+
+.offer-card__body { padding-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+.offer-card__title { font-size: 0.95rem; margin: 0; }
+
+.offer-card__prices {
+  display: flex;
+  align-items: baseline;
+  gap: .5rem;
+  line-height: 1;
+}
+.offer-card__price { font-weight: 700; color: #0d6efd; }
+.offer-card__base { color: #94a3b8; text-decoration: line-through; }
+
+.offer-card__link {
+  margin-top: 6px;
+  font-size: .9rem;
+  text-decoration: none;
+}

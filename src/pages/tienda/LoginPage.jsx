@@ -94,7 +94,6 @@ export default function LoginPage() {
     navigate(found.role === "admin" ? "/" : "/catalogo", { replace: true });
   };
 
-  // ---- Forgot password (demo) ----
   const genCode = (len = 6) =>
     Array.from({ length: len }, () => Math.floor(Math.random() * 10)).join("");
 

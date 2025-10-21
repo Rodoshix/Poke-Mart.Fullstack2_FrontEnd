@@ -11,19 +11,16 @@ const REGIONS = [
   { region: "Sinnoh", comunas: ["Ciudad Jubileo", "Ciudad Corazon", "Ciudad Pradera", "Pueblo Hojaverde"] },
 ];
 
-// Misma política del registro original:
 const EMAIL_DOMAINS = ["duoc.cl", "profesor.duoc.cl", "gmail.com"];
 
 const LOGO = "/src/assets/img/poke-mark-logo.png";
 
 export default function RegistroPage() {
-  // estilos de página (fondo gif + centrado)
   useEffect(() => {
     document.body.classList.add("page--registro");
     return () => document.body.classList.remove("page--registro");
   }, []);
 
-  // base de usuarios (json + locales)
   const baseUsers = useMemo(() => {
     const fromFile = Array.isArray(usersJson?.users) ? usersJson.users : [];
     let locals = [];
@@ -42,7 +39,6 @@ export default function RegistroPage() {
     return Array.from(map.values());
   }, []);
 
-  // form state
   const [form, setForm] = useState({
     nombre: "",
     apellido: "",
@@ -59,7 +55,6 @@ export default function RegistroPage() {
 
   const [status, setStatus] = useState({ text: "", error: false });
 
-  // comunas disponibles según región
   const comunas = useMemo(() => {
     const entry = REGIONS.find((r) => r.region === form.region);
     return entry ? entry.comunas : [];
@@ -187,14 +182,12 @@ export default function RegistroPage() {
     return issues;
   };
 
-  // next id
   const getNextId = () => {
     const all = baseUsers;
     const maxId = all.reduce((max, u) => Math.max(max, Number(u.id) || 0), 0);
     return (maxId || 0) + 1;
   };
 
-  // handlers
   const setField = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
   const onBlurRun = () => {
@@ -204,7 +197,6 @@ export default function RegistroPage() {
   };
 
   const onChangeRegion = (value) => {
-    // si cambias región, resetea comuna si ya no pertenece
     setForm((f) => ({
       ...f,
       region: value,
@@ -258,7 +250,6 @@ export default function RegistroPage() {
     localStorage.setItem("pm_registeredUsers", JSON.stringify(list));
 
     setStatus({ text: "¡Registro completado! Ya puedes iniciar sesión.", error: false });
-    // reset
     setForm({
       nombre: "",
       apellido: "",

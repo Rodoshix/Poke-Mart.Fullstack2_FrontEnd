@@ -66,7 +66,7 @@ export default function ProductDetailPage() {
   const [mainSrc, setMainSrc] = useState(gallery[0]);
   useEffect(() => setMainSrc(gallery[0]), [gallery]);
 
-  // Stock disponible (NO mutar product.stock)
+  // Stock disponible
   const computeAvailable = (p) =>
     getAvailableStock(String(p?.id ?? ""), Number(p?.stock ?? 0));
 

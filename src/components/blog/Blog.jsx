@@ -1,6 +1,6 @@
 // src/components/blog/Blog.jsx
 import { useEffect, useMemo, useState } from "react";
-import blogsData from "@/data/blogs.json"; // ajusta si tu JSON está en otra ruta
+import blogsData from "@/data/blogs.json";
 import { Link } from "react-router-dom";
 
 const FALLBACK_IMG = "https://placehold.co/600x400?text=Blog";
@@ -11,11 +11,10 @@ const resolveImg = (path) => {
   if (!p) return FALLBACK_IMG;
   if (/^https?:\/\//i.test(p)) return p;
   p = p.replace(/^(?:\.\/|\.\.\/)+/, "").replace(/^\/+/, "");
-  // Ej: src/assets/tienda/..., assets/...
   if (/^src\/assets\//i.test(p)) return `/${p}`;
   const i = p.indexOf("assets/");
   if (i !== -1) return `/${p.slice(i)}`;
-  return `/${p}`; // último recurso
+  return `/${p}`;
 };
 
 const fmt = (iso) => {
@@ -42,7 +41,6 @@ const escapeHtml = (str = "") =>
   })[ch] || ch);
 
 export default function Blog() {
-  // En vez de fetch, usamos el JSON importado (como hicimos en otras páginas)
   const blogs = useMemo(() => (Array.isArray(blogsData) ? blogsData : []), []);
 
   const [items, setItems] = useState([]);
@@ -64,7 +62,6 @@ export default function Blog() {
         const date = blog.fecha ? `Publicado ${fmt(blog.fecha)}` : "";
         const categoria = blog.categoria ? ` | ${blog.categoria}` : "";
         const img = resolveImg(blog.imagen);
-        // Ruta sugerida para detalle: /blog/:id (si aún no existe, este Link puede llevar a "#")
         const detailHref = `/blog/${encodeURIComponent(blog.id)}`;
 
         return (
@@ -86,7 +83,6 @@ export default function Blog() {
               <p className="blog-card__excerpt">
                 {escapeHtml(blog.descripcion || "Pronto más detalles…")}
               </p>
-              {/* Cambia a <a href={detailHref}> si aún no tienes Route de detalle */}
               <Link className="blog-card__link" to={detailHref}>
                 Leer más
               </Link>

@@ -22,7 +22,6 @@ export default function ContactoPage() {
     return () => document.body.classList.remove("page--contacto");
   }, []);
 
-  // helpers
   const emailError = useMemo(() => {
     const v = email.trim();
     if (!v) return "";
@@ -49,7 +48,6 @@ export default function ContactoPage() {
   );
 
   useEffect(() => {
-    // muestra ayuda en vivo similar al JS original
     if (nameError) setStatus({ text: nameError, error: true });
     else if (messageError) setStatus({ text: messageError, error: true });
     else if (emailError) setStatus({ text: emailError, error: true });

@@ -11,7 +11,6 @@ export default function BlogPage() {
 
   return (
     <>
-      {/* Fondos laterales como en el HTML original */}
       <img
         src="/src/assets/img/background-logo.png"
         className="left-border"
@@ -37,8 +36,6 @@ export default function BlogPage() {
             Consejos y relatos para acompañar tu aventura Poké&nbsp;Mart.
           </p>
         </header>
-
-        {/* Aquí va tu componente que lista los posts */}
         <Blog />
       </main>
     </>

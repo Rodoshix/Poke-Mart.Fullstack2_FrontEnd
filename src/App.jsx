@@ -12,6 +12,7 @@ import ContactoPage from "@/pages/tienda/ContactoPage.jsx";
 import RegistroPage from "@/pages/tienda/RegistroPage.jsx";
 import BlogPage from "@/pages/tienda/BlogPage.jsx";
 import BlogDetailPage from "./pages/tienda/BlogDetailPage.jsx";
+import OffersPage from "@/pages/tienda/OffersPage.jsx";
 
 const ReviewsPage = () => <h1 className="h3">Reseñas</h1>;
 const NotFound    = () => <div className="text-center"><h1 className="display-4">404</h1></div>;
@@ -34,6 +35,8 @@ export default () => (
         <Route path="*" element={<Navigate to="/404" replace />} />
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/blog/:id" element={<BlogDetailPage />} />
+        <Route path="/ofertas" element={<OffersPage />} />
+        
       </Routes>
     </main>
     <Footer />

@@ -28,7 +28,6 @@ body { font-family: 'Roboto', sans-serif; }
   width: 100%; aspect-ratio: 4/3; object-fit: contain; background: #f6f8fb; border-radius: .5rem;
 }
 
-/* Reviews */
 .reviews-summary__avg { line-height: 1; }
 .reviews-summary__stars { font-size: 1.25rem; color: #f7b500; }
 .reviews-bars .bar { display: flex; align-items: center; gap: .5rem; margin: .35rem 0; }
@@ -41,7 +40,6 @@ body { font-family: 'Roboto', sans-serif; }
 .reviews-list .review__meta { font-size: .85rem; color: #6c757d; }
 .review__help { font-size: .85rem; color: #6c757d; user-select: none; }
 
-/* Bordes decorativos */
 .left-border,
 .right-border{
   position: fixed;
@@ -55,7 +53,6 @@ body { font-family: 'Roboto', sans-serif; }
 .left-border { left: 0; }
 .right-border{ right: 0; transform: scaleX(-1); }
 
-/* Empuje lateral para no tapar contenido */
 .site-main{
   padding-left:  calc(clamp(72px, 11vw, 220px) + 16px);
   padding-right: calc(clamp(72px, 11vw, 220px) + 16px);
