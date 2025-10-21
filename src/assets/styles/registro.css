@@ -1,0 +1,184 @@
+.page--registro {
+  font-family: 'Roboto', sans-serif;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background-image: url("https://i.pinimg.com/originals/76/cc/71/76cc71fb45866a23a21ba5124743da4e.gif");
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: scroll;
+}
+
+.registro {
+  width: min(760px, 100%);
+}
+
+.registro__wrapper {
+  background: rgba(15, 23, 42, 0.28);
+  backdrop-filter: blur(18px);
+  border-radius: 28px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.32);
+  padding: clamp(1.75rem, 4vw, 2.85rem);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #f7f9ff;
+}
+
+.registro__header {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.registro__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.1rem;
+}
+
+.registro__logo {
+  width: 52px;
+  height: 52px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px;
+}
+
+.registro__empresa {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.registro__title {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  font-size: clamp(1.6rem, 4vw, 2.3rem);
+}
+
+.registro__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.registro__row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.registro__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.registro__label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(247, 249, 255, 0.8);
+}
+
+.registro__input {
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.18);
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+  color: #f7f9ff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.registro__input::placeholder {
+  color: rgba(247, 249, 255, 0.6);
+}
+
+.registro__input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(79, 128, 255, 0.7);
+  box-shadow: 0 0 0 4px rgba(79, 128, 255, 0.3);
+}
+
+.registro__input--select {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, rgba(247,249,255,0.8) 50%), linear-gradient(135deg, rgba(247,249,255,0.8) 50%, transparent 50%);
+  background-position: calc(100% - 18px) calc(50% - 4px),calc(100% - 12px) calc(50% - 4px);
+  background-size: 6px 6px; 
+  background-repeat: no-repeat;
+  color: #f7f9ff;
+  }
+
+.registro__input--select option {
+  color: #1a1f36;
+  background: #ffffff;
+}
+
+.registro__btn {
+  align-self: center;
+  width: min(280px, 100%);
+  border-radius: 999px;
+  padding: 0.95rem 2.5rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  background: linear-gradient(135deg, #3366ff, #5f8dff);
+  border: none;
+  color: #ffffff;
+  box-shadow: 0 16px 32px rgba(51, 102, 255, 0.35);
+}
+
+.registro__btn:hover,
+.registro__btn:focus {
+  box-shadow: 0 20px 40px rgba(51, 102, 255, 0.45);
+}
+
+.registro__footer {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.registro__hint {
+  color: rgba(247, 249, 255, 0.85);
+  margin: 0;
+}
+
+.registro__link {
+  color: #84a9ff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.registro__link:hover { text-decoration: underline; }
+
+@media (max-width: 768px) {
+  .registro__row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 576px) {
+  .page--registro {
+    padding: 2rem 0.75rem;
+  }
+
+  .registro__wrapper {
+    border-radius: 22px;
+    padding: 1.75rem;
+  }
+}
+
+.registro__status {  
+  min-height: 1.5rem;
+  font-size: 0.95rem;
+  color: #6ef2b8;
+  font-weight: 500;
+  margin: 0;
+}
+
+.registro__status--error {
+  color: #f9a8d4;
+}

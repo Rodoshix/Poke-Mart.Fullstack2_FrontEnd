@@ -3,7 +3,6 @@ const AUTH_KEY = "pm_session";
 const PROFILE_KEY = "pm_session_profile";
 const SESSION_DURATION = 60 * 60 * 1000; // 1 hora
 
-// Evento global para que otros componentes reaccionen (mismo tab)
 const emitAuthChange = () => {
   try {
     window.dispatchEvent(new Event("pm:authchange"));
