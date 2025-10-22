@@ -1,0 +1,136 @@
+/* Página */
+.page--checkout {
+  background: #f6f8fb;
+  font-family: 'Roboto', system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif;
+}
+
+/* Cards */
+.page--checkout .card {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+}
+
+.page--checkout .card-body {
+  padding: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+/* Títulos y barras superiores */
+.page--checkout .h4,
+.page--checkout .h5,
+.page--checkout .h6 {
+  letter-spacing: .02em;
+}
+
+/* Tabla del resumen */
+.page--checkout .table {
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+
+.page--checkout thead.table-light th {
+  background: #ffffff !important;
+  border-bottom-color: rgba(15, 23, 42, 0.08) !important;
+}
+
+.page--checkout .table td,
+.page--checkout .table th {
+  border-color: rgba(15, 23, 42, 0.06);
+}
+
+.page--checkout tfoot td {
+  background: #fff;
+}
+
+.page--checkout tfoot tr:last-child td {
+  border-top-width: 2px;
+  border-top-color: rgba(15, 23, 42, 0.12);
+}
+
+/* Imagen del item */
+.page--checkout img[alt] {
+  background: #f6f8fb;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 8px;
+}
+
+/* Formularios */
+.page--checkout .form-label {
+  font-weight: 600;
+  font-size: .95rem;
+}
+
+.page--checkout .form-control,
+.page--checkout .form-select,
+.page--checkout textarea {
+  border-radius: 12px;
+  border-color: rgba(15, 23, 42, 0.15);
+  background: #fff;
+  transition: box-shadow .2s ease, border-color .2s ease;
+}
+
+.page--checkout .form-control:focus,
+.page--checkout .form-select:focus,
+.page--checkout textarea:focus {
+  border-color: #6ea8fe; /* tono bootstrap primary focus */
+  box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.15);
+}
+
+/* Textos secundarios */
+.page--checkout .text-secondary {
+  color: rgba(26, 31, 54, .7) !important;
+}
+
+/* Badge del total */
+.page--checkout .badge.text-bg-primary {
+  padding: .5rem .75rem;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+/* Botones */
+.page--checkout .btn-success {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 12px 24px rgba(22, 163, 74, .25);
+}
+
+.page--checkout .btn-success:hover,
+.page--checkout .btn-success:focus {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  box-shadow: 0 16px 28px rgba(22, 163, 74, .32);
+}
+
+.page--checkout .btn-outline-secondary {
+  border-radius: 12px;
+}
+
+/* Alerts */
+.page--checkout .alert {
+  border-radius: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+/* Espaciados entre secciones */
+.page--checkout .row.g-4 > * {
+  scroll-margin-top: 88px;
+}
+
+/* Responsive afinado */
+@media (max-width: 991.98px) {
+  .page--checkout .card {
+    border-radius: 14px;
+    box-shadow: 0 14px 30px rgba(15, 23, 42, .08);
+  }
+}
+
+@media (max-width: 575.98px) {
+  .page--checkout .card-body {
+    padding: 1rem;
+  }
+
+  .page--checkout .badge.text-bg-primary {
+    font-size: .95rem;
+  }
+}

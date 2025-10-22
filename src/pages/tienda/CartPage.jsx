@@ -239,7 +239,7 @@ export default function CartPage() {
                 id="goCheckout"
                 className="btn btn-primary w-100 mt-3"
                 disabled={!totalItems}
-                onClick={() => alert("Proceso de compra disponible en la siguiente fase del proyecto.")}
+                onClick={() => navigate("/compra")}
               >
                 Confirmar compra
               </button>
