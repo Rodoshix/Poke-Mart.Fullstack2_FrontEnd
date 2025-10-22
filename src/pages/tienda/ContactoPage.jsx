@@ -5,6 +5,7 @@ import "@/assets/styles/contacto.css";
 import ContactForm from "@/components/contact/ContactForm";
 import ContactMap from "@/components/contact/ContactMap";
 import ContactInfoCard from "@/components/contact/ContactInfoCard";
+import PageBorders from "@/components/layout/PageBorders";
 
 const BG = "/src/assets/img/background-logo.png";
 
@@ -16,9 +17,7 @@ export default function ContactoPage() {
 
   return (
     <>
-      {/* Bordes laterales */}
-      <img src={BG} className="left-border" alt="" aria-hidden="true" decoding="async" loading="lazy" />
-      <img src={BG} className="right-border" alt="" aria-hidden="true" decoding="async" loading="lazy" />
+      <PageBorders />
 
       <main className="contacto-main container py-5">
         <div className="row g-5 align-items-center contacto-hero">

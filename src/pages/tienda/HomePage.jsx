@@ -6,6 +6,7 @@ import "@/assets/styles/home.css";
 
 import { HeroCarousel } from "@/components/home/HeroCarousel.jsx";
 import { ProductCard } from "@/components/catalog/ProductCard.jsx";
+import PageBorders from "@/components/layout/PageBorders";
 
 const pickFeatured = (data) => {
   const pokeballs = data.filter(p => p.categoria === "Poké Balls").slice(0, 2);
@@ -41,9 +42,7 @@ const HomePage = () => {
 
   return (
     <main className="site-main">
-      <img src={leftBorder} className="left-border" alt="" aria-hidden="true" decoding="async" loading="lazy" />
-      <img src={rightBorder} className="right-border" alt="" aria-hidden="true" decoding="async" loading="lazy" />
-
+      <PageBorders />
       <section className="hero container py-5">
         <div className="row align-items-center g-4">
           <div className="hero__content col-12 col-lg-6">

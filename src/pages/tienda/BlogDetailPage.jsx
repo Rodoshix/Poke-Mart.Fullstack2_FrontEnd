@@ -8,6 +8,7 @@ import BlogMeta from "@/components/blog/BlogMeta";
 import BlogTags from "@/components/blog/BlogTags";
 import BlogActions from "@/components/blog/BlogActions";
 import { useBlogById } from "@/hooks/useBlogById";
+import PageBorders from "@/components/layout/PageBorders";
 
 const BG_SIDE = "/src/assets/img/background-logo.png";
 
@@ -34,8 +35,7 @@ export default function BlogDetailPage() {
 
   return (
     <>
-      <img src={BG_SIDE} className="left-border" alt="" aria-hidden="true" />
-      <img src={BG_SIDE} className="right-border" alt="" aria-hidden="true" />
+      <PageBorders />
 
       <main className="site-main blog-detail container py-5">
         <BlogBreadcrumb title={blog?.titulo || "Detalle"} />

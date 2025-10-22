@@ -6,6 +6,7 @@ import { useCatalog } from "@/hooks/useCatalog";
 import CatalogHeader from "@/components/catalog/CatalogHeader.jsx";
 import ProductsGrid from "@/components/catalog/ProductsGrid.jsx";
 import Pagination from "@/components/catalog/Pagination.jsx";
+import PageBorders from "@/components/layout/PageBorders";
 
 const PAGE_SIZE = 12;
 
@@ -26,8 +27,7 @@ export default function CatalogPage() {
 
   return (
     <>
-      <img src="/src/assets/img/background-logo.png" className="left-border" alt="" aria-hidden="true" decoding="async" loading="lazy" />
-      <img src="/src/assets/img/background-logo.png" className="right-border" alt="" aria-hidden="true" decoding="async" loading="lazy" />
+      <PageBorders />
 
       <CatalogHeader
         q={q}
