@@ -2,7 +2,7 @@
 // src/components/offers/OfferCard.jsx
 import { Link } from "react-router-dom";
 import { money } from "@/utils/money";
-import { countdown } from "@/lib/offers";   // ⬅️ ahora desde lib
+import { countdown } from "@/lib/offers";
 
 const FALLBACK = "/src/assets/img/tienda/productos/poke-Ball.png";
 

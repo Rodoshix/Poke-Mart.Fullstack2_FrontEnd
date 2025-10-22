@@ -19,9 +19,6 @@ const HomePage = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const leftBorder  = "/src/assets/img/background-logo.png";
-  const rightBorder = "/src/assets/img/background-logo.png";
-
   const slides = useMemo(() => ([
     { src: "/src/assets/img/tienda/world/pokemon_galar_map.png",  alt: "Región de Galar para explorar" },
     { src: "/src/assets/img/tienda/world/Pokemon_sinnoh_map.png", alt: "Región de Sinnoh para explorar" },
