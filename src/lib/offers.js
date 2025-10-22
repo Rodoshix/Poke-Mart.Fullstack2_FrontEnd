@@ -34,10 +34,9 @@ export function getOfferInfo(p = {}, overlayById = null) {
   let pct = num(p.descuento ?? p.discountPct ?? p.discount);
   let endsAt = p.ofertaFin ?? p.ofertaHasta ?? p.saleEndsAt ?? p.endsAt ?? null;
 
-  // Soportar "precio comparativo"
+
   const compare = Math.max(num(p.precioAnterior ?? p.compareAtPrice ?? 0), basePrice);
 
-  // Overlay por ID
   const idKey = String(p.id ?? "");
   if (overlayById?.has(idKey)) {
     const ov = overlayById.get(idKey);
@@ -54,7 +53,6 @@ export function getOfferInfo(p = {}, overlayById = null) {
     const effectiveBase = Math.max(compare, basePrice);
     salePrice = Math.round(effectiveBase * (1 - pct / 100));
   } else if (compare > basePrice && basePrice > 0) {
-    // Oferta implícita (si manejaras precio comparativo mayor al actual)
     salePrice = basePrice;
     pct = Math.round((1 - salePrice / compare) * 100);
   }

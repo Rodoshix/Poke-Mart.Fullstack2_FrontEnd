@@ -1,12 +1,9 @@
 // src/pages/tienda/OffersPage.jsx
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-
-import productsData from "@/data/productos.json";
-import offersData from "@/data/ofertas.json"; // overlay de campañas
+import products from "@/data/productos.json";
+import offers from "@/data/ofertas.json";
 import * as cartStore from "@/lib/cartStore";
-import { getOfferInfo } from "@/lib/offers";
-
 import "@/assets/styles/ofertas.css";
 
 const FALLBACK = "/src/assets/img/tienda/productos/poke-Ball.png";
@@ -25,14 +22,40 @@ const resolveImg = (path) => {
 };
 
 const money = (v) =>
-  new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP" }).format(v ?? 0);
+  new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 }).format(v ?? 0);
 
-const badge = (pct) =>
-  pct >= 5 ? (
-    <span className="offer-badge" aria-label={`Descuento ${pct}%`}>-{pct}%</span>
-  ) : null;
+const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
-const formatCountdown = (ms) => {
+function computeOffer(product, overlayById) {
+  const o = overlayById.get(String(product.id));
+  if (!o || !(Number(o.discountPct) > 0)) {
+    return { onSale: false, basePrice: Number(product.precio) || 0, price: Number(product.precio) || 0, discountPct: 0, endsAt: null, expiresInMs: null };
+  }
+  const now = Date.now();
+  const startsAt = o.startsAt ? Date.parse(String(o.startsAt).trim()) : NaN;
+  const endsAt = o.endsAt ? Date.parse(String(o.endsAt).trim()) : NaN;
+
+  const started = Number.isNaN(startsAt) ? true : now >= startsAt;
+  const notEnded = Number.isNaN(endsAt) ? true : now <= endsAt;
+
+  const active = started && notEnded;
+  const base = Number(product.precio) || 0;
+  const pct = clamp(Number(o.discountPct) || 0, 0, 95);
+  const price = active ? Math.round(base * (1 - pct / 100)) : base;
+
+  return {
+    onSale: active,
+    basePrice: base,
+    price,
+    discountPct: pct,
+    endsAt: Number.isNaN(endsAt) ? null : endsAt,
+    expiresInMs: Number.isNaN(endsAt) ? null : endsAt - now,
+  };
+}
+
+const badge = (pct) => (pct >= 5 ? <span className="offer-badge">-{pct}%</span> : null);
+
+const countdown = (ms) => {
   if (ms == null) return "";
   if (ms <= 0) return "Terminado";
   const s = Math.floor(ms / 1000);
@@ -48,56 +71,73 @@ export default function OffersPage() {
     return () => document.body.classList.remove("page--ofertas");
   }, []);
 
-  // Map de overlay por id
+  // índice de overlays por id
   const overlayById = useMemo(() => {
-    const list = Array.isArray(offersData) ? offersData : [];
+    const list = Array.isArray(offers) ? offers : [];
     return new Map(list.map((o) => [String(o.id), o]));
   }, []);
 
-  const allOffers = useMemo(() => {
-    const raw = Array.isArray(productsData) ? productsData : [];
+  // productos con oferta activa
+  const items = useMemo(() => {
+    const raw = Array.isArray(products) ? products : [];
     return raw
       .map((p) => {
-        const offer = getOfferInfo(p, overlayById);
-        const stock = Number(p.stock ?? 0);
+        const offer = computeOffer(p, overlayById);
         return {
           ...p,
-          stock,
           img: resolveImg(p.imagen),
+          stock: Number(p.stock ?? 0),
           offer,
         };
       })
-      .filter((p) => p.offer.onSale);
+      .filter((x) => x.offer.onSale);
   }, [overlayById]);
 
-  // Orden
-  const [sort, setSort] = useState("best");
+  const [sort, setSort] = useState("best"); // best | priceAsc | priceDesc | ending
   const sorted = useMemo(() => {
-    const copy = allOffers.slice();
-    if (sort === "priceAsc") copy.sort((a, b) => a.offer.price - b.offer.price);
-    else if (sort === "priceDesc") copy.sort((a, b) => b.offer.price - a.offer.price);
-    else if (sort === "ending") {
-      const val = (x) => (x.offer.expiresInMs == null ? Number.POSITIVE_INFINITY : x.offer.expiresInMs);
-      copy.sort((a, b) => val(a) - val(b));
-    } else {
-      copy.sort((a, b) => b.offer.discountPct - a.offer.discountPct);
+    const list = items.slice();
+    switch (sort) {
+      case "priceAsc":
+        list.sort((a, b) => a.offer.price - b.offer.price);
+        break;
+      case "priceDesc":
+        list.sort((a, b) => b.offer.price - a.offer.price);
+        break;
+      case "ending":
+        list.sort(
+          (a, b) =>
+            (a.offer.expiresInMs == null ? Number.POSITIVE_INFINITY : a.offer.expiresInMs) -
+            (b.offer.expiresInMs == null ? Number.POSITIVE_INFINITY : b.offer.expiresInMs)
+        );
+        break;
+      case "best":
+      default:
+        list.sort((a, b) => b.offer.discountPct - a.offer.discountPct);
     }
-    return copy;
-  }, [allOffers, sort]);
+    return list;
+  }, [items, sort]);
 
   const add = (p) => {
-    const max = cartStore.getAvailableStock(String(p.id), Number(p.stock ?? 0));
-    if (max <= 0) return;
+    const available = cartStore.getAvailableStock(String(p.id), Number(p.stock ?? 0));
+    if (available <= 0) return;
+    // Enviamos precio rebajado; la imagen la resolverá el catálogo en CartPage
+    const offerPrice = Number.isFinite(p.offer.price) ? p.offer.price : Number(p.precio ?? 0);
     cartStore.addItem(
       {
         id: p.id,
         nombre: p.nombre,
-        precio: p.offer.price,
-        imagen: p.imagen,
-        stock: p.stock,
+        precio: offerPrice,
+        price: offerPrice,
+        _offer: {
+          base: Number(p.precio ?? 0),
+          price: offerPrice,
+          discountPct: p.offer.discountPct,
+          endsAt: p.offer.endsAt,
+        },
       },
       1
     );
+    window.dispatchEvent(new Event("cart:updated"));
   };
 
   if (!sorted.length) {
@@ -117,7 +157,7 @@ export default function OffersPage() {
       <header className="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
         <h1 className="h3 m-0">Ofertas</h1>
         <div className="d-flex align-items-center gap-2">
-          <label htmlFor="sort" className="form-label m-0 me-1">
+          <label className="form-label m-0 me-1" htmlFor="sort">
             Ordenar por
           </label>
           <select
@@ -137,13 +177,7 @@ export default function OffersPage() {
 
       <section className="row g-3">
         {sorted.map((p) => {
-          const endsLabel =
-            p.offer.endsAt && p.offer.expiresInMs != null
-              ? `Termina en ${formatCountdown(p.offer.expiresInMs)}`
-              : "";
-
           const out = p.stock <= 0;
-
           return (
             <div key={p.id} className="col-6 col-md-4 col-lg-3">
               <article className="offer-card h-100">
@@ -167,8 +201,8 @@ export default function OffersPage() {
                     <span className="offer-card__base">{money(p.offer.basePrice)}</span>
                   </div>
 
-                  {endsLabel ? (
-                    <div className="offer-card__ends text-secondary small">{endsLabel}</div>
+                  {p.offer.expiresInMs != null ? (
+                    <div className="offer-card__ends text-secondary small">Termina en {countdown(p.offer.expiresInMs)}</div>
                   ) : null}
 
                   <button
@@ -180,11 +214,7 @@ export default function OffersPage() {
                     {out ? "Sin stock" : "Añadir"}
                   </button>
 
-                  <Link
-                    className="offer-card__link"
-                    to={`/producto/${encodeURIComponent(p.id)}`}
-                    aria-label={`Ver detalle de ${p.nombre}`}
-                  >
+                  <Link className="offer-card__link" to={`/producto/${p.id}`}>
                     Ver detalle
                   </Link>
                 </div>

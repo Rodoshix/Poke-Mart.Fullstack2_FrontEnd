@@ -61,12 +61,14 @@ export default function CartPage() {
     const enriched = cart.map((item) => {
       const id = String(item.id);
       const prod = catalog.get(id) || null;
-      const price = Number(prod?.precio ?? item.price ?? 0);
+
+      const price = Number(item.price ?? prod?.precio ?? 0);
+
       const stock = Number(prod?.stock ?? item.stock ?? item.qty ?? 0);
       const name = prod?.nombre ?? item.name ?? "Producto";
       const image = resolveImg(prod?.imagen ?? item.image ?? FALLBACK_IMAGE);
       const descripcion = prod?.descripcion ?? "";
-      return { id, qty: Number(item.qty ?? 0), price, stock, name, image, descripcion, product: prod };
+      return { id, qty: Number(item.qty ?? 0), price, stock, name, image, descripcion, product: prod, _offer: item._offer ?? null };
     });
     setItems(enriched);
   };
@@ -148,6 +150,12 @@ export default function CartPage() {
                       <div className="cart-item__title">{item.name}</div>
                       <div className="text-primary fw-semibold">{money(item.price)}</div>
                       <div className="cart-item__meta">Stock disponible: {max}</div>
+                      {item._offer && (
+                        <div className="small text-success">
+                          Oferta aplicada: <del className="text-muted me-1">{money(item._offer.base)}</del>
+                          {money(item._offer.price)} (-{item._offer.discountPct}%)
+                        </div>
+                      )}
                     </div>
 
                     <div className="cart-item__price">
