@@ -1,4 +1,5 @@
-// src/components/ui/HeroCarousel.jsx
+// usado por HomePage.jsx
+// src/components/home/HeroCarousel.jsx
 import { useEffect, useRef } from "react";
 import Carousel from "bootstrap/js/dist/carousel";
 

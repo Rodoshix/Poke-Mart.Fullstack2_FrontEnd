@@ -1,4 +1,4 @@
-// usado en CatalogPage.jsx
+// usado en CatalogPage.jsx y HomePage.jsx
 // src/components/catalog/ProductCard.jsx
 import { Link } from "react-router-dom";
 import { resolveImg } from "@/utils/resolveImg";

@@ -1,9 +1,10 @@
 // src/pages/HomePage.jsx
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import productsData from "@/data/productos.json";
 import "@/assets/styles/home.css";
 
-import { HeroCarousel } from "@/components/ui/HeroCarousel.jsx";
+import { HeroCarousel } from "@/components/home/HeroCarousel.jsx";
 import { ProductCard } from "@/components/catalog/ProductCard.jsx";
 
 const pickFeatured = (data) => {
@@ -52,7 +53,7 @@ const HomePage = () => {
             <p className="hero__subtitle lead">
               Equípate para tu aventura: Poké Balls, curación, ropa, transporte, expedición y tecnología.
             </p>
-            <a className="hero__cta btn btn-primary btn-lg" href="/catalogo">Ver productos</a>
+            <Link className="hero__cta btn btn-primary btn-lg" to="/catalogo">Ver productos</Link>
           </div>
 
           <div className="hero__media col-12 col-lg-6">
@@ -64,7 +65,7 @@ const HomePage = () => {
       <section className="product-grid container py-5">
         <header className="product-grid__header d-flex justify-content-between align-items-center mb-4">
           <h2 className="product-grid__title h3 m-0">Productos destacados</h2>
-          <a className="product-grid__more btn btn-outline-secondary btn-sm" href="/catalogo">Ver todo</a>
+          <Link className="product-grid__more btn btn-outline-secondary btn-sm" to="/catalogo">Ver todo</Link>
         </header>
 
         <div className="product-grid__list row g-4" aria-live="polite">

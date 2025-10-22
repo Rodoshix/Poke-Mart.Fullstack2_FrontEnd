@@ -1,3 +1,4 @@
+// usado por HomePage.jsx y ProductPage.jsx
 // src/components/catalog/RelatedProducts.jsx
 import { ProductCard } from "@/components/catalog/ProductCard.jsx";
 
