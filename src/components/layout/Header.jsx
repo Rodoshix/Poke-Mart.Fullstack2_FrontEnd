@@ -85,6 +85,9 @@ export const Header = () => {
                 <NavLink className="site-nav__link nav-link" to="/catalogo">Productos</NavLink>
               </li>
               <li className="site-nav__item nav-item">
+                <NavLink className="site-nav__link nav-link" to="/categoria">Categoria</NavLink>
+              </li>
+              <li className="site-nav__item nav-item">
                 <NavLink className="site-nav__link nav-link" to="/ofertas">Ofertas</NavLink>
               </li>
               <li className="site-nav__item nav-item">
