@@ -38,6 +38,8 @@ export default function CatalogPage() {
         onClear={clearFilters}
       />
 
+      <div>.</div> {/* espacio */}
+
       <main className="site-main products container pb-5 flex-grow-1">
         <ProductsGrid items={items} />
 
