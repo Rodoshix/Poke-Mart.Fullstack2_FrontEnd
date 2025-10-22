@@ -14,6 +14,7 @@ import BlogPage from "@/pages/tienda/BlogPage.jsx";
 import BlogDetailPage from "./pages/tienda/BlogDetailPage.jsx";
 import OffersPage from "@/pages/tienda/OffersPage.jsx";
 import CheckoutPage from "@/pages/tienda/CheckoutPage";
+import CategoriaPage from "@/pages/tienda/CategoriaPage.jsx";
 
 const ReviewsPage = () => <h1 className="h3">Reseñas</h1>;
 const NotFound    = () => <div className="text-center"><h1 className="display-4">404</h1></div>;
@@ -38,7 +39,8 @@ export default () => (
         <Route path="/blog/:id" element={<BlogDetailPage />} />
         <Route path="/ofertas" element={<OffersPage />} />
         <Route path="/compra" element={<CheckoutPage />} />
-        
+        <Route path="/categoria" element={<CategoriaPage />} />
+        <Route path="/categoria/:slug" element={<CategoriaPage />} />
       </Routes>
     </main>
     <Footer />

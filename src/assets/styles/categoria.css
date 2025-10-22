@@ -1,0 +1,186 @@
+/***** CategoriaPage – facelift *****/
+.page--catalog {
+  --pm-surface: #fff;
+  --pm-border: rgba(16,24,40,.08);
+  --pm-border-strong: rgba(16,24,40,.14);
+  --pm-muted: #6c757d;
+  --pm-shadow-sm: 0 4px 14px rgba(16,24,40,.06);
+  --pm-shadow-lg: 0 12px 32px rgba(16,24,40,.10);
+}
+
+/* Migas */
+.page--catalog .breadcrumb {
+  --bs-breadcrumb-divider-color: var(--pm-muted);
+  color: var(--pm-muted);
+}
+.page--catalog .breadcrumb a {
+  text-decoration: none;
+}
+.page--catalog .breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+/* ===== Sidebar ===== */
+.page--catalog .category-sidebar {
+  background: var(--pm-surface);
+  border: 1px solid var(--pm-border);
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: var(--pm-shadow-sm);
+  position: sticky;
+  top: 88px; /* debajo del header */
+}
+@media (max-width: 991.98px) {
+  .page--catalog .category-sidebar { position: static; }
+}
+
+.page--catalog .category-sidebar .list-group { gap: 2px; }
+.page--catalog .category-sidebar label {
+  cursor: pointer;
+  border-radius: 10px;
+  padding: 6px 8px;
+  transition: background .15s ease;
+}
+.page--catalog .category-sidebar label:hover {
+  background: rgba(16,24,40,.03);
+}
+
+/* radios bonitos */
+.page--catalog .category-sidebar input[type="radio"]{
+  appearance: none;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--pm-border-strong);
+  display: inline-grid; place-content: center;
+  transition: all .15s ease;
+}
+.page--catalog .category-sidebar input[type="radio"]::after{
+  content:"";
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  transform: scale(0);
+  transition: transform .15s ease;
+  background: var(--bs-primary);
+}
+.page--catalog .category-sidebar input[type="radio"]:checked{
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 3px rgba(13,110,253,.12);
+}
+.page--catalog .category-sidebar input[type="radio"]:checked::after{
+  transform: scale(1);
+}
+
+/* "Ver Más" bonito */
+.page--catalog .category-sidebar details summary {
+  list-style: none;
+  cursor: pointer;
+  color: var(--bs-primary);
+  font-weight: 600;
+}
+.page--catalog .category-sidebar details summary::-webkit-details-marker{display:none;}
+.page--catalog .category-sidebar details[open] summary { opacity:.9; }
+
+/* Botón limpiar */
+.page--catalog .category-sidebar .btn {
+  border-radius: 12px;
+}
+
+/* ===== Toolbar Orden ===== */
+.page--catalog .dropdown .btn-outline-secondary {
+  border-color: var(--pm-border-strong);
+  border-radius: 12px;
+  background: var(--pm-surface);
+}
+.page--catalog .dropdown-menu {
+  border-radius: 12px;
+  box-shadow: var(--pm-shadow-lg);
+  border: 1px solid var(--pm-border);
+}
+.page--catalog .dropdown-item:hover {
+  background: rgba(13,110,253,.10);
+}
+
+/* Trends pill (decorativo) */
+.page--catalog .rounded-pill[disabled] {
+  opacity: 1;
+  background: #f8f9fa;
+  border-color: var(--pm-border);
+  box-shadow: inset 0 0 0 1px var(--pm-border);
+}
+
+/* ===== Grid & Cards ===== */
+
+/* Si tu ProductsGrid ya define grid, esto solo suaviza; si no, se aplicará */
+.page--catalog .products-grid,
+.page--catalog .catalog__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 16px;
+}
+
+.page--catalog .card {
+  border: 1px solid var(--pm-border);
+  border-radius: 16px;
+  box-shadow: var(--pm-shadow-sm);
+  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  background: var(--pm-surface);
+}
+.page--catalog .card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--pm-shadow-lg);
+  border-color: var(--pm-border-strong);
+}
+
+/* área de imagen consistente */
+.page--catalog .card img {
+  height: 120px;
+  object-fit: contain;
+  padding: 8px;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.05));
+}
+
+/* títulos y subtítulos */
+.page--catalog .card .card-title,
+.page--catalog .product-title {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: .15rem;
+}
+.page--catalog .card .product-category,
+.page--catalog .card small,
+.page--catalog .text-muted {
+  color: var(--pm-muted) !important;
+}
+
+/* precio destacado */
+.page--catalog .product-price,
+.page--catalog .card .text-primary {
+  color: var(--bs-primary) !important;
+  font-weight: 800;
+  letter-spacing: .1px;
+}
+
+/* ===== Paginación ===== */
+.page--catalog .pagination .page-link {
+  border-radius: 10px;
+  border: 1px solid var(--pm-border);
+  box-shadow: none;
+}
+.page--catalog .pagination .page-item.active .page-link{
+  background: var(--bs-primary);
+  border-color: var(--bs-primary);
+  color: #fff;
+}
+.page--catalog .pagination .page-link:hover{
+  background: rgba(13,110,253,.08);
+}
+
+/* ===== Pequeños ajustes responsive ===== */
+@media (max-width: 575.98px) {
+  .page--catalog .dropdown .btn-outline-secondary {
+    padding: .375rem .6rem;
+  }
+  .page--catalog .rounded-pill[disabled] {
+    display:none; /* espacio en móviles */
+  }
+}
