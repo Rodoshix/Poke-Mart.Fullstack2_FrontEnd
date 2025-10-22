@@ -1,3 +1,4 @@
+// usado por CheckoutPage.jsx
 // src/components/checkout/CheckoutAddressForm.jsx
 import { REGIONES } from "@/data/regiones";
 

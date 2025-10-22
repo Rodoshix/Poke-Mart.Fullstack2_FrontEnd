@@ -1,3 +1,4 @@
+// usado por CheckoutPage.jsx
 // src/components/checkout/PaymentModal.jsx
 export default function PaymentModal({
   open, status, orderId, email, errors = [],

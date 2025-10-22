@@ -1,3 +1,4 @@
+// usado por CheckoutPage.jsx
 // src/components/checkout/OrderSummaryTable.jsx
 import { money } from "@/utils/money";
 
