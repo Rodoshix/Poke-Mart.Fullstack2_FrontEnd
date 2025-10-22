@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import "@/assets/styles/blog.css";
 import Blog from "@/components/blog/Blog.jsx";
+import PageBorders from "@/components/layout/PageBorders";
 
 export default function BlogPage() {
   useEffect(() => {
@@ -11,8 +12,7 @@ export default function BlogPage() {
 
   return (
     <>
-      <img src="/src/assets/img/background-logo.png" className="left-border"alt=""aria-hidden="true"decoding="async"loading="lazy"/>
-      <img src="/src/assets/img/background-logo.png"className="right-border"alt=""aria-hidden="true"decoding="async"loading="lazy"/>
+      <PageBorders />
 
       <main className="site-main blog-main container py-5">
         <header className="blog-hero text-center mb-5">

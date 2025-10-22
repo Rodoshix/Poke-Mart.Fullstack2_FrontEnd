@@ -143,7 +143,7 @@
     "nombre": "Master Ball",
     "categoria": "Poké Balls",
     "precio": 1000,
-    "stock": 1,
+    "stock": 2,
     "imagen": "src/assets/img/tienda/productos/master-ball.png",
     "descripcion": "La Master Ball es el objeto más codiciado por entrenadores de todo el mundo, conocida por su capacidad de captura infalible. No importa cuán fuerte, raro o esquivo sea el Pokémon, esta esfera garantiza el éxito absoluto. Su diseño en tonos púrpura y detalles brillantes la convierte en un símbolo de poder y prestigio. Dada su rareza extrema, se utiliza únicamente en situaciones decisivas, cuando no existe margen para fallar. Más que un objeto, la Master Ball es un legado de confianza que representa el máximo logro de la tecnología en el universo Pokémon."
   },
