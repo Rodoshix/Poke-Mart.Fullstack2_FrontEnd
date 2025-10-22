@@ -1,4 +1,4 @@
-// hook usado en BlogDetailPage
+// hook usado en BlogDetailPage.jsx
 // src/hooks/useBlogById.js
 import { useEffect, useMemo, useState } from "react";
 import blogsData from "@/data/blogs.json";

@@ -1,4 +1,4 @@
-// usado en BlogDetailPage
+// usado en BlogDetailPage.jsx
 // src/components/blog/BlogActions.jsx
 import { Link } from "react-router-dom";
 
