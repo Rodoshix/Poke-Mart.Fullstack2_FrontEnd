@@ -35,7 +35,6 @@ export default function CheckoutAddressForm({ form, setField }) {
             <input className="form-control" placeholder="Ej: 603" value={form.departamento} onChange={(e) => setField("departamento", e.target.value)} />
           </div>
 
-          {/* Inputs libres, como en tu diseño original */}
           <div className="col-md-6">
             <label className="form-label">Región*</label>
             <input className="form-control" placeholder="Ej: Kanto" value={form.region} onChange={(e) => setField("region", e.target.value)} />

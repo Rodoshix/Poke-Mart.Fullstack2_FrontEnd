@@ -13,14 +13,13 @@ export default function CartPage() {
   const navigate = useNavigate();
   const { items, totals, shippingConfig, actions } = useCartViewModel();
 
-  // Guardia de sesión (igual que tu código)
+  // Guardia de sesión
   useEffect(() => {
     const s = getAuth();
     const p = getProfile();
     if (!s || !p) navigate("/", { replace: true });
   }, [navigate]);
 
-  // Body class
   useEffect(() => {
     document.body.classList.add("page--carrito");
     return () => document.body.classList.remove("page--carrito");
