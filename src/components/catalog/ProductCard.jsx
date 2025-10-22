@@ -1,36 +1,21 @@
+// usado en CatalogPage.jsx
 // src/components/catalog/ProductCard.jsx
 import { Link } from "react-router-dom";
+import { resolveImg } from "@/utils/resolveImg";
+import { money } from "@/utils/money";
 
 const PLACEHOLDER = "/src/assets/img/tienda/productos/poke-Ball.png";
-const resolveImg = (path) => {
-  let clean = String(path ?? "").trim();
-  if (!clean) return PLACEHOLDER;
-  if (/^https?:\/\//i.test(clean)) return clean;
-
-  clean = clean.replace(/^(?:\.\/|\.\.\/)+/, "").replace(/^\/+/, "");
-  if (/^src\/assets\//.test(clean)) return `/${clean}`;
-
-  if (/^(tienda|img|assets\/img)\//.test(clean)) {
-    clean = `src/assets/${clean.replace(/^assets\//, "")}`;
-    return `/${clean}`;
-  }
-
-  return `/src/assets/img/${clean}`;
-};
 
 export const ProductCard = ({ product }) => {
   const href = `/producto/${encodeURIComponent(product.id)}`;
+  const img = resolveImg(product.imagen);
 
   return (
     <article className="product-card card h-100">
-      <Link
-        className="product-card__media text-center p-3"
-        to={href}
-        aria-label={`Ver ${product.nombre}`}
-      >
+      <Link className="product-card__media text-center p-3" to={href} aria-label={`Ver ${product.nombre}`}>
         <img
           className="product-card__img card-img-top img-fluid"
-          src={resolveImg(product.imagen)}
+          src={img}
           alt={product.nombre}
           onError={(e) => (e.currentTarget.src = PLACEHOLDER)}
         />
@@ -43,13 +28,11 @@ export const ProductCard = ({ product }) => {
           </Link>
         </h3>
 
-        <div className="text-muted small mb-2">
-          {product.categoria ?? "—"}
-        </div>
+        <div className="text-muted small mb-2">{product.categoria ?? "—"}</div>
 
         <div className="product-card__footer d-flex justify-content-between align-items-center mt-auto">
           <span className="product-card__price text-primary fw-semibold">
-            ${Number(product.precio ?? 0).toLocaleString("es-CL")}
+            {money(product.precio)}
           </span>
         </div>
       </div>
