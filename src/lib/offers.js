@@ -9,22 +9,16 @@ const pick = (obj, keys, def) => {
   return def;
 };
 
-/**
- * Calcula la oferta efectiva de un producto combinando:
- *  - datos base del producto (precio, precioOferta, descuento, ofertaFin, compareAtPrice)
- *  - overlay de campañas (salePrice, discountPct, endsAt) tomado desde ofertas.json
- *
- * @param {Object} p - producto base (de productos.json)
- * @param {Map<string, Object>} overlayById - Map por id con ofertas (de ofertas.json)
- * @returns {{
- *   onSale: boolean,
- *   price: number,           // precio final a cobrar (si hay oferta, el precio de oferta)
- *   basePrice: number,       // precio base/compare (para mostrar tachado si aplica)
- *   discountPct: number,     // porcentaje de descuento efectivo
- *   endsAt: string|null,     // fecha fin ISO si existe
- *   expiresInMs: number|null // ms restantes si hay endsAt
- * }}
- */
+export function countdown(ms) {
+  if (ms == null) return "";
+  if (ms <= 0) return "Terminado";
+  const s = Math.floor(ms / 1000);
+  const d = Math.floor(s / 86400);
+  const h = Math.floor((s % 86400) / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  return d > 0 ? `${d}d ${h}h` : `${h}h ${m}m`;
+}
+
 export function getOfferInfo(p = {}, overlayById = null) {
   const basePrice = num(
     pick(p, ["precio", "price", "precioBase", "precio_listado", "regularPrice"], 0)
@@ -33,7 +27,6 @@ export function getOfferInfo(p = {}, overlayById = null) {
   let salePrice = num(p.precioOferta ?? p.offerPrice ?? p.salePrice);
   let pct = num(p.descuento ?? p.discountPct ?? p.discount);
   let endsAt = p.ofertaFin ?? p.ofertaHasta ?? p.saleEndsAt ?? p.endsAt ?? null;
-
 
   const compare = Math.max(num(p.precioAnterior ?? p.compareAtPrice ?? 0), basePrice);
 
