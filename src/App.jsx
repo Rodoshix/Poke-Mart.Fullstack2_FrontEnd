@@ -1,0 +1,46 @@
+import { Routes, Route, Navigate } from "react-router-dom";
+import { Header } from "./components/layout/Header.jsx";
+import { Footer } from "./components/layout/Footer.jsx";
+
+import HomePage from "@/pages/tienda/HomePage.jsx";
+import CatalogPage from "@/pages/tienda/CatalogPage.jsx";
+import ProductDetailPage from "@/pages/tienda/ProductDetailPage.jsx";
+import LoginPage from "@/pages/tienda/LoginPage.jsx";
+import CartPage from "@/pages/tienda/CartPage.jsx";
+import NosotrosPage from "@/pages/tienda/NosotrosPage.jsx";
+import ContactoPage from "@/pages/tienda/ContactoPage.jsx";
+import RegistroPage from "@/pages/tienda/RegistroPage.jsx";
+import BlogPage from "@/pages/tienda/BlogPage.jsx";
+import BlogDetailPage from "./pages/tienda/BlogDetailPage.jsx";
+import OffersPage from "@/pages/tienda/OffersPage.jsx";
+import CheckoutPage from "@/pages/tienda/CheckoutPage";
+
+const ReviewsPage = () => <h1 className="h3">Reseñas</h1>;
+const NotFound    = () => <div className="text-center"><h1 className="display-4">404</h1></div>;
+
+export default () => (
+  <div className="d-flex flex-column min-vh-100 app-shell">
+    <Header cartCount={0} />
+    <main className="my-4 flex-grow-1 app-main">
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/catalogo" element={<CatalogPage />} />
+        <Route path="/producto/:id" element={<ProductDetailPage />} />
+        <Route path="/reseñas" element={<ReviewsPage />} />
+        <Route path="/carrito" element={<CartPage />} />
+        <Route path="/nosotros" element={<NosotrosPage />} />
+        <Route path="/contacto" element={<ContactoPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/registro" element={<RegistroPage />} />
+        <Route path="/404" element={<NotFound />} />
+        <Route path="*" element={<Navigate to="/404" replace />} />
+        <Route path="/blog" element={<BlogPage />} />
+        <Route path="/blog/:id" element={<BlogDetailPage />} />
+        <Route path="/ofertas" element={<OffersPage />} />
+        <Route path="/compra" element={<CheckoutPage />} />
+        
+      </Routes>
+    </main>
+    <Footer />
+  </div>
+);
