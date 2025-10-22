@@ -1,22 +1,41 @@
-// usado por HomePage.jsx
 // src/components/home/HeroCarousel.jsx
 import { useEffect, useRef } from "react";
 import Carousel from "bootstrap/js/dist/carousel";
 
 export const HeroCarousel = ({ slides = [], interval = 2500 }) => {
   const ref = useRef(null);
+  const instanceRef = useRef(null);
 
   useEffect(() => {
-    if (!ref.current) return;
-    const instance = Carousel.getOrCreateInstance(ref.current, {
-      interval,
-      ride: "carousel",
-      pause: false,
-      wrap: true,
-      touch: true,
-    });
-    return () => instance?.dispose();
-  }, [interval]);
+    const el = ref.current;
+    if (!el) return;
+
+    // si no hay items, no inicializamos
+    const hasItems = !!el.querySelector(".carousel-item");
+    if (!hasItems) return;
+
+    // evita reinstalar si ya existe
+    if (!instanceRef.current) {
+      try {
+        instanceRef.current = Carousel.getOrCreateInstance(el, {
+          interval,
+          ride: "carousel",
+          pause: false,
+          wrap: true,
+          touch: true,
+        });
+      } catch (e) {
+      }
+    }
+
+    return () => {
+      try {
+        instanceRef.current?.dispose();
+      } finally {
+        instanceRef.current = null;
+      }
+    };
+  }, [interval, slides.length]);
 
   return (
     <div

@@ -8,7 +8,6 @@ import { showCartGuardModal, CartGuardModal } from "@/components/auth/CartGuardM
 import { getCount } from "@/lib/cartStore";
 
 export const Header = () => {
-  const [q, setQ] = useState("");
   const [cartCount, setCartCount] = useState(() => {
     try {
       return getCount();
@@ -18,11 +17,6 @@ export const Header = () => {
   });
 
   const navigate = useNavigate();
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    navigate(`/catalogo?q=${encodeURIComponent(q)}`);
-  };
 
   const handleCartClick = (e) => {
     const auth = getAuth();
@@ -91,7 +85,7 @@ export const Header = () => {
                 <NavLink className="site-nav__link nav-link" to="/catalogo">Productos</NavLink>
               </li>
               <li className="site-nav__item nav-item">
-              <NavLink className="site-nav__link nav-link" to="/ofertas">Ofertas</NavLink>
+                <NavLink className="site-nav__link nav-link" to="/ofertas">Ofertas</NavLink>
               </li>
               <li className="site-nav__item nav-item">
                 <NavLink className="site-nav__link nav-link" to="/nosotros">Nosotros</NavLink>
@@ -104,18 +98,7 @@ export const Header = () => {
               </li>
             </ul>
 
-            <form className="d-none d-lg-flex me-3" onSubmit={handleSearch} role="search">
-              <input
-                className="form-control me-2"
-                type="search"
-                placeholder="Buscar ítem, MT…"
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                aria-label="Buscar"
-              />
-              <button className="btn btn-outline-primary" type="submit">Buscar</button>
-            </form>
-
+            {/* Acciones (sin buscador) */}
             <div className="site-nav__actions d-flex align-items-center gap-3">
               <AuthMenu />
 

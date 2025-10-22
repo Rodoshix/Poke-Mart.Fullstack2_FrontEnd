@@ -30,7 +30,6 @@ export default function ProductDetailPage() {
     related,
   } = useProductDetail(id);
 
-  // === Resolver reseñas por índice (compat con reviews.json actual) ===
   const reviewKey = useMemo(() => {
     const arr = Array.isArray(productsData) ? productsData : [];
     const idx = arr.findIndex((p) => String(p.id) === String(id));
