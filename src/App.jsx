@@ -21,6 +21,8 @@ import AdminDashboard from "@/pages/admin/AdminDashboard.jsx";
 import AdminOrders from "@/pages/admin/AdminOrders.jsx";
 import AdminOrderDetail from "@/pages/admin/AdminOrderDetail.jsx";
 import AdminProducts from "@/pages/admin/AdminProducts.jsx";
+import AdminProductEdit from "@/pages/admin/AdminProductEdit.jsx";
+import AdminProductCreate from "@/pages/admin/AdminProductCreate.jsx";
 import AdminProductsCritical from "@/pages/admin/AdminProductsCritical.jsx";
 import AdminProductsReports from "@/pages/admin/AdminProductsReports.jsx";
 import AdminCategories from "@/pages/admin/AdminCategories.jsx";
@@ -53,6 +55,8 @@ export default () => (
       <Route path="ordenes" element={<AdminOrders />} />
       <Route path="ordenes/:id" element={<AdminOrderDetail />} />
       <Route path="productos" element={<AdminProducts />} />
+      <Route path="productos/nuevo" element={<AdminProductCreate />} />
+      <Route path="productos/:id/editar" element={<AdminProductEdit />} />
       <Route path="productos/criticos" element={<AdminProductsCritical />} />
       <Route path="productos/reportes" element={<AdminProductsReports />} />
       <Route path="categorias" element={<AdminCategories />} />

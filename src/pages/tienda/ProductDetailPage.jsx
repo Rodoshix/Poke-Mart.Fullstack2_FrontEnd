@@ -12,8 +12,8 @@ import ProductBuyBox from "@/components/product/ProductBuyBox";
 import { RelatedProducts } from "@/components/catalog/RelatedProducts.jsx";
 import { Reviews } from "@/components/reviews/Reviews.jsx";
 
-import productsData from "@/data/productos.json";
 import reviewsData from "@/data/reviews.json";
+import useProductsData from "@/hooks/useProductsData.js";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -29,12 +29,13 @@ export default function ProductDetailPage() {
     addToCart,
     related,
   } = useProductDetail(id);
+  const products = useProductsData();
 
   const reviewKey = useMemo(() => {
-    const arr = Array.isArray(productsData) ? productsData : [];
+    const arr = Array.isArray(products) ? products : [];
     const idx = arr.findIndex((p) => String(p.id) === String(id));
     return idx >= 0 ? String(idx + 1) : null;
-  }, [id]);
+  }, [products, id]);
 
   const reviews = useMemo(() => {
     if (!reviewKey) return [];

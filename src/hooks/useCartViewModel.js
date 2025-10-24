@@ -2,7 +2,7 @@
 // src/hooks/useCartViewModel.js
 import { useCallback, useEffect, useMemo, useState } from "react";
 import * as cartStore from "@/lib/cartStore";
-import products from "@/data/productos.json";
+import useProductsData from "@/hooks/useProductsData.js";
 import { resolveImg } from "@/utils/resolveImg";
 
 const SHIPPING_THRESHOLD = 1000;
@@ -16,10 +16,11 @@ const clamp = (value, min, max) => {
 
 export function useCartViewModel() {
   const [items, setItems] = useState([]);
+  const products = useProductsData();
 
   const catalog = useMemo(
     () => new Map((products ?? []).map((p) => [String(p.id), p])),
-    []
+    [products]
   );
 
   const syncState = useCallback(() => {
