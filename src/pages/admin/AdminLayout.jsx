@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import AdminSidebar from "@/components/admin/layout/AdminSidebar.jsx";
-import AdminTopbar from "@/components/admin/layout/AdminTopbar.jsx";
-import AdminFooter from "@/components/admin/layout/AdminFooter.jsx";
+import AdminSidebar from "@/components/layout/AdminSidebar.jsx";
+import AdminTopbar from "@/components/layout/AdminTopbar.jsx";
+import AdminFooter from "@/components/layout/AdminFooter.jsx";
 import useAuthSession from "@/hooks/useAuthSession.js";
 import "@/assets/styles/admin.css";
 
