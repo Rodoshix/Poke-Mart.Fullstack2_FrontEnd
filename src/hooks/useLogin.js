@@ -76,7 +76,9 @@ export function useLogin({ navigate, params }) {
       navigate("/carrito", { replace: true });
       return;
     }
-    navigate(found.role === "admin" ? "/" : "/catalogo", { replace: true });
+
+    const isAdmin = (found.role || "").toLowerCase() === "admin";
+    navigate(isAdmin ? "/admin" : "/", { replace: true });
   };
 
   const genCode = (len = 6) =>
@@ -152,7 +154,9 @@ export function useLogin({ navigate, params }) {
 
     setAuth({ token, profile });
     closeForgot();
-    navigate(user.role === "admin" ? "/" : "/catalogo", { replace: true });
+
+    const isAdmin = (user.role || "").toLowerCase() === "admin";
+    navigate(isAdmin ? "/admin" : "/", { replace: true });
   };
 
   return {
