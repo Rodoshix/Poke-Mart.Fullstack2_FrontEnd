@@ -1,7 +1,8 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import brandLogo from "@/assets/img/poke-mark-logo.png";
-import { clearAuth, getProfile } from "@/components/auth/session.js";
 import { useMemo } from "react";
+import brandLogo from "@/assets/img/poke-mark-logo.png";
+import { clearAuth } from "@/components/auth/session.js";
+import useAuthSession from "@/hooks/useAuthSession.js";
 
 const NAV_ITEMS = [
   { to: "/admin", label: "Dashboard", code: "DB", end: true },
@@ -14,23 +15,29 @@ const NAV_ITEMS = [
 
 const AdminSidebar = ({ isOpen, onHide }) => {
   const navigate = useNavigate();
+  const { profile } = useAuthSession();
 
-  const profile = useMemo(() => {
+  const computedProfile = useMemo(() => {
     const fallback = {
       name: "Admin Poké Mart",
-      email: "admin@pokemart.cl",
+      email: "admin@duoc.cl",
       avatar: brandLogo,
     };
 
-    const data = getProfile();
-    if (!data) return fallback;
+    if (!profile) return fallback;
+
+    const fullName =
+      [profile.nombre, profile.apellido].filter(Boolean).join(" ") ||
+      profile.name ||
+      profile.username ||
+      fallback.name;
 
     return {
-      name: data?.name || fallback.name,
-      email: data?.email || fallback.email,
-      avatar: data?.avatar || fallback.avatar,
+      name: fullName,
+      email: profile.email || fallback.email,
+      avatar: profile.avatarUrl || profile.avatar || fallback.avatar,
     };
-  }, []);
+  }, [profile]);
 
   const handleStoreRedirect = () => {
     navigate("/", { replace: false });
@@ -104,15 +111,15 @@ const AdminSidebar = ({ isOpen, onHide }) => {
         onClick={handleNavigate}
       >
         <img
-          src={profile.avatar}
-          alt={profile.name}
+          src={computedProfile.avatar}
+          alt={computedProfile.name}
           className="admin-sidebar__avatar"
           width="40"
           height="40"
         />
         <span className="admin-sidebar__profile-meta">
-          <span className="admin-sidebar__profile-name">{profile.name}</span>
-          <span className="admin-sidebar__profile-email">{profile.email}</span>
+          <span className="admin-sidebar__profile-name">{computedProfile.name}</span>
+          <span className="admin-sidebar__profile-email">{computedProfile.email}</span>
         </span>
       </Link>
     </aside>

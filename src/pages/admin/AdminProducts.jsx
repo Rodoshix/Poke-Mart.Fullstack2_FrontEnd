@@ -16,8 +16,10 @@ const PAGE_SIZE = 10;
 const AdminProducts = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const presetCategory = location.state?.presetCategory ?? "";
+  const presetSearch = location.state?.presetSearch ?? "";
+  const [searchTerm, setSearchTerm] = useState(presetSearch);
+  const [selectedCategory, setSelectedCategory] = useState(presetCategory);
   const [sortOption, setSortOption] = useState(DEFAULT_SORT);
   const [currentPage, setCurrentPage] = useState(1);
   const [products, setProducts] = useState(() => getAllProducts());
@@ -119,6 +121,15 @@ const AdminProducts = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, selectedCategory, sortOption]);
+
+  useEffect(() => {
+    if (presetCategory) {
+      setSelectedCategory(presetCategory);
+      setSearchTerm("");
+      setSortOption(DEFAULT_SORT);
+      setCurrentPage(1);
+    }
+  }, [presetCategory]);
 
   useEffect(() => {
     if (currentPage > totalPages) {

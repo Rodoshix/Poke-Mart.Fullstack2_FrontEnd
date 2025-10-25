@@ -61,6 +61,7 @@ export default () => (
       <Route path="productos/reportes" element={<AdminProductsReports />} />
       <Route path="categorias" element={<AdminCategories />} />
       <Route path="usuarios" element={<AdminUsers />} />
+      <Route path="usuarios/nuevo" element={<AdminUserEdit />} />
       <Route path="usuarios/:id" element={<AdminUserEdit />} />
       <Route path="usuarios/:id/historial" element={<AdminUserHistory />} />
       <Route path="ofertas" element={<AdminOffers />} />

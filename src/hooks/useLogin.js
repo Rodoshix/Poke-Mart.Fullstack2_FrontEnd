@@ -1,8 +1,8 @@
 // usado por LoginPage.jsx
 // src/hooks/useLogin.js
 import { useEffect, useMemo, useState } from "react";
-import usersJson from "@/data/users.json";
 import { setAuth } from "@/components/auth/session";
+import { getAllUsers } from "@/services/userService.js";
 
 export function useLogin({ navigate, params }) {
   const [username, setUsername] = useState("");
@@ -18,12 +18,11 @@ export function useLogin({ navigate, params }) {
   const [demoCode, setDemoCode] = useState("");
 
   const allUsers = useMemo(() => {
-    const base = Array.isArray(usersJson?.users) ? usersJson.users : [];
     try {
-      const extras = JSON.parse(localStorage.getItem("pm_registeredUsers") || "[]");
-      return Array.isArray(extras) ? base.concat(extras) : base;
+      const users = getAllUsers();
+      return Array.isArray(users) ? users : [];
     } catch {
-      return base;
+      return [];
     }
   }, []);
 
@@ -67,6 +66,7 @@ export function useLogin({ navigate, params }) {
       nombre: found.nombre,
       apellido: found.apellido,
       email: found.email,
+      avatarUrl: found.avatarUrl,
     };
 
     setAuth({ token, profile });
@@ -150,6 +150,7 @@ export function useLogin({ navigate, params }) {
       nombre: user.nombre,
       apellido: user.apellido,
       email: user.email,
+      avatarUrl: user.avatarUrl,
     };
 
     setAuth({ token, profile });
