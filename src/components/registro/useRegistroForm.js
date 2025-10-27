@@ -66,6 +66,7 @@ export function useRegistroForm() {
       comuna: data.comuna,
       direccion: data.direccion,
       email: data.email,
+      avatarUrl: "",
     };
 
     saveUser(newUser);

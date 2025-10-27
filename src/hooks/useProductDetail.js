@@ -1,7 +1,7 @@
 // usado por ProductDetailPage.jsx
 // src/hooks/useProductDetail.js
 import { useEffect, useMemo, useState } from "react";
-import productsData from "@/data/productos.json";
+import useProductsData from "@/hooks/useProductsData.js";
 import { addItem, getAvailableStock } from "@/lib/cartStore";
 import { resolveImg } from "@/utils/resolveImg";
 
@@ -10,11 +10,11 @@ const MAX_QTY = 99;
 const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
 export function useProductDetail(productId) {
-  const raw = Array.isArray(productsData) ? productsData : [];
+  const rawProducts = useProductsData();
 
   const all = useMemo(
     () =>
-      raw.map((p) => ({
+      (rawProducts ?? []).map((p) => ({
         id: p.id ?? "",
         nombre: p.nombre ?? "Producto",
         categoria: p.categoria ?? "—",
@@ -25,7 +25,7 @@ export function useProductDetail(productId) {
           p.descripcion ||
           "Este producto forma parte del catálogo de Poké Mart. Pronto añadiremos una descripción más detallada.",
       })),
-    [raw]
+    [rawProducts]
   );
 
   const product = useMemo(

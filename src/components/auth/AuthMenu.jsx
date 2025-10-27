@@ -16,6 +16,7 @@ export default function AuthMenu() {
   const navigate = useNavigate();
   const { session, profile } = useAuthSession();
   const isLogged = !!session && !!profile;
+  const isAdmin = (profile?.role || "").toLowerCase() === "admin";
 
   if (!isLogged) {
     return (
@@ -48,13 +49,28 @@ export default function AuthMenu() {
 
   return (
     <div className="header-auth d-flex align-items-center gap-2">
-      <div className="auth-chip d-flex align-items-center">
-        <div className="auth-avatar" aria-hidden="true">{getInitial(profile)}</div>
-        <div className="auth-meta">
-          <div className="auth-name" title={name}>{name}</div>
-          <div className="auth-email" title={email}>{email}</div>
+      {isAdmin ? (
+        <button
+          type="button"
+          className="auth-chip auth-chip--link d-flex align-items-center"
+          title="Ir al panel administrador"
+          onClick={() => navigate("/admin")}
+        >
+          <div className="auth-avatar" aria-hidden="true">{getInitial(profile)}</div>
+          <div className="auth-meta">
+            <div className="auth-name" title={name}>{name}</div>
+            <div className="auth-email" title={email}>{email}</div>
+          </div>
+        </button>
+      ) : (
+        <div className="auth-chip d-flex align-items-center">
+          <div className="auth-avatar" aria-hidden="true">{getInitial(profile)}</div>
+          <div className="auth-meta">
+            <div className="auth-name" title={name}>{name}</div>
+            <div className="auth-email" title={email}>{email}</div>
+          </div>
         </div>
-      </div>
+      )}
 
       <button
         className="btn btn-sm btn-outline-danger rounded-pill auth-btn"

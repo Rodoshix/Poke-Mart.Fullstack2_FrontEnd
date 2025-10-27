@@ -51,6 +51,26 @@ body { padding-top: var(--header-h); }
   box-shadow: 0 1px 2px rgba(0,0,0,.04);
 }
 
+button.auth-chip {
+  appearance: none;
+  background: #fff;
+}
+
+.auth-chip--link {
+  cursor: pointer;
+  transition: box-shadow 180ms ease, transform 180ms ease;
+}
+
+.auth-chip--link:hover {
+  box-shadow: 0 6px 14px rgba(30, 115, 232, 0.18);
+  transform: translateY(-1px);
+}
+
+.auth-chip--link:focus-visible {
+  outline: 2px solid #1e73e8;
+  outline-offset: 2px;
+}
+
 .auth-avatar {
   width: 28px;
   height: 28px;

@@ -1,7 +1,7 @@
 // hook usado en CatalogPage.jsx
 // src/hooks/useCatalog.js
 import { useEffect, useMemo, useState } from "react";
-import productsData from "@/data/productos.json";
+import useProductsData from "@/hooks/useProductsData.js";
 
 const normalize = (p = {}) => ({
   id: p.id ?? "",
@@ -21,13 +21,14 @@ export function useCatalog({ pageSize = 12, initialQ = "" } = {}) {
   const [q, setQ] = useState(initialQ);
   const [cat, setCat] = useState("");
   const [page, setPage] = useState(1);
+  const rawProducts = useProductsData();
 
   const all = useMemo(
     () =>
-      (productsData ?? [])
+      (rawProducts ?? [])
         .map(normalize)
         .sort((a, b) => a.nombre.localeCompare(b.nombre, "es")),
-    []
+    [rawProducts]
   );
 
   const categorias = useMemo(() => uniqueCats(all), [all]);
