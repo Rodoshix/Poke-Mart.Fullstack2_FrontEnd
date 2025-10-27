@@ -1,7 +1,7 @@
 // src/pages/HomePage.jsx
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import productsData from "@/data/productos.json";
+import useProductsData from "@/hooks/useProductsData.js";
 import "@/assets/styles/home.css";
 
 import { HeroCarousel } from "@/components/home/HeroCarousel.jsx";
@@ -18,6 +18,7 @@ const pickFeatured = (data) => {
 const HomePage = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const products = useProductsData();
 
   const slides = useMemo(() => ([
     { src: "/src/assets/img/tienda/world/pokemon_galar_map.png",  alt: "Región de Galar para explorar" },
@@ -30,12 +31,12 @@ const HomePage = () => {
     setLoading(true);
     const t = setTimeout(() => {
       if (!alive) return;
-      const destacados = pickFeatured(productsData || []);
+      const destacados = pickFeatured(products || []);
       setItems(destacados);
       setLoading(false);
-    }, 200);
+    }, 120);
     return () => { alive = false; clearTimeout(t); };
-  }, []);
+  }, [products]);
 
   return (
     <main className="site-main">

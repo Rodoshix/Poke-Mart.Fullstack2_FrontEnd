@@ -7,7 +7,7 @@ import Pagination from "@/components/catalog/Pagination.jsx";
 import PageBorders from "@/components/layout/PageBorders";
 import CategorySidebar from "@/components/catalog/CategorySidebar.jsx";
 import SortToolbar from "@/components/catalog/SortToolbar.jsx";
-import productsData from "@/data/productos.json";
+import useProductsData from "@/hooks/useProductsData.js";
 
 const PAGE_SIZE = 12;
 
@@ -36,11 +36,12 @@ export default function CategoriaPage() {
 
   const [sort, setSort] = useState(searchParams.get("sort") || "recomendados");
   const [page, setPage] = useState(Number(searchParams.get("page") || 1));
+  const rawProducts = useProductsData();
 
   const all = useMemo(() => {
-    const raw = Array.isArray(productsData) ? productsData : [];
+    const raw = Array.isArray(rawProducts) ? rawProducts : [];
     return raw.map(normalize);
-  }, []);
+  }, [rawProducts]);
 
   const categorias = useMemo(() => uniqueCats(all), [all]);
 
@@ -73,12 +74,12 @@ export default function CategoriaPage() {
 
   // sync a la URL
   useEffect(() => {
-    const next = new URLSearchParams(searchParams);
+    const next = new URLSearchParams();
     next.set("page", String(page));
-    if (sort) next.set("sort", sort); else next.delete("sort");
-    if (selectedCat) next.set("cat", selectedCat); else next.delete("cat");
+    if (sort) next.set("sort", sort);
+    if (selectedCat) next.set("cat", selectedCat);
     setSearchParams(next, { replace: true });
-  }, [sort, selectedCat, page]);
+  }, [sort, selectedCat, page, setSearchParams]);
 
   // resetear página cuando cambian filtros/orden
   useEffect(() => setPage(1), [sort, selectedCat]);

@@ -1,25 +1,11 @@
 // src/components/registro/usersRepo.js
-import usersJson from "@/data/users.json";
+import { getAllUsers, USERS_EVENT } from "@/services/userService.js";
 
 const LS_KEY = "pm_registeredUsers";
 
 export function getBaseUsers() {
-  const fromFile = Array.isArray(usersJson?.users) ? usersJson.users : [];
-  let locals = [];
-  try {
-    locals = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
-    if (!Array.isArray(locals)) locals = [];
-  } catch {
-    locals = [];
-  }
-  // fusion simple por id/username/email
-  const map = new Map();
-  [...fromFile, ...locals].forEach((u) => {
-    if (!u || typeof u !== "object") return;
-    const key = Number(u.id) || u.username || u.email;
-    map.set(key, u);
-  });
-  return Array.from(map.values());
+  const users = getAllUsers();
+  return Array.isArray(users) ? users : [];
 }
 
 export function getNextId(baseUsers) {
@@ -37,4 +23,7 @@ export function saveUser(newUser) {
   }
   list.push(newUser);
   localStorage.setItem(LS_KEY, JSON.stringify(list));
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(USERS_EVENT));
+  }
 }
