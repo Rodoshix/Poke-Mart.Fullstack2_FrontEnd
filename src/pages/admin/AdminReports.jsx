@@ -136,7 +136,7 @@ const AdminReports = () => {
       return acc;
     }, new Map());
     const statusList = Array.from(statusCount.entries()).map(([status, count]) => ({
-      status,
+      status: status === "completed" ? "Completadas" : status,
       count,
     }));
 
