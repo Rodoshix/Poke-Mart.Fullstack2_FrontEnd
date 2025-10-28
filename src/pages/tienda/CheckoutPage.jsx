@@ -1,5 +1,5 @@
 // src/pages/tienda/CheckoutPage.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import "@/assets/styles/checkout.css";
 
@@ -12,7 +12,6 @@ import { useCheckoutForm } from "@/hooks/useCheckoutForm";
 
 import OrderSummaryTable from "@/components/checkout/OrderSummaryTable";
 import CheckoutAddressForm from "@/components/checkout/CheckoutAddressForm";
-import PaymentModal from "@/components/checkout/PaymentModal";
 
 import { money } from "@/utils/money";
 import { createOrder } from "@/services/orderService.js";
@@ -31,28 +30,31 @@ export default function CheckoutPage() {
 
   const { form, setField, validate } = useCheckoutForm();
 
-  const [status, setStatus] = useState(null);
-  const [orderId, setOrderId] = useState(null);
-  const [errorMsgs, setErrorMsgs] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [paymentLabel, setPaymentLabel] = useState("");
-
-  const openModal = () => setShowModal(true);
-  const closeModal = () => setShowModal(false);
+  const estimatedWindow = useMemo(() => {
+    const now = new Date();
+    const start = new Date(now.getTime() + 2 * 86_400_000);
+    const end = new Date(now.getTime() + 5 * 86_400_000);
+    return {
+      start,
+      end,
+      startISO: start.toISOString(),
+      endISO: end.toISOString(),
+    };
+  }, []);
 
   const pagarAhora = () => {
     if (!items.length) return;
 
     const errs = validate();
     if (errs.length) {
-      setErrorMsgs(errs);
-      setStatus("error");
-      openModal();
+      sessionStorage.removeItem("pm_lastOrder");
+      navigate("/compra/error", {
+        replace: true,
+        state: { message: errs },
+      });
       return;
     }
 
-    setPaymentLabel("");
-    let orderRecord = null;
     try {
       const profile = getProfile();
       const now = new Date();
@@ -81,7 +83,7 @@ export default function CheckoutPage() {
       const selectedPaymentLabel =
         PAYMENT_METHOD_LABELS[form.paymentMethod] ?? PAYMENT_METHOD_LABELS.credit;
 
-      orderRecord = createOrder({
+      const orderRecord = createOrder({
         customerId: profile?.id,
         customer:
           `${form.nombre} ${form.apellido}`.trim() ||
@@ -121,22 +123,41 @@ export default function CheckoutPage() {
       });
 
       applyProductSale(adjustments);
-      setPaymentLabel(selectedPaymentLabel);
+      const orderSnapshot = {
+        id: orderRecord.id,
+        paymentMethod: selectedPaymentLabel,
+        email: form.email,
+        estimated: {
+          start: estimatedWindow.startISO,
+          end: estimatedWindow.endISO,
+        },
+        items: items.map((item) => ({
+          id: item.id,
+          name: item.name,
+          quantity: item.qty,
+          image: item.image,
+          vendor: item.product?.vendor || "Poké Mart Oficial",
+        })),
+      };
+
+      sessionStorage.setItem("pm_lastOrder", JSON.stringify(orderSnapshot));
+      cartStore.clearCart();
+      window.dispatchEvent(new Event("cart:updated"));
+      navigate("/compra/exito", {
+        replace: true,
+        state: { orderId: orderSnapshot.id },
+      });
     } catch (error) {
       console.error("No se pudo registrar la orden", error);
-      setStatus("error");
-      setErrorMsgs(["Ocurrió un problema al registrar la orden. Intenta nuevamente."]);
-      openModal();
-      return;
+      sessionStorage.removeItem("pm_lastOrder");
+      navigate("/compra/error", {
+        replace: true,
+        state: {
+          message:
+            "No pudimos completar tu pedido. Inténtalo nuevamente en unos minutos.",
+        },
+      });
     }
-
-    const fallbackId = `ORD-${Date.now().toString(36).toUpperCase()}`;
-    setOrderId(orderRecord?.id ?? fallbackId);
-    setStatus("ok");
-    setErrorMsgs([]);
-    cartStore.clearCart();
-    window.dispatchEvent(new Event("cart:updated"));
-    openModal();
   };
 
   useEffect(() => {
@@ -152,23 +173,6 @@ export default function CheckoutPage() {
           Total a pagar: <span className="badge text-bg-primary fs-6">{money(total)}</span>
         </div>
       </div>
-
-      {/* Modal de pago */}
-      <PaymentModal
-        open={showModal}
-        status={status}
-        orderId={orderId}
-        email={form.email}
-        paymentLabel={paymentLabel}
-        errors={errorMsgs}
-        onClose={closeModal}
-        onGoHome={() => navigate("/")}
-        onKeepShopping={() => { closeModal(); navigate("/catalogo"); }}
-        onFixData={() => {
-          closeModal();
-          setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }), 0);
-        }}
-      />
 
       <div className="row g-4 mt-2">
         <section className="col-12">

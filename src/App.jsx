@@ -15,6 +15,8 @@ import BlogPage from "@/pages/tienda/BlogPage.jsx";
 import BlogDetailPage from "./pages/tienda/BlogDetailPage.jsx";
 import OffersPage from "@/pages/tienda/OffersPage.jsx";
 import CheckoutPage from "@/pages/tienda/CheckoutPage";
+import CheckoutSuccessPage from "@/pages/tienda/CheckoutSuccessPage.jsx";
+import CheckoutErrorPage from "@/pages/tienda/CheckoutErrorPage.jsx";
 import CategoriaPage from "@/pages/tienda/CategoriaPage.jsx";
 
 import AdminLayout from "@/pages/admin/AdminLayout.jsx";
@@ -97,6 +99,8 @@ const App = () => {
         <Route path="blog/:id" element={<BlogDetailPage />} />
         <Route path="ofertas" element={<OffersPage />} />
         <Route path="compra" element={<CheckoutPage />} />
+        <Route path="compra/exito" element={<CheckoutSuccessPage />} />
+        <Route path="compra/error" element={<CheckoutErrorPage />} />
         <Route path="categoria" element={<CategoriaPage />} />
         <Route path="categoria/:slug" element={<CategoriaPage />} />
         <Route path="404" element={<NotFound />} />
