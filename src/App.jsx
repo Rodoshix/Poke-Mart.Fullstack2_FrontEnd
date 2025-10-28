@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { Header } from "./components/layout/Header.jsx";
 import { Footer } from "./components/layout/Footer.jsx";
+import useAuthSession from "@/hooks/useAuthSession.js";
 
 import HomePage from "@/pages/tienda/HomePage.jsx";
 import CatalogPage from "@/pages/tienda/CatalogPage.jsx";
@@ -14,6 +15,8 @@ import BlogPage from "@/pages/tienda/BlogPage.jsx";
 import BlogDetailPage from "./pages/tienda/BlogDetailPage.jsx";
 import OffersPage from "@/pages/tienda/OffersPage.jsx";
 import CheckoutPage from "@/pages/tienda/CheckoutPage";
+import CheckoutSuccessPage from "@/pages/tienda/CheckoutSuccessPage.jsx";
+import CheckoutErrorPage from "@/pages/tienda/CheckoutErrorPage.jsx";
 import CategoriaPage from "@/pages/tienda/CategoriaPage.jsx";
 
 import AdminLayout from "@/pages/admin/AdminLayout.jsx";
@@ -47,47 +50,64 @@ const StoreLayout = () => (
   </div>
 );
 
-export default () => (
-  <Routes>
-    <Route path="/admin/login" element={<AdminLogin />} />
-    <Route path="/admin" element={<AdminLayout />}>
-      <Route index element={<AdminDashboard />} />
-      <Route path="ordenes" element={<AdminOrders />} />
-      <Route path="ordenes/:id" element={<AdminOrderDetail />} />
-      <Route path="productos" element={<AdminProducts />} />
-      <Route path="productos/nuevo" element={<AdminProductCreate />} />
-      <Route path="productos/:id/editar" element={<AdminProductEdit />} />
-      <Route path="productos/criticos" element={<AdminProductsCritical />} />
-      <Route path="productos/reportes" element={<AdminProductsReports />} />
-      <Route path="categorias" element={<AdminCategories />} />
-      <Route path="usuarios" element={<AdminUsers />} />
-      <Route path="usuarios/nuevo" element={<AdminUserEdit />} />
-      <Route path="usuarios/:id" element={<AdminUserEdit />} />
-      <Route path="usuarios/:id/historial" element={<AdminUserHistory />} />
-      <Route path="ofertas" element={<AdminOffers />} />
-      <Route path="reportes" element={<AdminReports />} />
-      <Route path="perfil" element={<AdminProfile />} />
-      <Route path="*" element={<Navigate to="/admin" replace />} />
-    </Route>
+const App = () => {
+  const { session } = useAuthSession();
+  const isAuthenticated = Boolean(session);
 
-    <Route path="/" element={<StoreLayout />}>
-      <Route index element={<HomePage />} />
-      <Route path="catalogo" element={<CatalogPage />} />
-      <Route path="producto/:id" element={<ProductDetailPage />} />
-      <Route path="reseñas" element={<ReviewsPage />} />
-      <Route path="carrito" element={<CartPage />} />
-      <Route path="nosotros" element={<NosotrosPage />} />
-      <Route path="contacto" element={<ContactoPage />} />
-      <Route path="login" element={<LoginPage />} />
-      <Route path="registro" element={<RegistroPage />} />
-      <Route path="blog" element={<BlogPage />} />
-      <Route path="blog/:id" element={<BlogDetailPage />} />
-      <Route path="ofertas" element={<OffersPage />} />
-      <Route path="compra" element={<CheckoutPage />} />
-      <Route path="categoria" element={<CategoriaPage />} />
-      <Route path="categoria/:slug" element={<CategoriaPage />} />
-      <Route path="404" element={<NotFound />} />
-      <Route path="*" element={<Navigate to="/404" replace />} />
-    </Route>
-  </Routes>
-);
+  return (
+    <Routes>
+      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<AdminDashboard />} />
+        <Route path="ordenes" element={<AdminOrders />} />
+        <Route path="ordenes/:id" element={<AdminOrderDetail />} />
+        <Route path="productos" element={<AdminProducts />} />
+        <Route path="productos/nuevo" element={<AdminProductCreate />} />
+        <Route path="productos/:id/editar" element={<AdminProductEdit />} />
+        <Route path="productos/criticos" element={<AdminProductsCritical />} />
+        <Route path="productos/reportes" element={<AdminProductsReports />} />
+        <Route path="categorias" element={<AdminCategories />} />
+        <Route path="usuarios" element={<AdminUsers />} />
+        <Route path="usuarios/nuevo" element={<AdminUserEdit />} />
+        <Route path="usuarios/:id" element={<AdminUserEdit />} />
+        <Route path="usuarios/:id/historial" element={<AdminUserHistory />} />
+        <Route path="ofertas" element={<AdminOffers />} />
+        <Route path="reportes" element={<AdminReports />} />
+        <Route path="perfil" element={<AdminProfile />} />
+        <Route path="*" element={<Navigate to="/admin" replace />} />
+      </Route>
+
+      <Route path="/" element={<StoreLayout />}>
+        <Route index element={<HomePage />} />
+        <Route path="catalogo" element={<CatalogPage />} />
+        <Route path="producto/:id" element={<ProductDetailPage />} />
+        <Route path="reseñas" element={<ReviewsPage />} />
+        <Route path="carrito" element={<CartPage />} />
+        <Route path="nosotros" element={<NosotrosPage />} />
+        <Route path="contacto" element={<ContactoPage />} />
+        <Route
+          path="login"
+          element={isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />}
+        />
+        <Route
+          path="registro"
+          element={
+            isAuthenticated ? <Navigate to="/" replace /> : <RegistroPage />
+          }
+        />
+        <Route path="blog" element={<BlogPage />} />
+        <Route path="blog/:id" element={<BlogDetailPage />} />
+        <Route path="ofertas" element={<OffersPage />} />
+        <Route path="compra" element={<CheckoutPage />} />
+        <Route path="compra/exito" element={<CheckoutSuccessPage />} />
+        <Route path="compra/error" element={<CheckoutErrorPage />} />
+        <Route path="categoria" element={<CategoriaPage />} />
+        <Route path="categoria/:slug" element={<CategoriaPage />} />
+        <Route path="404" element={<NotFound />} />
+        <Route path="*" element={<Navigate to="/404" replace />} />
+      </Route>
+    </Routes>
+  );
+};
+
+export default App;

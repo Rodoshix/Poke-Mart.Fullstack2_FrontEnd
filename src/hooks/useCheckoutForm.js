@@ -16,8 +16,15 @@ function extractUsers(data) {
 
 export function useCheckoutForm() {
   const [form, setForm] = useState({
-    nombre: "", apellido: "", email: "",
-    calle: "", departamento: "", region: "", comuna: "", notas: "",
+    nombre: "",
+    apellido: "",
+    email: "",
+    calle: "",
+    departamento: "",
+    region: "",
+    comuna: "",
+    notas: "",
+    paymentMethod: "credit",
   });
 
   const setField = (k, v) => setForm((f) => ({ ...f, [k]: v }));
@@ -96,6 +103,10 @@ export function useCheckoutForm() {
       errs.push("Debes ingresar una comuna.");
     } else if (regionEntry && !regionEntry.comunas.includes(form.comuna)) {
       errs.push("La comuna no pertenece a la región ingresada.");
+    }
+
+    if (!["credit", "debit", "transfer"].includes(form.paymentMethod)) {
+      errs.push("Selecciona un método de pago válido.");
     }
 
     return errs;

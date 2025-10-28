@@ -1,7 +1,9 @@
 import { useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import OrderFilters from "@/components/orders/OrderFilters.jsx";
 import OrderTable from "@/components/orders/OrderTable.jsx";
-import { seedOrders } from "@/data/seedOrders.js";
+import useOrdersData from "@/hooks/useOrdersData.js";
+import { resetOrders } from "@/services/orderService.js";
 
 const DEFAULT_SORT = "createdAt:desc";
 
@@ -36,15 +38,31 @@ const filterOrders = (orders, searchTerm) => {
 };
 
 const AdminOrders = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOption, setSortOption] = useState(DEFAULT_SORT);
 
-  const ordersDataset = useMemo(() => (Array.isArray(seedOrders) ? seedOrders : []), []);
+  const ordersDataset = useOrdersData();
 
   const filteredAndSortedOrders = useMemo(() => {
-    const filtered = filterOrders(ordersDataset, searchTerm);
+    const base = Array.isArray(ordersDataset) ? ordersDataset : [];
+    const filtered = filterOrders(base, searchTerm);
     return sortOrders(filtered, sortOption);
   }, [ordersDataset, searchTerm, sortOption]);
+
+  const handleRestoreOrders = () => {
+    const confirmed =
+      typeof window === "undefined"
+        ? true
+        : window.confirm(
+            "¿Restaurar el historial de órdenes original? Se eliminarán las órdenes agregadas localmente.",
+          );
+    if (!confirmed) return;
+
+    resetOrders();
+    navigate(location.pathname, { replace: true, state: { status: "reset" } });
+  };
 
   return (
     <section className="admin-paper admin-orders">
@@ -56,6 +74,16 @@ const AdminOrders = () => {
         </p>
       </div>
 
+      <div className="admin-orders__actions">
+        <button
+          type="button"
+          className="admin-products__action-button admin-products__action-button--danger"
+          onClick={handleRestoreOrders}
+        >
+          Restaurar órdenes
+        </button>
+      </div>
+
       <OrderFilters
         searchTerm={searchTerm}
         sortOption={sortOption}
@@ -64,7 +92,7 @@ const AdminOrders = () => {
       />
 
       <div className="admin-orders__meta">
-        Mostrando {filteredAndSortedOrders.length} de {ordersDataset.length} órdenes registradas.
+        Mostrando {filteredAndSortedOrders.length} de {Array.isArray(ordersDataset) ? ordersDataset.length : 0} órdenes registradas.
       </div>
 
       <OrderTable orders={filteredAndSortedOrders} />

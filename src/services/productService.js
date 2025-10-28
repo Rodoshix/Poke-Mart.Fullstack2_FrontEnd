@@ -148,16 +148,67 @@ const updateProduct = (productId, changes) => {
   }
 
   const overrides = readOverrides();
+  const updatedMap = { ...(overrides.updated ?? {}) };
+  const addedList = Array.isArray(overrides.added) ? [...overrides.added] : [];
   const nextProduct = mapProduct(
     { ...existing, ...changes, id: numericId, stockBase: existing.stockBase },
     existing.stockBase,
   );
-  overrides.updated = {
-    ...(overrides.updated ?? {}),
-    [numericId]: nextProduct,
-  };
+  const addedIndex = addedList.findIndex((item) => Number(item.id) === numericId);
+
+  if (addedIndex >= 0) {
+    addedList[addedIndex] = nextProduct;
+    delete updatedMap[numericId];
+    overrides.added = addedList;
+    overrides.updated = updatedMap;
+  } else {
+    updatedMap[numericId] = nextProduct;
+    overrides.added = addedList;
+    overrides.updated = updatedMap;
+  }
+
   writeOverrides(overrides);
   return getProductById(numericId);
+};
+
+const applyProductSale = (lineItems = []) => {
+  if (!Array.isArray(lineItems) || lineItems.length === 0) {
+    return { updated: [] };
+  }
+
+  const adjustments = new Map();
+  lineItems.forEach((item) => {
+    const productId = Number(item?.productId ?? item?.id);
+    const quantity = Number(item?.quantity ?? item?.qty ?? item?.amount);
+    if (!Number.isFinite(productId) || !Number.isFinite(quantity) || quantity <= 0) return;
+    const current = adjustments.get(productId) ?? 0;
+    adjustments.set(productId, current + quantity);
+  });
+
+  if (!adjustments.size) {
+    return { updated: [] };
+  }
+
+  const results = [];
+
+  adjustments.forEach((quantity, productId) => {
+    const product = getProductById(productId);
+    if (!product) return;
+    const currentStock = Number(product.stock ?? 0);
+    if (!Number.isFinite(currentStock)) return;
+    const nextStock = Math.max(0, currentStock - quantity);
+    if (nextStock === currentStock) return;
+
+    updateProduct(productId, { stock: nextStock });
+    results.push({
+      id: productId,
+      previousStock: currentStock,
+      nextStock,
+      deducted: currentStock - nextStock,
+    });
+  });
+
+  return { updated: results };
 };
 
 const resetProducts = () => {
@@ -180,6 +231,7 @@ export {
   getNextProductId,
   createProduct,
   updateProduct,
+  applyProductSale,
   subscribeToProductChanges,
   PRODUCTS_EVENT,
   PRODUCT_STORAGE_KEY,
