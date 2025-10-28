@@ -5,6 +5,7 @@ import "@/assets/styles/checkout.css";
 
 import * as cartStore from "@/lib/cartStore";
 import { getAuth, getProfile } from "@/components/auth/session";
+import { applyProductSale } from "@/services/productService.js";
 
 import { useCartViewModel } from "@/hooks/useCartViewModel";      // ya creado en el carrito
 import { useCheckoutForm } from "@/hooks/useCheckoutForm";        // nuevo
@@ -50,6 +51,17 @@ export default function CheckoutPage() {
       setStatus("error");
       openModal();
       return;
+    }
+
+    try {
+      const adjustments = items.map(({ id, qty, product }) => ({
+        id,
+        productId: product?.id ?? id,
+        quantity: qty,
+      }));
+      applyProductSale(adjustments);
+    } catch (error) {
+      console.error("No se pudo actualizar el stock tras la compra", error);
     }
 
     const oid = `PM-${Date.now().toString(36).toUpperCase()}`;
