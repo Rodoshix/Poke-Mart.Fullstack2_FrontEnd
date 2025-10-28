@@ -174,13 +174,14 @@ const createUser = (userData) => {
   const all = getAllUsers();
   ensureUniqueCredentials(all, userData);
 
+  const timestamp = new Date().toISOString();
   const newUser = mapUser(
     {
       ...userData,
       id: getNextUserId(),
-      registeredAt: userData.registeredAt ?? new Date().toISOString(),
+      registeredAt: timestamp,
     },
-    userData.registeredAt,
+    timestamp,
   );
 
   const overrides = readOverrides();
@@ -208,7 +209,7 @@ const updateUser = (userId, changes) => {
       ...existing,
       ...changes,
       id: numericId,
-      registeredAt: changes.registeredAt ?? existing.registeredAt,
+      registeredAt: existing.registeredAt,
     },
   };
   writeOverrides(overrides);

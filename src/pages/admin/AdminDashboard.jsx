@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import StatCard from "@/components/dashboard/StatCard.jsx";
 import QuickLinks from "@/components/dashboard/QuickLinks.jsx";
-import { seedOrders } from "@/data/seedOrders.js";
+import {
+  getAllOrders,
+  subscribeToOrderChanges,
+  ORDER_STORAGE_KEY,
+} from "@/services/orderService.js";
 import {
   getAllProducts,
   subscribeToProductChanges,
@@ -32,7 +36,7 @@ const QUICK_LINKS = [
 const computeDashboardMetrics = () => {
   const now = Date.now();
 
-  const orders = Array.isArray(seedOrders) ? seedOrders : [];
+  const orders = getAllOrders();
   const totalOrders = orders.length;
 
   const ordersLast30 = orders.filter(({ createdAt }) => {
@@ -130,11 +134,13 @@ const AdminDashboard = () => {
   useEffect(() => {
     const unsubscribeProducts = subscribeToProductChanges(refreshMetrics);
     const unsubscribeUsers = subscribeToUserChanges(refreshMetrics);
+    const unsubscribeOrders = subscribeToOrderChanges(refreshMetrics);
 
     if (typeof window === "undefined") {
       return () => {
         unsubscribeProducts?.();
         unsubscribeUsers?.();
+        unsubscribeOrders?.();
       };
     }
 
@@ -142,6 +148,7 @@ const AdminDashboard = () => {
       PRODUCT_STORAGE_KEY,
       USER_STORAGE_KEY,
       REGISTERED_USER_STORAGE_KEY,
+      ORDER_STORAGE_KEY,
       null,
     ]);
 
@@ -157,6 +164,7 @@ const AdminDashboard = () => {
     return () => {
       unsubscribeProducts?.();
       unsubscribeUsers?.();
+      unsubscribeOrders?.();
       window.removeEventListener("storage", handleStorage);
     };
   }, [refreshMetrics]);

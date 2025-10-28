@@ -1,5 +1,5 @@
 // src/pages/tienda/CheckoutPage.jsx
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "@/assets/styles/checkout.css";
 
@@ -15,6 +15,7 @@ import CheckoutAddressForm from "@/components/checkout/CheckoutAddressForm";
 import PaymentModal from "@/components/checkout/PaymentModal";
 
 import { money } from "@/utils/money";
+import { createOrder } from "@/services/orderService.js";
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
@@ -53,19 +54,78 @@ export default function CheckoutPage() {
       return;
     }
 
+    let orderRecord = null;
     try {
+      const profile = getProfile();
+      const now = new Date();
+
       const adjustments = items.map(({ id, qty, product }) => ({
         id,
         productId: product?.id ?? id,
         quantity: qty,
       }));
+
+      const orderItems = items.map((item) => ({
+        productId: item.product?.id ?? Number(item.id),
+        sku: String(item.product?.id ?? item.id),
+        name: item.name,
+        quantity: Math.max(1, Number(item.qty) || 0),
+        unitPrice: Math.max(0, Number(item.price) || 0),
+      }));
+
+      const shippingMethod = shipping > 0 ? "Despacho estándar" : "Retiro en tienda";
+      const shippingCarrier = shipping > 0 ? "Poké Express" : "Retiro en tienda";
+
       applyProductSale(adjustments);
+
+      orderRecord = createOrder({
+        customerId: profile?.id,
+        customer:
+          `${form.nombre} ${form.apellido}`.trim() ||
+          profile?.nombre ||
+          profile?.username ||
+          "Cliente tienda",
+        customerEmail: form.email || profile?.email || "",
+        customerPhone: profile?.telefono || profile?.phone || "",
+        status: "completed",
+        currency: "CLP",
+        items: orderItems,
+        summary: {
+          subtotal: Math.round(subtotal),
+          shipping: Math.round(shipping),
+          discount: 0,
+          total: Math.round(total),
+        },
+        payment: {
+          method: "Pago en línea",
+          status: "Pagado",
+          transactionId: `PAY-${Date.now()}`,
+          capturedAt: now.toISOString(),
+        },
+        shipping: {
+          method: shippingMethod,
+          carrier: shippingCarrier,
+          cost: Math.round(shipping),
+          address: {
+            street: form.calle,
+            city: form.comuna,
+            region: form.region,
+            reference: form.departamento,
+            country: "Chile",
+          },
+        },
+        notes: form.notas?.trim(),
+      });
     } catch (error) {
-      console.error("No se pudo actualizar el stock tras la compra", error);
+      console.error("No se pudo registrar la orden", error);
+      setStatus("error");
+      setErrorMsgs(["Ocurrió un problema al registrar la orden. Intenta nuevamente."]);
+      openModal();
+      return;
     }
 
-    const oid = `PM-${Date.now().toString(36).toUpperCase()}`;
-    setOrderId(oid);
+    const fallbackId = `ORD-${Date.now().toString(36).toUpperCase()}`;
+    setOrderId(orderRecord?.id ?? fallbackId);
     setStatus("ok");
     setErrorMsgs([]);
     cartStore.clearCart();

@@ -189,7 +189,8 @@ const UserForm = ({
       comuna: formState.comuna.trim(),
       direccion: formState.direccion.trim(),
       email: formState.email.trim(),
-      registeredAt: formState.registeredAt,
+      registeredAt:
+        initialUser?.registeredAt ?? formState.registeredAt ?? new Date().toISOString(),
     };
 
     try {
@@ -428,14 +429,12 @@ const UserForm = ({
             type="datetime-local"
             className="admin-user-form__input"
             value={formState.registeredAt ? formState.registeredAt.slice(0, 16) : ""}
-            onChange={(event) => {
-              const value = event.target.value;
-              setFormState((prev) => ({
-                ...prev,
-                registeredAt: value ? new Date(value).toISOString() : prev.registeredAt,
-              }));
-            }}
+            readOnly
+            disabled
           />
+          <small className="text-muted d-block mt-1">
+            La fecha de registro se asigna automáticamente y no puede modificarse.
+          </small>
         </div>
       </div>
 

@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import OrderSummary from "@/components/orderDetail/OrderSummary.jsx";
 import OrderItems from "@/components/orderDetail/OrderItems.jsx";
-import { getOrderById } from "@/data/seedOrders.js";
+import useOrdersData from "@/hooks/useOrdersData.js";
 
 const formatDateTime = (value) => {
   if (!value) return "No disponible";
@@ -22,7 +22,11 @@ const AdminOrderDetail = () => {
   const { id: orderId = "" } = useParams();
   const navigate = useNavigate();
 
-  const order = useMemo(() => getOrderById(orderId), [orderId]);
+  const orders = useOrdersData();
+  const order = useMemo(() => {
+    const list = Array.isArray(orders) ? orders : [];
+    return list.find((item) => String(item.id) === String(orderId)) ?? null;
+  }, [orders, orderId]);
 
   const handleBack = () => {
     navigate(-1);

@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
-import { seedOrders } from "@/data/seedOrders.js";
 import { getUserById } from "@/services/userService.js";
 import OrderTable from "@/components/orders/OrderTable.jsx";
+import useOrdersData from "@/hooks/useOrdersData.js";
 
 const currencyFormatter = new Intl.NumberFormat("es-CL", {
   style: "currency",
@@ -19,6 +19,11 @@ const dateFormatter = new Intl.DateTimeFormat("es-CL", {
 const AdminUserHistory = () => {
   const { id } = useParams();
   const numericId = Number(id);
+  const orders = useOrdersData();
+  const normalizedOrders = useMemo(
+    () => (Array.isArray(orders) ? orders : []),
+    [orders],
+  );
 
   const user = useMemo(() => {
     if (!id) return null;
@@ -28,10 +33,9 @@ const AdminUserHistory = () => {
 
   const userOrders = useMemo(() => {
     if (!user) return [];
-    const ordersDataset = Array.isArray(seedOrders) ? seedOrders : [];
     const normalizedEmail = (user.email ?? "").trim().toLowerCase();
 
-    return ordersDataset.filter((order) => {
+    return normalizedOrders.filter((order) => {
       const orderCustomerId = Number(order.customerId);
       if (!Number.isNaN(orderCustomerId) && orderCustomerId === numericId) {
         return true;
@@ -44,7 +48,7 @@ const AdminUserHistory = () => {
       }
       return false;
     });
-  }, [numericId, user]);
+  }, [normalizedOrders, numericId, user]);
 
   const metrics = useMemo(() => {
     if (!user || userOrders.length === 0) {

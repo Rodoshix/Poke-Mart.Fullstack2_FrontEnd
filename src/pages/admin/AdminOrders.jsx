@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import OrderFilters from "@/components/orders/OrderFilters.jsx";
 import OrderTable from "@/components/orders/OrderTable.jsx";
-import { seedOrders } from "@/data/seedOrders.js";
+import useOrdersData from "@/hooks/useOrdersData.js";
 
 const DEFAULT_SORT = "createdAt:desc";
 
@@ -39,10 +39,11 @@ const AdminOrders = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOption, setSortOption] = useState(DEFAULT_SORT);
 
-  const ordersDataset = useMemo(() => (Array.isArray(seedOrders) ? seedOrders : []), []);
+  const ordersDataset = useOrdersData();
 
   const filteredAndSortedOrders = useMemo(() => {
-    const filtered = filterOrders(ordersDataset, searchTerm);
+    const base = Array.isArray(ordersDataset) ? ordersDataset : [];
+    const filtered = filterOrders(base, searchTerm);
     return sortOrders(filtered, sortOption);
   }, [ordersDataset, searchTerm, sortOption]);
 
@@ -64,7 +65,7 @@ const AdminOrders = () => {
       />
 
       <div className="admin-orders__meta">
-        Mostrando {filteredAndSortedOrders.length} de {ordersDataset.length} órdenes registradas.
+        Mostrando {filteredAndSortedOrders.length} de {Array.isArray(ordersDataset) ? ordersDataset.length : 0} órdenes registradas.
       </div>
 
       <OrderTable orders={filteredAndSortedOrders} />
