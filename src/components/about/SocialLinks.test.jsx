@@ -7,17 +7,14 @@ describe("Testing SocialLinks", () => {
   it("CP-Social1: Renderiza el heading y los 4 links por defecto con href/target/rel", () => {
     render(<SocialLinks />);
 
-    // Heading
     expect(
       screen.getByRole("heading", { level: 3, name: /síguenos/i })
     ).toBeInTheDocument();
 
-    // Links por defecto
     const labels = ["Facebook", "Instagram", "Twitter", "LinkedIn"];
     labels.forEach((label) => {
       const link = screen.getByRole("link", { name: label });
       expect(link).toBeInTheDocument();
-      // href correcto
       const hrefStartsWith = {
         Facebook: "https://www.facebook.com/",
         Instagram: "https://www.instagram.com/",
@@ -25,7 +22,6 @@ describe("Testing SocialLinks", () => {
         LinkedIn: "https://www.linkedin.com/",
       }[label];
       expect(link).toHaveAttribute("href", hrefStartsWith);
-      // seguridad
       expect(link).toHaveAttribute("target", "_blank");
       expect(link).toHaveAttribute("rel", "noopener noreferrer");
     });
@@ -38,7 +34,6 @@ describe("Testing SocialLinks", () => {
     ];
     render(<SocialLinks links={custom} />);
 
-    // Están los personalizados
     expect(screen.getByRole("link", { name: /telegram/i })).toHaveAttribute(
       "href",
       "https://t.me/pokemart"
@@ -48,7 +43,6 @@ describe("Testing SocialLinks", () => {
       "https://youtube.com/@pokemart"
     );
 
-    // No están los defaults
     expect(screen.queryByRole("link", { name: /facebook/i })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /instagram/i })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /twitter/i })).not.toBeInTheDocument();
@@ -92,15 +86,12 @@ describe("Testing SocialLinks", () => {
   it("CP-Social5: Se renderiza sin links (array vacío) mostrando únicamente el heading", () => {
     const { container } = render(<SocialLinks links={[]} />);
 
-    // Heading visible
     expect(
       screen.getByRole("heading", { level: 3, name: /síguenos/i })
     ).toBeInTheDocument();
 
-    // Lista vacía de enlaces
     expect(screen.queryAllByRole("link")).toHaveLength(0);
 
-    // UL existe pero sin LI
     const ul = container.querySelector("ul.about-social__list");
     expect(ul).toBeInTheDocument();
     expect(ul?.querySelectorAll("li").length).toBe(0);

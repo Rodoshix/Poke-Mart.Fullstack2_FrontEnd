@@ -7,14 +7,12 @@ describe("Testing AboutMap", () => {
   it("CP-Map1: Renderiza heading e imagen con valores por defecto", () => {
     render(<AboutMap />);
 
-    // h3 con el heading por defecto
     const heading = screen.getByRole("heading", {
       level: 3,
       name: /cómo llegar/i,
     });
     expect(heading).toBeInTheDocument();
 
-    // Imagen con src/alt por defecto y atributos de performance
     const img = screen.getByRole("img", {
       name: /mapa de ubicación de poké mart — sucursal central/i,
     });
