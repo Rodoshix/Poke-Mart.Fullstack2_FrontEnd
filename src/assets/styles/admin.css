@@ -3246,6 +3246,11 @@
     width: 100%;
   }
 
+  .admin-orders__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .admin-order-filters__input,
   .admin-order-filters__select {
     width: 100%;
@@ -3340,4 +3345,9 @@
   .admin-product-reports__grid {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+.admin-orders__actions {
+  display: flex;
+  gap: 12px;
+  margin: 28px 0 18px;
 }

@@ -1,7 +1,9 @@
 import { useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import OrderFilters from "@/components/orders/OrderFilters.jsx";
 import OrderTable from "@/components/orders/OrderTable.jsx";
 import useOrdersData from "@/hooks/useOrdersData.js";
+import { resetOrders } from "@/services/orderService.js";
 
 const DEFAULT_SORT = "createdAt:desc";
 
@@ -36,6 +38,8 @@ const filterOrders = (orders, searchTerm) => {
 };
 
 const AdminOrders = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOption, setSortOption] = useState(DEFAULT_SORT);
 
@@ -47,6 +51,19 @@ const AdminOrders = () => {
     return sortOrders(filtered, sortOption);
   }, [ordersDataset, searchTerm, sortOption]);
 
+  const handleRestoreOrders = () => {
+    const confirmed =
+      typeof window === "undefined"
+        ? true
+        : window.confirm(
+            "¿Restaurar el historial de órdenes original? Se eliminarán las órdenes agregadas localmente.",
+          );
+    if (!confirmed) return;
+
+    resetOrders();
+    navigate(location.pathname, { replace: true, state: { status: "reset" } });
+  };
+
   return (
     <section className="admin-paper admin-orders">
       <div className="admin-page-header">
@@ -55,6 +72,16 @@ const AdminOrders = () => {
           Revisa el histórico de compras de la tienda, identifica a los clientes y accede al detalle completo de cada
           boleta.
         </p>
+      </div>
+
+      <div className="admin-orders__actions">
+        <button
+          type="button"
+          className="admin-products__action-button admin-products__action-button--danger"
+          onClick={handleRestoreOrders}
+        >
+          Restaurar órdenes
+        </button>
       </div>
 
       <OrderFilters

@@ -1,8 +1,16 @@
 // usado por CheckoutPage.jsx
 // src/components/checkout/PaymentModal.jsx
 export default function PaymentModal({
-  open, status, orderId, email, errors = [],
-  onClose, onGoHome, onKeepShopping, onFixData,
+  open,
+  status,
+  orderId,
+  email,
+  paymentLabel,
+  errors = [],
+  onClose,
+  onGoHome,
+  onKeepShopping,
+  onFixData,
 }) {
   if (!open) return null;
 
@@ -28,7 +36,14 @@ export default function PaymentModal({
             {status === "ok" ? (
               <>
                 <p className="mb-1">Pedido <span className="fw-semibold">{orderId}</span> confirmado.</p>
-                <p className="text-secondary mb-3">Te enviaremos la confirmación a <span className="fw-semibold">{email}</span>.</p>
+                <p className="text-secondary mb-2">
+                  Te enviaremos la confirmación a <span className="fw-semibold">{email}</span>.
+                </p>
+                {paymentLabel && (
+                  <p className="text-secondary mb-3">
+                    Método de pago: <span className="fw-semibold">{paymentLabel}</span>.
+                  </p>
+                )}
                 <div className="d-flex gap-2 flex-wrap">
                   <button className="btn btn-success" onClick={onGoHome}>Volver al inicio</button>
                   <button className="btn btn-outline-light" onClick={onKeepShopping}>Seguir comprando</button>

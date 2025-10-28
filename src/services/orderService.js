@@ -42,11 +42,16 @@ const normalizeOrderItems = (items = []) =>
     })
     .filter((item) => item.quantity > 0);
 
-const normalizeStatusHistory = (history, createdAt, updatedAt, status) => {
+const normalizeStatusHistory = (
+  history,
+  createdAt,
+  updatedAt,
+  status,
+) => {
   if (!Array.isArray(history) || history.length === 0) {
     return [
       { status: "created", label: "Orden creada", timestamp: createdAt },
-      { status: "completed", label: "Pago confirmado", timestamp: updatedAt },
+      { status: "Pendiente de Envío", label: "Pendiente de Envío", timestamp: updatedAt },
     ];
   }
   return history
@@ -100,14 +105,8 @@ const mapOrder = (order) => {
       capturedAt: order.payment?.capturedAt ?? updatedAt,
     },
     shipping: {
-      method: coerceString(
-        order.shipping?.method ||
-          (shippingCost > 0 ? "Despacho estándar" : "Retiro en tienda"),
-      ),
-      carrier: coerceString(
-        order.shipping?.carrier ||
-          (shippingCost > 0 ? "Poké Express" : "Retiro en tienda"),
-      ),
+      method: coerceString(order.shipping?.method || "Despacho a domicilio"),
+      carrier: coerceString(order.shipping?.carrier || "Pendiente"),
       cost: shippingCost,
       trackingNumber: coerceString(order.shipping?.trackingNumber),
       estimatedDelivery: order.shipping?.estimatedDelivery ?? null,

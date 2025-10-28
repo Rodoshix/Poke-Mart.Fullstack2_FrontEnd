@@ -7,8 +7,8 @@ import * as cartStore from "@/lib/cartStore";
 import { getAuth, getProfile } from "@/components/auth/session";
 import { applyProductSale } from "@/services/productService.js";
 
-import { useCartViewModel } from "@/hooks/useCartViewModel";      // ya creado en el carrito
-import { useCheckoutForm } from "@/hooks/useCheckoutForm";        // nuevo
+import { useCartViewModel } from "@/hooks/useCartViewModel";
+import { useCheckoutForm } from "@/hooks/useCheckoutForm";
 
 import OrderSummaryTable from "@/components/checkout/OrderSummaryTable";
 import CheckoutAddressForm from "@/components/checkout/CheckoutAddressForm";
@@ -20,25 +20,22 @@ import { createOrder } from "@/services/orderService.js";
 export default function CheckoutPage() {
   const navigate = useNavigate();
 
-  // Guardia de sesión
   useEffect(() => {
     const s = getAuth();
     const p = getProfile();
     if (!s || !p) navigate("/", { replace: true });
   }, [navigate]);
 
-  // Carrito (reuso del hook del carrito)
   const { items, totals } = useCartViewModel();
   const { subtotal, shipping, total } = totals;
 
-  // Formulario y validación
   const { form, setField, validate } = useCheckoutForm();
 
-  // Modal/pago
-  const [status, setStatus] = useState(null); // 'ok' | 'error' | null
+  const [status, setStatus] = useState(null);
   const [orderId, setOrderId] = useState(null);
   const [errorMsgs, setErrorMsgs] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [paymentLabel, setPaymentLabel] = useState("");
 
   const openModal = () => setShowModal(true);
   const closeModal = () => setShowModal(false);
@@ -54,6 +51,7 @@ export default function CheckoutPage() {
       return;
     }
 
+    setPaymentLabel("");
     let orderRecord = null;
     try {
       const profile = getProfile();
@@ -73,10 +71,15 @@ export default function CheckoutPage() {
         unitPrice: Math.max(0, Number(item.price) || 0),
       }));
 
-      const shippingMethod = shipping > 0 ? "Despacho estándar" : "Retiro en tienda";
-      const shippingCarrier = shipping > 0 ? "Poké Express" : "Retiro en tienda";
-
-      applyProductSale(adjustments);
+      const shippingMethod = "Despacho a domicilio";
+      const shippingCarrier = "Pendiente";
+      const PAYMENT_METHOD_LABELS = {
+        credit: "Tarjeta de crédito",
+        debit: "Tarjeta de débito",
+        transfer: "Transferencia bancaria",
+      };
+      const selectedPaymentLabel =
+        PAYMENT_METHOD_LABELS[form.paymentMethod] ?? PAYMENT_METHOD_LABELS.credit;
 
       orderRecord = createOrder({
         customerId: profile?.id,
@@ -87,7 +90,7 @@ export default function CheckoutPage() {
           "Cliente tienda",
         customerEmail: form.email || profile?.email || "",
         customerPhone: profile?.telefono || profile?.phone || "",
-        status: "completed",
+        status: "Pendiente de Envío",
         currency: "CLP",
         items: orderItems,
         summary: {
@@ -97,7 +100,7 @@ export default function CheckoutPage() {
           total: Math.round(total),
         },
         payment: {
-          method: "Pago en línea",
+          method: selectedPaymentLabel,
           status: "Pagado",
           transactionId: `PAY-${Date.now()}`,
           capturedAt: now.toISOString(),
@@ -116,6 +119,9 @@ export default function CheckoutPage() {
         },
         notes: form.notas?.trim(),
       });
+
+      applyProductSale(adjustments);
+      setPaymentLabel(selectedPaymentLabel);
     } catch (error) {
       console.error("No se pudo registrar la orden", error);
       setStatus("error");
@@ -153,6 +159,7 @@ export default function CheckoutPage() {
         status={status}
         orderId={orderId}
         email={form.email}
+        paymentLabel={paymentLabel}
         errors={errorMsgs}
         onClose={closeModal}
         onGoHome={() => navigate("/")}
