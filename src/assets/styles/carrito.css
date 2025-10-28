@@ -1,0 +1,100 @@
+html, body { height: 100%; }
+
+body{
+  font-family: 'Roboto', sans-serif;
+  color: var(--pm-black);
+  background: var(--pm-white);
+}
+
+body.page--carrito{
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+.page--carrito > main{ flex: 1 0 auto; }
+.site-footer{ margin-top: auto; }
+
+.site-nav__title{ font-weight: 700; }
+.site-nav__cart{ line-height: 1; }
+
+.site-header .site-nav{
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.left-border,
+.right-border{
+  position: fixed;
+  top: 0;
+  height: 100dvh;
+  width: clamp(110px, 12vw, 240px);
+  object-fit: cover;
+  z-index: -1;
+  pointer-events: none;
+}
+.left-border{ left: 0; }
+.right-border{ right: 0; transform: scaleX(-1); }
+
+@media (min-width: 992px){
+  .site-main{
+    padding-left:  calc(clamp(110px, 12vw, 240px) + 16px);
+    padding-right: calc(clamp(110px, 12vw, 240px) + 16px);
+  }
+}
+
+@media (max-width: 991.98px){
+  .left-border, .right-border{ display: none; }
+  .site-main{ padding-inline: 1rem; }
+}
+
+.cart-list.card{ overflow: hidden; }
+
+.cart-item{
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+}
+.cart-item:last-child{ border-bottom: 0; }
+
+.cart-item__img{
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  background: #f6f8fb;
+  border-radius: 12px;
+}
+
+.cart-item__title{ font-weight: 500; }
+.cart-item__meta{ font-size: .875rem; color: #666; }
+
+.qty{
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.qty__btn{
+  width: 36px;
+  height: 36px;
+  border: 0;
+  background: #f8f9fa;
+}
+.qty__value{
+  width: 40px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.cart-item__price{ text-align: right; }
+.cart-item__remove{
+  color: #0d6efd;
+  font-size: .875rem;
+  cursor: pointer;
+}
+
+.cart-summary .card-body{ padding: 16px 16px 20px; }
+
+.font-orbitron{ font-family: 'Orbitron', sans-serif; }

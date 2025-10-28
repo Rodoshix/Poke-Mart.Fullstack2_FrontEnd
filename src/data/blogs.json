@@ -1,0 +1,38 @@
+[
+    {
+      "id": "blg-1",
+      "titulo": "Guía rápida de Poké Balls para principiantes",
+      "fecha": "2025-09-10",
+      "categoria": "Guías",
+      "descripcion": "¿No sabes cuándo usar una Super Ball o una Ultra Ball? Repasamos los tipos de Poké Balls, sus ventajas y consejos para mejorar tu tasa de captura en distintas condiciones.",
+      "etiquetas": ["pokeballs", "consejos", "principiantes"],
+      "imagen": "src/assets/img/tienda/blog/blog1.jpg"
+    },
+    {
+      "id": "blg-2",
+      "titulo": "Kit de expedición esencial para rutas largas",
+      "fecha": "2025-09-07",
+      "categoria": "Expedición",
+      "descripcion": "Desde tiendas de campaña y repelentes hasta sacos de dormir: armamos una lista de verificación práctica para que no te falte nada en tu próxima aventura.",
+      "etiquetas": ["expedicion", "checklist"],
+      "imagen": "src/assets/img/tienda/blog/blog2.jpg"
+    },
+    {
+      "id": "blg-3",
+      "titulo": "Tecnología Rotom: ventajas del Rotom Phone",
+      "fecha": "2025-09-04",
+      "categoria": "Tecnología",
+      "descripcion": "El Rotom Phone es más que un celular: mapa dinámico, Pokédex integrada y utilidades únicas. Te contamos cuándo conviene y qué alternativas existen.",
+      "etiquetas": ["tecnologia", "rotom", "pokedex"],
+      "imagen": "src/assets/img/tienda/blog/blog3.jpg"
+    },
+    {
+      "id": "blg-4",
+      "titulo": "Cómo cuidar tus zapatillas de entrenador",
+      "fecha": "2025-09-01",
+      "categoria": "Ropa",
+      "descripcion": "Lávalas bien, sécalas mejor. Trucos sencillos para alargar la vida de tus zapatillas en climas húmedos o con mucho polvo de ruta.",
+      "etiquetas": ["ropa", "cuidado", "consejos"],
+      "imagen": "src/assets/img/tienda/blog/blog4.jpg"
+    }
+]   
