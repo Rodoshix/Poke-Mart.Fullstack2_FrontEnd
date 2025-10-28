@@ -5,5 +5,10 @@ import path from "path";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  test:{
+    globals: true,
+    environment: "happy-dom",
+    setupFiles: "./src/setupTests.js"
+  },
   resolve: { alias: { "@": path.resolve(__dirname, "src") } },
 });
