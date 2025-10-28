@@ -1,7 +1,7 @@
 import { useMemo } from "react";
-import { seedOrders } from "@/data/seedOrders.js";
 import { getAllUsers } from "@/services/userService.js";
 import { getAllProducts } from "@/services/productService.js";
+import useOrdersData from "@/hooks/useOrdersData.js";
 
 const CURRENCY_FORMATTER = new Intl.NumberFormat("es-CL", {
   style: "currency",
@@ -17,7 +17,11 @@ const normalizeRole = (role = "") => role.toString().trim().toLowerCase();
 const AdminReports = () => {
   const users = useMemo(() => getAllUsers(), []);
   const products = useMemo(() => getAllProducts(), []);
-  const orders = useMemo(() => (Array.isArray(seedOrders) ? seedOrders : []), []);
+  const orders = useOrdersData();
+  const normalizedOrders = useMemo(
+    () => (Array.isArray(orders) ? orders : []),
+    [orders],
+  );
 
   const productById = useMemo(() => {
     const map = new Map();
@@ -31,9 +35,12 @@ const AdminReports = () => {
     const now = Date.now();
     const totalUsers = users.length;
     const totalProducts = products.length;
-    const totalOrders = orders.length;
-    const totalRevenue = orders.reduce((acc, order) => acc + (Number(order.total) || 0), 0);
-    const recentOrders = orders.filter((order) => {
+    const totalOrders = normalizedOrders.length;
+    const totalRevenue = normalizedOrders.reduce(
+      (acc, order) => acc + (Number(order.total) || 0),
+      0,
+    );
+    const recentOrders = normalizedOrders.filter((order) => {
       const timestamp = new Date(order.createdAt).getTime();
       return !Number.isNaN(timestamp) && now - timestamp <= THIRTY_DAYS;
     });
@@ -53,7 +60,7 @@ const AdminReports = () => {
       revenueLast30,
       newUsers,
     };
-  }, [orders, products, users]);
+  }, [normalizedOrders, products, users]);
 
   const userInsights = useMemo(() => {
     const admins = users.filter((user) => normalizeRole(user.role) === "admin");
@@ -123,25 +130,25 @@ const AdminReports = () => {
   }, [products]);
 
   const orderInsights = useMemo(() => {
-    const statusCount = orders.reduce((acc, order) => {
+    const statusCount = normalizedOrders.reduce((acc, order) => {
       const status = order.status || "unknown";
       acc.set(status, (acc.get(status) ?? 0) + 1);
       return acc;
     }, new Map());
     const statusList = Array.from(statusCount.entries()).map(([status, count]) => ({
-      status,
+      status: status === "completed" ? "Completadas" : status,
       count,
     }));
 
     const now = Date.now();
-    const lastOrderTimestamp = orders.reduce((latest, order) => {
+    const lastOrderTimestamp = normalizedOrders.reduce((latest, order) => {
       const timestamp = new Date(order.createdAt).getTime();
       if (Number.isNaN(timestamp)) return latest;
       return Math.max(latest, timestamp);
     }, 0);
 
     const lastOrder = lastOrderTimestamp ? new Date(lastOrderTimestamp) : null;
-    const overdueOrders = orders.filter((order) => {
+    const overdueOrders = normalizedOrders.filter((order) => {
       if (!order.statusHistory || order.statusHistory.length === 0) return false;
       const finalStatus = order.statusHistory[order.statusHistory.length - 1]?.status;
       if (finalStatus === "completed" || finalStatus === "cancelled") return false;
@@ -154,11 +161,11 @@ const AdminReports = () => {
       lastOrder,
       overdueOrders,
     };
-  }, [orders]);
+  }, [normalizedOrders]);
 
   const topCustomers = useMemo(() => {
     const map = new Map();
-    orders.forEach((order) => {
+    normalizedOrders.forEach((order) => {
       const key = order.customerEmail || order.customerId || order.customer;
       if (!key) return;
       const existing = map.get(key) ?? {
@@ -175,11 +182,11 @@ const AdminReports = () => {
     return Array.from(map.values())
       .sort((a, b) => b.total - a.total)
       .slice(0, 5);
-  }, [orders]);
+  }, [normalizedOrders]);
 
   const topProducts = useMemo(() => {
     const map = new Map();
-    orders.forEach((order) => {
+    normalizedOrders.forEach((order) => {
       (order.items ?? []).forEach((item) => {
         const productId = item.productId ?? item.sku;
         if (productId == null) return;
@@ -204,7 +211,7 @@ const AdminReports = () => {
       }))
       .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 5);
-  }, [orders, productById]);
+  }, [normalizedOrders, productById]);
 
   return (
     <section className="admin-paper admin-reports">

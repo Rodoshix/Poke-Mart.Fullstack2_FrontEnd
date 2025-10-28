@@ -6,6 +6,7 @@ import UserTable from "@/components/users/UserTable.jsx";
 import { resetUsers } from "@/services/userService.js";
 
 const SORT_OPTIONS = [
+  { value: "id-asc", label: "ID ascendente" },
   { value: "recent", label: "Más recientes" },
   { value: "name", label: "Nombre A-Z" },
   { value: "role", label: "Rol" },
@@ -22,7 +23,7 @@ const AdminUsers = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
   const [selectedRegion, setSelectedRegion] = useState("");
-  const [sortOption, setSortOption] = useState("recent");
+  const [sortOption, setSortOption] = useState("id-asc");
 
   const enrichedUsers = useMemo(
     () =>
@@ -85,12 +86,15 @@ const AdminUsers = () => {
         list.sort((a, b) => a.role.localeCompare(b.role));
         break;
       case "recent":
-      default:
         list.sort((a, b) => {
           const valueA = a.registeredDate ? a.registeredDate.getTime() : 0;
           const valueB = b.registeredDate ? b.registeredDate.getTime() : 0;
           return valueB - valueA;
         });
+        break;
+      case "id-asc":
+      default:
+        list.sort((a, b) => (Number(a.id) || 0) - (Number(b.id) || 0));
     }
     return list;
   }, [filteredUsers, sortOption]);
@@ -118,11 +122,17 @@ const AdminUsers = () => {
     return () => clearTimeout(timeout);
   }, [feedbackMessage, navigate, location.pathname]);
 
+  useEffect(() => {
+    if (status === "created") {
+      setSortOption("id-asc");
+    }
+  }, [status]);
+
   const handleResetFilters = () => {
     setSearchTerm("");
     setSelectedRole("");
     setSelectedRegion("");
-    setSortOption("recent");
+    setSortOption("id-asc");
   };
 
   const handleRestoreUsers = () => {
@@ -206,7 +216,7 @@ const AdminUsers = () => {
         onSortChange={setSortOption}
         onSearchChange={setSearchTerm}
         onReset={
-          selectedRole || selectedRegion || searchTerm || sortOption !== "recent"
+          selectedRole || selectedRegion || searchTerm || sortOption !== "id-asc"
             ? handleResetFilters
             : undefined
         }

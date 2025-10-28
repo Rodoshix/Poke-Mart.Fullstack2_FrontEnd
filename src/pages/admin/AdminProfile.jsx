@@ -75,14 +75,6 @@ const AdminProfile = () => {
     }));
   };
 
-  const handleRegisteredAtChange = (event) => {
-    const { value } = event.target;
-    setFormState((prev) => ({
-      ...prev,
-      registeredAt: value ? new Date(value).toISOString() : prev.registeredAt,
-    }));
-  };
-
   const handleRunBlur = () => {
     setFormState((prev) => {
       const cleaned = norm.run(prev.run);
@@ -210,7 +202,7 @@ const AdminProfile = () => {
         comuna: formState.comuna.trim(),
         direccion: formState.direccion.replace(/\s+/g, " ").trim(),
         email: norm.email(formState.email),
-        registeredAt: formState.registeredAt,
+        registeredAt: user.registeredAt,
         avatarUrl: formState.avatarUrl,
       };
 
@@ -531,8 +523,12 @@ const AdminProfile = () => {
                 type="datetime-local"
                 className="admin-user-form__input"
                 value={formState.registeredAt ? formState.registeredAt.slice(0, 16) : ""}
-                onChange={handleRegisteredAtChange}
+                readOnly
+                disabled
               />
+              <small className="text-muted d-block mt-1">
+                La fecha de registro se establece automáticamente y no es editable.
+              </small>
             </div>
           </div>
 
