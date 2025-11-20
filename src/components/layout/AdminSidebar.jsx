@@ -9,7 +9,15 @@ import AdminSidebarNavigation from "./AdminSidebarNavigation.jsx";
 import AdminSidebarActions from "./AdminSidebarActions.jsx";
 import AdminSidebarProfile from "./AdminSidebarProfile.jsx";
 
-const AdminSidebar = ({ isOpen, onHide }) => {
+const filterNavItemsByRole = (items, role) => {
+  const normalized = (role || "").toLowerCase();
+  if (normalized === "vendedor") {
+    return items.filter((item) => item.code === "OR" || item.code === "PR");
+  }
+  return items;
+};
+
+const AdminSidebar = ({ isOpen, onHide, role }) => {
   const navigate = useNavigate();
   const { profile } = useAuthSession();
 
@@ -35,6 +43,11 @@ const AdminSidebar = ({ isOpen, onHide }) => {
     };
   }, [profile]);
 
+  const navItems = useMemo(
+    () => filterNavItemsByRole(ADMIN_SIDEBAR_NAV_ITEMS, role || profile?.role),
+    [role, profile]
+  );
+
   const handleStoreRedirect = () => {
     navigate("/", { replace: false });
     onHide?.();
@@ -53,7 +66,7 @@ const AdminSidebar = ({ isOpen, onHide }) => {
   return (
     <aside className="admin-sidebar" data-open={isOpen}>
       <AdminSidebarBrand />
-      <AdminSidebarNavigation items={ADMIN_SIDEBAR_NAV_ITEMS} onNavigate={handleNavigate} />
+      <AdminSidebarNavigation items={navItems} onNavigate={handleNavigate} />
       <AdminSidebarActions
         onStoreRedirect={handleStoreRedirect}
         onLogout={handleLogout}

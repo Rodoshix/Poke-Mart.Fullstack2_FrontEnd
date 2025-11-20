@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import ProductFilters from "@/components/products/ProductFilters.jsx";
 import ProductTable from "@/components/products/ProductTable.jsx";
 import Paginator from "@/components/common/Paginator.jsx";
+import useAuthSession from "@/hooks/useAuthSession.js";
 import {
   getAllProducts,
   subscribeToProductChanges,
@@ -16,6 +17,9 @@ const PAGE_SIZE = 10;
 const AdminProducts = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { profile } = useAuthSession();
+  const role = (profile?.role || "").toLowerCase();
+  const isAdmin = role === "admin";
   const presetCategory = location.state?.presetCategory ?? "";
   const presetSearch = location.state?.presetSearch ?? "";
   const [searchTerm, setSearchTerm] = useState(presetSearch);
@@ -99,11 +103,11 @@ const AdminProducts = () => {
   const feedbackMessage = useMemo(() => {
     switch (status) {
       case "created":
-        return `Se agregó el producto #${updatedProductId} al catálogo (almacenado localmente).`;
+        return `Se agrego el producto #${updatedProductId} al catalogo (almacenado localmente).`;
       case "updated":
         return `El producto #${updatedProductId ?? ""} fue actualizado (cambios locales).`;
       case "reset":
-        return "El catálogo se restauró a los productos originales del proyecto.";
+        return "El catalogo se restauro a los productos originales del proyecto.";
       default:
         return "";
     }
@@ -143,7 +147,7 @@ const AdminProducts = () => {
 
   const handleRestoreDefaults = () => {
     const confirmed =
-      typeof window === "undefined" ? true : window.confirm("¿Restaurar el catálogo original?");
+      typeof window === "undefined" ? true : window.confirm("Restaurar el catalogo original?");
     if (!confirmed) return;
     resetProducts();
     const refreshed = getAllProducts();
@@ -160,24 +164,26 @@ const AdminProducts = () => {
       <div className="admin-page-header">
         <h1 className="admin-page-title">Productos</h1>
         <p className="admin-page-subtitle">
-          Gestiona el catálogo que se muestra en la tienda: revisa stock, precios e identifica productos críticos.
+          Gestiona el catalogo que se muestra en la tienda: revisa stock, precios e identifica productos criticos.
         </p>
       </div>
 
-      <div className="admin-products__actions">
-        <Link to="/admin/productos/nuevo" className="admin-products__action-button admin-products__action-button--primary">
-          + Agregar producto
-        </Link>
-        <Link to="/admin/productos/criticos" className="admin-products__action-button">
-          Productos críticos
-        </Link>
-        <Link to="/admin/productos/reportes" className="admin-products__action-button">
-          Reportes de productos
-        </Link>
-        <button type="button" className="admin-products__action-button admin-products__action-button--danger" onClick={handleRestoreDefaults}>
-          Restaurar catálogo
-        </button>
-      </div>
+      {isAdmin && (
+        <div className="admin-products__actions">
+          <Link to="/admin/productos/nuevo" className="admin-products__action-button admin-products__action-button--primary">
+            + Agregar producto
+          </Link>
+          <Link to="/admin/productos/criticos" className="admin-products__action-button">
+            Productos criticos
+          </Link>
+          <Link to="/admin/productos/reportes" className="admin-products__action-button">
+            Reportes de productos
+          </Link>
+          <button type="button" className="admin-products__action-button admin-products__action-button--danger" onClick={handleRestoreDefaults}>
+            Restaurar catalogo
+          </button>
+        </div>
+      )}
 
       <ProductFilters
         searchTerm={searchTerm}

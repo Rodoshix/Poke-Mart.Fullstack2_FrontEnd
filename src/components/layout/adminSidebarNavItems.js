@@ -1,8 +1,8 @@
 const ADMIN_SIDEBAR_NAV_ITEMS = [
   { to: "/admin", label: "Dashboard", code: "DB", end: true },
-  { to: "/admin/ordenes", label: "Órdenes", code: "OR" },
+  { to: "/admin/ordenes", label: "Ordenes", code: "OR" },
   { to: "/admin/productos", label: "Productos", code: "PR" },
-  { to: "/admin/categorias", label: "Categorías", code: "CT" },
+  { to: "/admin/categorias", label: "Categorias", code: "CT" },
   { to: "/admin/usuarios", label: "Usuarios", code: "US" },
   { to: "/admin/reportes", label: "Reportes", code: "RP" },
 ];
