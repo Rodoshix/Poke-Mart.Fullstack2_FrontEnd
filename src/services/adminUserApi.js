@@ -1,29 +1,4 @@
-import { ensureFreshSession } from "@/services/authService.js";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
-
-const defaultHeaders = {
-  "Content-Type": "application/json",
-};
-
-async function parseResponse(response) {
-  const text = await response.text();
-  if (!text) return {};
-  try {
-    return JSON.parse(text);
-  } catch {
-    return {};
-  }
-}
-
-async function handle(response) {
-  const data = await parseResponse(response);
-  if (!response.ok) {
-    const message = data?.message || data?.error || `Error ${response.status}`;
-    throw new Error(message);
-  }
-  return data;
-}
+import { apiFetch } from "@/services/httpClient.js";
 
 const mapUser = (u) => ({
   id: u.id,
@@ -43,17 +18,7 @@ const mapUser = (u) => ({
 });
 
 export async function fetchAdminUsers() {
-  const session = await ensureFreshSession();
-  if (!session?.token) throw new Error("No autenticado");
-
-  const response = await fetch(`${API_BASE_URL}/api/admin/users`, {
-    method: "GET",
-    headers: {
-      ...defaultHeaders,
-      Authorization: `Bearer ${session.token}`,
-    },
-  });
-  const data = await handle(response);
+  const data = await apiFetch("/api/admin/users", { auth: true });
   if (!Array.isArray(data)) return [];
   return data.map(mapUser);
 }

@@ -35,7 +35,6 @@ import AdminUserHistory from "@/pages/admin/AdminUserHistory.jsx";
 import AdminOffers from "@/pages/admin/AdminOffers.jsx";
 import AdminReports from "@/pages/admin/AdminReports.jsx";
 import AdminProfile from "@/pages/admin/AdminProfile.jsx";
-import AdminLogin from "@/pages/admin/AdminLogin.jsx";
 
 const ReviewsPage = () => <h1 className="h3">Reseñas</h1>;
 const NotFound    = () => <div className="text-center"><h1 className="display-4">404</h1></div>;
@@ -56,7 +55,6 @@ const App = () => {
 
   return (
     <Routes>
-      <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<AdminDashboard />} />
         <Route path="ordenes" element={<AdminOrders />} />

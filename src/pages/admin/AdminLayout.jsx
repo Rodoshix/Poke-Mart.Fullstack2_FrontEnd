@@ -29,8 +29,9 @@ const AdminLayout = () => {
   const { session, profile } = useAuthSession();
   const location = useLocation();
   const role = (profile?.role || "").toLowerCase();
-  const isAdmin = !!session && !!profile && role === "admin";
-  const isSeller = !!session && !!profile && role === "vendedor";
+  const hasSession = !!session && !!profile;
+  const isAdmin = hasSession && role === "admin";
+  const isSeller = hasSession && role === "vendedor";
   const isAuthorized = isAdmin || isSeller;
   const [isDesktop, setIsDesktop] = useState(() => isDesktopViewport());
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => isDesktopViewport());
@@ -72,7 +73,7 @@ const AdminLayout = () => {
     setIsSidebarOpen(false);
   };
 
-  if (!isAuthorized) {
+  if (!hasSession || !isAuthorized) {
     return <Navigate to="/" replace />;
   }
 
