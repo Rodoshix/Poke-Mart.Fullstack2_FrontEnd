@@ -1,10 +1,11 @@
 // src/components/registro/useRegistroForm.js
 import { useMemo, useState } from "react";
-import { getBaseUsers, getNextId, saveUser } from "./usersRepo";
 import { formatRun, getComunasByRegion, norm, validate } from "./validators";
+import { register as apiRegister } from "@/services/authService.js";
+import { setAuth } from "@/components/auth/session";
 
-export function useRegistroForm() {
-  const baseUsers = useMemo(() => getBaseUsers(), []);
+export function useRegistroForm({ onSuccess } = {}) {
+  const baseUsers = useMemo(() => [], []); // el backend valida duplicados
   const [form, setForm] = useState({
     nombre: "",
     apellido: "",
@@ -34,14 +35,14 @@ export function useRegistroForm() {
     setForm((f) => ({ ...f, region: value, comuna: "" }));
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     setStatus({ text: "", error: false });
 
     const data = {
       ...form,
       run: norm.run(form.run),
-      direccion: form.direccion.replace(/\s+/g, " ").trim(),
+      direccion: (form.direccion || "").replace(/\s+/g, " ").trim(),
       email: norm.email(form.email),
       username: form.username.trim(),
     };
@@ -53,38 +54,36 @@ export function useRegistroForm() {
       return;
     }
 
-    const newUser = {
-      id: getNextId(baseUsers),
-      username: data.username,
-      password: data.password,
-      role: "cliente",
-      nombre: data.nombre,
-      apellido: data.apellido,
-      run: formatRun(data.run),
-      fechaNacimiento: data.fechaNacimiento,
-      region: data.region,
-      comuna: data.comuna,
-      direccion: data.direccion,
-      email: data.email,
-      avatarUrl: "",
-    };
+    try {
+      const payload = await apiRegister({
+        email: data.email,
+        username: data.username,
+        password: data.password,
+        nombre: data.nombre,
+        apellido: data.apellido,
+        rut: formatRun(data.run),
+        direccion: data.direccion,
+        region: data.region,
+        comuna: data.comuna,
+        fechaNacimiento: data.fechaNacimiento,
+        telefono: "",
+      });
 
-    saveUser(newUser);
+      const { token, refreshToken, expiresAt, profile } = payload || {};
+      if (token && profile) {
+        setAuth({
+          token,
+          refreshToken,
+          expiresAt: expiresAt ?? Date.now() + 60 * 60 * 1000,
+          profile: { ...profile, role: (profile.role || "").toLowerCase() },
+        });
+      }
 
-    setStatus({ text: "¡Registro completado! Ya puedes iniciar sesión.", error: false });
-    setForm({
-      nombre: "",
-      apellido: "",
-      run: "",
-      fechaNacimiento: "",
-      region: "",
-      comuna: "",
-      direccion: "",
-      username: "",
-      email: "",
-      password: "",
-      passwordConfirm: "",
-    });
+      setStatus({ text: "Registro completado. Te hemos iniciado sesi\u00f3n.", error: false });
+      if (onSuccess) onSuccess();
+    } catch (err) {
+      setStatus({ text: err?.message || "No se pudo registrar. Intenta nuevamente.", error: true });
+    }
   };
 
   return { form, setField, status, comunas, onBlurRun, onChangeRegion, onSubmit };

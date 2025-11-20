@@ -1,3 +1,5 @@
+import { getAuth, setAuth, clearAuth } from "@/components/auth/session";
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 const defaultHeaders = {
@@ -32,11 +34,11 @@ export async function login({ identifier, password }) {
   return handle(response);
 }
 
-export async function register({ email, username, password, nombre, apellido }) {
+export async function register({ email, username, password, nombre, apellido, rut, direccion, region, comuna, fechaNacimiento, telefono }) {
   const response = await fetch(`${API_BASE_URL}/auth/register`, {
     method: "POST",
     headers: defaultHeaders,
-    body: JSON.stringify({ email, username, password, nombre, apellido }),
+    body: JSON.stringify({ email, username, password, nombre, apellido, rut, direccion, region, comuna, fechaNacimiento, telefono }),
   });
   return handle(response);
 }
@@ -51,3 +53,27 @@ export async function refreshToken(refreshToken) {
 }
 
 export { API_BASE_URL };
+
+// Optional: attempts to refresh the session if expired, returns fresh auth or null
+export async function ensureFreshSession() {
+  const session = getAuth();
+  if (!session?.refreshToken) return null;
+  const { expiresAt, refreshToken: rt } = session;
+  const needsRefresh = !expiresAt || Date.now() > expiresAt - 60_000; // margen 1 min
+  if (!needsRefresh) return session;
+  try {
+    const payload = await refreshToken(rt);
+    const { token, refreshToken: newRt, expiresAt: newExp, profile } = payload || {};
+    if (!token || !profile) throw new Error("Respuesta invalida en refresh");
+    setAuth({
+      token,
+      refreshToken: newRt ?? rt,
+      expiresAt: newExp ?? Date.now() + 60 * 60 * 1000,
+      profile: { ...profile, role: (profile.role || "").toLowerCase() },
+    });
+    return getAuth();
+  } catch (err) {
+    clearAuth();
+    return null;
+  }
+}

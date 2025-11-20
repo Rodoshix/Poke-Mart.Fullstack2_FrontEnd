@@ -1,6 +1,6 @@
 // src/pages/tienda/RegistroPage.jsx
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "@/assets/styles/registro.css";
 
 import { REGIONES as REGIONS } from "@/data/regiones";
@@ -15,7 +15,10 @@ export default function RegistroPage() {
     return () => document.body.classList.remove("page--registro");
   }, []);
 
-  const { form, setField, status, comunas, onBlurRun, onChangeRegion, onSubmit } = useRegistroForm();
+  const navigate = useNavigate();
+  const { form, setField, status, comunas, onBlurRun, onChangeRegion, onSubmit } = useRegistroForm({
+    onSuccess: () => navigate("/", { replace: true }),
+  });
 
   return (
     <main className="registro" role="main">
