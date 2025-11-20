@@ -1,20 +1,18 @@
 import { useEffect, useState } from "react";
 import { fetchProducts } from "@/services/catalogApi.js";
-import {
-  getAllProducts,
-} from "@/services/productService.js";
+import { getAllProducts } from "@/services/productService.js";
 
 const useProductsData = () => {
-  const [products, setProducts] = useState(() => getAllProducts());
+  const [products, setProducts] = useState([]);
 
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
       try {
         const data = await fetchProducts();
-        if (!cancelled) setProducts(data);
+        if (!cancelled) setProducts(Array.isArray(data) ? data : []);
       } catch (_) {
-        // si falla, se mantiene el fallback local
+        if (!cancelled) setProducts(getAllProducts());
       }
     };
     load();

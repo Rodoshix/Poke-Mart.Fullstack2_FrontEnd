@@ -1,20 +1,17 @@
 import { useEffect, useState } from "react";
 import { fetchAdminUsers } from "@/services/adminUserApi.js";
-import { getAllUsers } from "@/services/userService.js";
 
 const useUsersData = () => {
-  const [users, setUsers] = useState(() => getAllUsers());
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
       try {
         const data = await fetchAdminUsers();
-        if (!cancelled && Array.isArray(data)) {
-          setUsers(data);
-        }
+        if (!cancelled) setUsers(Array.isArray(data) ? data : []);
       } catch {
-        // fallback se queda con los datos locales/mock
+        if (!cancelled) setUsers([]);
       }
     };
     load();
