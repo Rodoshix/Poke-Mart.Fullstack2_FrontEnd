@@ -1,23 +1,22 @@
 // src/hooks/useOffers.js
 import { useMemo, useState } from "react";
 import useProductsData from "@/hooks/useProductsData.js";
-import offers from "@/data/ofertas.json";
 import * as cartStore from "@/lib/cartStore";
-import { getOfferInfo } from "@/lib/offers";       // ⬅️ usa el lib
+import { getOfferInfo } from "@/lib/offers";
 import { resolveImg } from "@/utils/resolveImg";
 
 export function useOffers() {
   const products = useProductsData();
-  const overlayById = useMemo(() => {
-    const list = Array.isArray(offers) ? offers : [];
-    return new Map(list.map((o) => [String(o.id), o]));
-  }, []);
 
   const items = useMemo(() => {
     const raw = Array.isArray(products) ? products : [];
     return raw
       .map((p) => {
-        const offer = getOfferInfo(p, overlayById);
+        const offer = getOfferInfo({
+          ...p,
+          discountPct: p.discountPct ?? p.offer?.discountPct ?? 0,
+          endsAt: p.endsAt ?? p.offer?.endsAt ?? null,
+        });
         return {
           ...p,
           img: resolveImg(p.imagen),
@@ -26,7 +25,7 @@ export function useOffers() {
         };
       })
       .filter((x) => x.offer.onSale);
-  }, [overlayById, products]);
+  }, [products]);
 
   const [sort, setSort] = useState("best");
   const sorted = useMemo(() => {

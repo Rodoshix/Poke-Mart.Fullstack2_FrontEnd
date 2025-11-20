@@ -1,31 +1,26 @@
 import { useEffect, useState } from "react";
+import { fetchProducts } from "@/services/catalogApi.js";
 import {
   getAllProducts,
-  subscribeToProductChanges,
-  PRODUCT_STORAGE_KEY,
 } from "@/services/productService.js";
 
 const useProductsData = () => {
   const [products, setProducts] = useState(() => getAllProducts());
 
   useEffect(() => {
-    const refresh = () => setProducts(getAllProducts());
-    const unsubscribe = subscribeToProductChanges(refresh);
-
-    if (typeof window !== "undefined") {
-      const handleStorage = (event) => {
-        if (event.key === null || event.key === PRODUCT_STORAGE_KEY) {
-          refresh();
-        }
-      };
-      window.addEventListener("storage", handleStorage);
-      return () => {
-        unsubscribe();
-        window.removeEventListener("storage", handleStorage);
-      };
-    }
-
-    return unsubscribe;
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const data = await fetchProducts();
+        if (!cancelled) setProducts(data);
+      } catch (_) {
+        // si falla, se mantiene el fallback local
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return products;
