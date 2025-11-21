@@ -1,31 +1,23 @@
 import { useEffect, useState } from "react";
-import {
-  getAllOrders,
-  subscribeToOrderChanges,
-  ORDER_STORAGE_KEY,
-} from "@/services/orderService.js";
+import { fetchAdminOrders } from "@/services/orderApi.js";
 
 const useOrdersData = () => {
-  const [orders, setOrders] = useState(() => getAllOrders());
+  const [orders, setOrders] = useState([]);
 
   useEffect(() => {
-    const refresh = () => setOrders(getAllOrders());
-    const unsubscribe = subscribeToOrderChanges(refresh);
-
-    if (typeof window !== "undefined") {
-      const handleStorage = (event) => {
-        if (event.key === null || event.key === ORDER_STORAGE_KEY) {
-          refresh();
-        }
-      };
-      window.addEventListener("storage", handleStorage);
-      return () => {
-        unsubscribe();
-        window.removeEventListener("storage", handleStorage);
-      };
-    }
-
-    return unsubscribe;
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const data = await fetchAdminOrders();
+        if (!cancelled) setOrders(Array.isArray(data) ? data : []);
+      } catch {
+        if (!cancelled) setOrders([]);
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return orders;
