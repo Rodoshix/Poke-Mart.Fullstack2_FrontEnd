@@ -1,22 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { useMemo } from "react";
 import StatCard from "@/components/dashboard/StatCard.jsx";
 import QuickLinks from "@/components/dashboard/QuickLinks.jsx";
-import {
-  getAllOrders,
-  subscribeToOrderChanges,
-  ORDER_STORAGE_KEY,
-} from "@/services/orderService.js";
-import {
-  getAllProducts,
-  subscribeToProductChanges,
-  PRODUCT_STORAGE_KEY,
-} from "@/services/productService.js";
-import {
-  getAllUsers,
-  subscribeToUserChanges,
-  USER_STORAGE_KEY,
-  REGISTERED_USER_STORAGE_KEY,
-} from "@/services/userService.js";
+import useOrdersData from "@/hooks/useOrdersData.js";
+import useAdminProducts from "@/hooks/useAdminProducts.js";
+import useUsersData from "@/hooks/useUsersData.js";
 
 const THIRTY_DAYS_MS = 30 * 86_400_000;
 const INVENTORY_CAPACITY_BUFFER = 80;
@@ -33,141 +20,97 @@ const QUICK_LINKS = [
   { id: "store", to: "/", title: "Tienda", description: "Ver vitrina online", icon: "ST" },
 ];
 
-const computeDashboardMetrics = () => {
-  const now = Date.now();
-
-  const orders = getAllOrders();
-  const totalOrders = orders.length;
-
-  const ordersLast30 = orders.filter(({ createdAt }) => {
-    const createdAtMs = new Date(createdAt).getTime();
-    return Number.isFinite(createdAtMs) && now - createdAtMs <= THIRTY_DAYS_MS;
-  }).length;
-  const ordersPrev30 = orders.filter(({ createdAt }) => {
-    const createdAtMs = new Date(createdAt).getTime();
-    if (!Number.isFinite(createdAtMs)) return false;
-    const diff = now - createdAtMs;
-    return diff > THIRTY_DAYS_MS && diff <= THIRTY_DAYS_MS * 2;
-  }).length;
-
-  const growthRate =
-    ordersPrev30 === 0 ? 1 : (ordersLast30 - ordersPrev30) / Math.max(ordersPrev30, 1);
-  const growthProbability = Math.round(Math.max(0, Math.min(100, 50 + growthRate * 100)));
-  const ordersTrendVariant = ordersLast30 >= ordersPrev30 ? "positive" : "negative";
-
-  const productList = getAllProducts();
-  const inventoryTotalUnits = productList.reduce(
-    (acc, product) => acc + (Number(product?.stock) || 0),
-    0,
-  );
-  const inventoryCapacity = productList.reduce((acc, product) => {
-    const base = Number(product?.stockBase ?? product?.stock ?? 0);
-    return acc + base + INVENTORY_CAPACITY_BUFFER;
-  }, 0);
-
-  const users = getAllUsers();
-  const totalUsers = users.length;
-  const newUsersLast30 = users.filter(({ registeredAt }) => {
-    const registeredAtMs = new Date(registeredAt).getTime();
-    return Number.isFinite(registeredAtMs) && now - registeredAtMs <= THIRTY_DAYS_MS;
-  }).length;
-  const newUsersRatio =
-    totalUsers === 0 ? 0 : Math.round((newUsersLast30 / Math.max(totalUsers, 1)) * 100);
-  const userTrendVariant = newUsersLast30 > 0 ? "positive" : "neutral";
-
-  const orderStats = {
-    title: "Compras del sitio",
-    icon: "ORD",
-    primaryValue: formatNumber(totalOrders),
-    primaryLabel: "Órdenes totales",
-    secondaryLabel: "Probabilidad de aumento",
-    secondaryValue: `${growthProbability}%`,
-    trend: {
-      label: "Órdenes últimos 30 días",
-      value: formatNumber(ordersLast30),
-      variant: ordersTrendVariant,
-    },
-    tone: "primary",
-  };
-
-  const inventoryStats = {
-    title: "Inventario disponible",
-    icon: "INV",
-    primaryValue: formatNumber(inventoryTotalUnits),
-    primaryLabel: "Unidades en stock",
-    secondaryLabel: "Capacidad máxima",
-    secondaryValue: formatNumber(inventoryCapacity),
-    trend: {
-      label: "SKUs activos",
-      value: formatNumber(productList.length),
-      variant: "neutral",
-    },
-    tone: "accent",
-  };
-
-  const userStats = {
-    title: "Usuarios registrados",
-    icon: "USR",
-    primaryValue: formatNumber(totalUsers),
-    primaryLabel: "Usuarios totales",
-    secondaryLabel: "Altas últimos 30 días",
-    secondaryValue: formatNumber(newUsersLast30),
-    trend: {
-      label: "Participación reciente",
-      value: `${newUsersRatio}% del total`,
-      variant: userTrendVariant,
-    },
-    tone: "neutral",
-  };
-
-  return { orderStats, inventoryStats, userStats };
-};
-
 const AdminDashboard = () => {
-  const [metrics, setMetrics] = useState(() => computeDashboardMetrics());
+  const orders = useOrdersData();
+  const products = useAdminProducts();
+  const users = useUsersData();
   const quickLinks = QUICK_LINKS;
 
-  const refreshMetrics = useCallback(() => {
-    setMetrics(computeDashboardMetrics());
-  }, []);
+  const metrics = useMemo(() => {
+    const now = Date.now();
+    const safeOrders = Array.isArray(orders) ? orders : [];
+    const safeProducts = Array.isArray(products) ? products : [];
+    const safeUsers = Array.isArray(users) ? users : [];
 
-  useEffect(() => {
-    const unsubscribeProducts = subscribeToProductChanges(refreshMetrics);
-    const unsubscribeUsers = subscribeToUserChanges(refreshMetrics);
-    const unsubscribeOrders = subscribeToOrderChanges(refreshMetrics);
+    const ordersLast30 = safeOrders.filter(({ createdAt }) => {
+      const t = new Date(createdAt).getTime();
+      return Number.isFinite(t) && now - t <= THIRTY_DAYS_MS;
+    }).length;
+    const ordersPrev30 = safeOrders.filter(({ createdAt }) => {
+      const t = new Date(createdAt).getTime();
+      if (!Number.isFinite(t)) return false;
+      const diff = now - t;
+      return diff > THIRTY_DAYS_MS && diff <= THIRTY_DAYS_MS * 2;
+    }).length;
+    const growthRate =
+      ordersPrev30 === 0 ? 1 : (ordersLast30 - ordersPrev30) / Math.max(ordersPrev30, 1);
+    const growthProbability = Math.round(Math.max(0, Math.min(100, 50 + growthRate * 100)));
+    const ordersTrendVariant = ordersLast30 >= ordersPrev30 ? "positive" : "negative";
 
-    if (typeof window === "undefined") {
-      return () => {
-        unsubscribeProducts?.();
-        unsubscribeUsers?.();
-        unsubscribeOrders?.();
-      };
-    }
+    const inventoryTotalUnits = safeProducts.reduce(
+      (acc, product) => acc + (Number(product?.stock) || 0),
+      0,
+    );
+    const inventoryCapacity = safeProducts.reduce((acc, product) => {
+      const base = Number(product?.stockBase ?? product?.stock ?? 0);
+      return acc + base + INVENTORY_CAPACITY_BUFFER;
+    }, 0);
 
-    const watchedKeys = new Set([
-      PRODUCT_STORAGE_KEY,
-      USER_STORAGE_KEY,
-      REGISTERED_USER_STORAGE_KEY,
-      ORDER_STORAGE_KEY,
-      null,
-    ]);
+    const newUsersLast30 = safeUsers.filter(({ registeredAt }) => {
+      const t = new Date(registeredAt).getTime();
+      return Number.isFinite(t) && now - t <= THIRTY_DAYS_MS;
+    }).length;
+    const newUsersRatio =
+      safeUsers.length === 0 ? 0 : Math.round((newUsersLast30 / Math.max(safeUsers.length, 1)) * 100);
+    const userTrendVariant = newUsersLast30 > 0 ? "positive" : "neutral";
 
-    const handleStorage = (event) => {
-      if (watchedKeys.has(event.key)) {
-        refreshMetrics();
-      }
+    const orderStats = {
+      title: "Compras del sitio",
+      icon: "ORD",
+      primaryValue: formatNumber(safeOrders.length),
+      primaryLabel: "Órdenes totales",
+      secondaryLabel: "Probabilidad de aumento",
+      secondaryValue: `${growthProbability}%`,
+      trend: {
+        label: "Órdenes últimos 30 días",
+        value: formatNumber(ordersLast30),
+        variant: ordersTrendVariant,
+      },
+      tone: "primary",
     };
 
-    window.addEventListener("storage", handleStorage);
-    refreshMetrics();
-
-    return () => {
-      unsubscribeProducts?.();
-      unsubscribeUsers?.();
-      unsubscribeOrders?.();
-      window.removeEventListener("storage", handleStorage);
+    const inventoryStats = {
+      title: "Inventario disponible",
+      icon: "INV",
+      primaryValue: formatNumber(inventoryTotalUnits),
+      primaryLabel: "Unidades en stock",
+      secondaryLabel: "Capacidad máxima",
+      secondaryValue: formatNumber(inventoryCapacity),
+      trend: {
+        label: "SKUs activos",
+        value: formatNumber(safeProducts.length),
+        variant: "neutral",
+      },
+      tone: "accent",
     };
-  }, [refreshMetrics]);
+
+    const userStats = {
+      title: "Usuarios registrados",
+      icon: "USR",
+      primaryValue: formatNumber(safeUsers.length),
+      primaryLabel: "Usuarios totales",
+      secondaryLabel: "Altas últimos 30 días",
+      secondaryValue: formatNumber(newUsersLast30),
+      trend: {
+        label: "Participación reciente",
+        value: `${newUsersRatio}% del total`,
+        variant: userTrendVariant,
+      },
+      tone: "neutral",
+    };
+
+    return { orderStats, inventoryStats, userStats };
+  }, [orders, products, users]);
 
   const { orderStats, inventoryStats, userStats } = metrics;
 
