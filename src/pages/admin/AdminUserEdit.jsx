@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import UserForm from "@/components/users/UserForm.jsx";
-import { createAdminUser, fetchAdminUser, updateAdminUser } from "@/services/adminUserApi.js";
+import { createAdminUser, fetchAdminUser, updateAdminUser, deactivateAdminUser, setAdminUserActive } from "@/services/adminUserApi.js";
 
 const AdminUserEdit = () => {
   const { id } = useParams();
@@ -51,6 +51,7 @@ const AdminUserEdit = () => {
         direccion: "",
         email: "",
         telefono: "",
+        active: true,
         registeredAt: new Date().toISOString(),
       },
     [user],
@@ -84,6 +85,28 @@ const AdminUserEdit = () => {
 
   const handleCancel = () => {
     navigate(-1);
+  };
+
+  const handleDeactivate = async () => {
+    if (!user?.id) return;
+    const ok = window.confirm("Desactivar este usuario? No podr\u00e1 iniciar sesion hasta reactivarlo.");
+    if (!ok) return;
+    try {
+      await deactivateAdminUser(user.id);
+      navigate("/admin/usuarios", { replace: true, state: { status: "updated", userId: user.id } });
+    } catch (err) {
+      setErrorMessage(err?.message || "No se pudo desactivar el usuario.");
+    }
+  };
+
+  const handleActivate = async () => {
+    if (!user?.id) return;
+    try {
+      await setAdminUserActive(user.id, true);
+      navigate("/admin/usuarios", { replace: true, state: { status: "updated", userId: user.id } });
+    } catch (err) {
+      setErrorMessage(err?.message || "No se pudo reactivar el usuario.");
+    }
   };
 
   if (loading) {
@@ -131,6 +154,36 @@ const AdminUserEdit = () => {
       {errorMessage && (
         <div className="admin-products__alert admin-products__alert--error" role="alert">
           {errorMessage}
+        </div>
+      )}
+
+      {!isNew && user && (
+        <div className="admin-users__actions">
+          <div className="admin-users__status">
+            Estado:{" "}
+            <span className={`badge ${user.active ? "text-bg-success" : "text-bg-secondary"}`}>
+              {user.active ? "Activo" : "Inactivo"}
+            </span>
+          </div>
+          <div className="admin-users__actions-buttons">
+            {user.active ? (
+              <button
+                type="button"
+                className="admin-products__action-button admin-products__action-button--danger"
+                onClick={handleDeactivate}
+              >
+                Desactivar
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="admin-products__action-button admin-products__action-button--primary"
+                onClick={handleActivate}
+              >
+                Reactivar
+              </button>
+            )}
+          </div>
         </div>
       )}
 

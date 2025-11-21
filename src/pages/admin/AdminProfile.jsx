@@ -357,6 +357,21 @@ const AdminProfile = () => {
             </div>
 
             <div className="admin-user-form__group">
+              <label className="admin-user-form__label" htmlFor="admin-phone">
+                Telefono
+              </label>
+              <input
+                id="admin-phone"
+                name="telefono"
+                type="tel"
+                className="admin-user-form__input"
+                value={formState.telefono}
+                onChange={handleChange}
+                placeholder="+56912345678"
+              />
+            </div>
+
+            <div className="admin-user-form__group">
               <label className="admin-user-form__label" htmlFor="admin-username">
                 Usuario
               </label>

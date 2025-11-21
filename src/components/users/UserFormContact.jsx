@@ -16,6 +16,21 @@ const UserFormContact = ({ formState, onChange }) => (
     </div>
 
     <div className="admin-user-form__group">
+      <label className="admin-user-form__label" htmlFor="user-phone">
+        Teléfono
+      </label>
+      <input
+        id="user-phone"
+        name="telefono"
+        type="tel"
+        className="admin-user-form__input"
+        value={formState.telefono}
+        onChange={onChange}
+        placeholder="+56912345678"
+      />
+    </div>
+
+    <div className="admin-user-form__group">
       <label className="admin-user-form__label" htmlFor="user-registered-at">
         Registrado el
       </label>
@@ -35,4 +50,3 @@ const UserFormContact = ({ formState, onChange }) => (
 );
 
 export default UserFormContact;
-

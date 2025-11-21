@@ -56,6 +56,8 @@ const UserForm = ({ initialUser, onSubmit, onCancel, submitLabel = "Guardar", is
         comuna: formState.comuna.trim(),
         direccion: formState.direccion.replace(/\s+/g, " ").trim(),
         email: formState.email.trim(),
+        telefono: formState.telefono.trim(),
+        active: formState.active,
         registeredAt:
           initialUser?.registeredAt ?? formState.registeredAt ?? new Date().toISOString(),
       };

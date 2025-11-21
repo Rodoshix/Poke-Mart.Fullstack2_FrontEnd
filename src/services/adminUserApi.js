@@ -74,3 +74,11 @@ export async function updateAdminUser(id, payload) {
 export async function deactivateAdminUser(id) {
   await apiFetch(`/api/admin/users/${id}`, { method: "DELETE", auth: true });
 }
+
+export async function setAdminUserActive(id, active) {
+  const data = await apiFetch(`/api/admin/users/${id}/status?active=${active ? "true" : "false"}`, {
+    method: "PATCH",
+    auth: true,
+  });
+  return mapUser(data);
+}
