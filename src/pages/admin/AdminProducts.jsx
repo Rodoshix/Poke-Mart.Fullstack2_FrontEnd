@@ -142,6 +142,20 @@ const AdminProducts = () => {
     navigate(location.pathname, { replace: true });
   };
 
+  const stockMetrics = useMemo(() => {
+    let critical = 0;
+    let low = 0;
+    filteredProducts.forEach((p) => {
+      const base = Number(p.stockBase ?? p.stock ?? 0);
+      const current = Number(p.stock ?? 0);
+      if (base <= 0) return;
+      const ratio = current / base;
+      if (ratio <= 0.1) critical += 1;
+      else if (ratio <= 0.3) low += 1;
+    });
+    return { critical, low };
+  }, [filteredProducts]);
+
   return (
     <section className="admin-paper admin-products">
       <div className="admin-page-header">
@@ -149,6 +163,16 @@ const AdminProducts = () => {
         <p className="admin-page-subtitle">
           Gestiona el catalogo que se muestra en la tienda: revisa stock, precios e identifica productos criticos.
         </p>
+        <div className="admin-products__summary-cards">
+          <div className="admin-summary-card admin-summary-card--critical">
+            <span className="admin-summary-card__label">Stock critico</span>
+            <strong className="admin-summary-card__value">{stockMetrics.critical}</strong>
+          </div>
+          <div className="admin-summary-card admin-summary-card--low">
+            <span className="admin-summary-card__label">Stock bajo</span>
+            <strong className="admin-summary-card__value">{stockMetrics.low}</strong>
+          </div>
+        </div>
       </div>
 
       {isAdmin && (
