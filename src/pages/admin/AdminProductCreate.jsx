@@ -1,19 +1,17 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ProductForm from "@/components/products/ProductForm.jsx";
-import { createProduct, getNextProductId } from "@/services/productService.js";
-import useProductsData from "@/hooks/useProductsData.js";
+import { createAdminProduct, fetchAdminProducts } from "@/services/adminProductApi.js";
+import useAdminProducts from "@/hooks/useAdminProducts.js";
 
 const AdminProductCreate = () => {
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
-  const products = useProductsData();
-
-  const nextId = useMemo(() => getNextProductId(), []);
+  const products = useAdminProducts();
 
   const initialProduct = useMemo(
     () => ({
-      id: nextId,
+      id: "",
       nombre: "",
       categoria: "",
       precio: "",
@@ -21,7 +19,7 @@ const AdminProductCreate = () => {
       imagen: "",
       descripcion: "",
     }),
-    [nextId],
+    [],
   );
 
   const categories = useMemo(() => {
@@ -35,7 +33,8 @@ const AdminProductCreate = () => {
 
   const handleSubmit = async (payload) => {
     try {
-      const created = createProduct(payload);
+      const created = await createAdminProduct(payload);
+      await fetchAdminProducts(); // auto-refresh cache hook on remount
       setErrorMessage("");
       navigate("/admin/productos", {
         replace: true,

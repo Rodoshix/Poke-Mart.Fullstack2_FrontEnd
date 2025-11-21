@@ -4,12 +4,8 @@ import ProductFilters from "@/components/products/ProductFilters.jsx";
 import ProductTable from "@/components/products/ProductTable.jsx";
 import Paginator from "@/components/common/Paginator.jsx";
 import useAuthSession from "@/hooks/useAuthSession.js";
-import {
-  getAllProducts,
-  subscribeToProductChanges,
-  PRODUCT_STORAGE_KEY,
-  resetProducts,
-} from "@/services/productService.js";
+import { fetchAdminProducts } from "@/services/adminProductApi.js";
+import useAdminProducts from "@/hooks/useAdminProducts.js";
 
 const DEFAULT_SORT = "id:asc";
 const PAGE_SIZE = 10;
@@ -26,27 +22,21 @@ const AdminProducts = () => {
   const [selectedCategory, setSelectedCategory] = useState(presetCategory);
   const [sortOption, setSortOption] = useState(DEFAULT_SORT);
   const [currentPage, setCurrentPage] = useState(1);
-  const [products, setProducts] = useState(() => getAllProducts());
+  const [products, setProducts] = useState([]);
+  const productsInitial = useAdminProducts();
 
   useEffect(() => {
-    const refresh = () => setProducts(getAllProducts());
-    const unsubscribe = subscribeToProductChanges(refresh);
+    setProducts(productsInitial);
+  }, [productsInitial]);
 
-    if (typeof window !== "undefined") {
-      const onStorage = (event) => {
-        if (event.key === null || event.key === PRODUCT_STORAGE_KEY) {
-          refresh();
-        }
-      };
-      window.addEventListener("storage", onStorage);
-      return () => {
-        unsubscribe();
-        window.removeEventListener("storage", onStorage);
-      };
+  const refresh = async () => {
+    try {
+      const data = await fetchAdminProducts();
+      setProducts(Array.isArray(data) ? data : []);
+    } catch {
+      setProducts([]);
     }
-
-    return unsubscribe;
-  }, []);
+  };
 
   const categories = useMemo(() => {
     const set = new Set();
@@ -106,8 +96,6 @@ const AdminProducts = () => {
         return `Se agrego el producto #${updatedProductId} al catalogo (almacenado localmente).`;
       case "updated":
         return `El producto #${updatedProductId ?? ""} fue actualizado (cambios locales).`;
-      case "reset":
-        return "El catalogo se restauro a los productos originales del proyecto.";
       default:
         return "";
     }
@@ -146,17 +134,12 @@ const AdminProducts = () => {
   };
 
   const handleRestoreDefaults = () => {
-    const confirmed =
-      typeof window === "undefined" ? true : window.confirm("Restaurar el catalogo original?");
-    if (!confirmed) return;
-    resetProducts();
-    const refreshed = getAllProducts();
-    setProducts(refreshed);
+    refresh();
     setSearchTerm("");
     setSelectedCategory("");
     setSortOption(DEFAULT_SORT);
     setCurrentPage(1);
-    navigate(location.pathname, { replace: true, state: { status: "reset" } });
+    navigate(location.pathname, { replace: true });
   };
 
   return (
@@ -179,8 +162,8 @@ const AdminProducts = () => {
           <Link to="/admin/productos/reportes" className="admin-products__action-button">
             Reportes de productos
           </Link>
-          <button type="button" className="admin-products__action-button admin-products__action-button--danger" onClick={handleRestoreDefaults}>
-            Restaurar catalogo
+          <button type="button" className="admin-products__action-button" onClick={handleRestoreDefaults}>
+            Refrescar catalogo
           </button>
         </div>
       )}
