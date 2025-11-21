@@ -68,4 +68,17 @@ export async function fetchAdminOrders() {
   return data.map(mapOrderResponse);
 }
 
+export async function updateAdminOrder(id, payload) {
+  const data = await apiFetch(`/api/admin/orders/${id}`, {
+    method: "PATCH",
+    auth: true,
+    body: {
+      estado: payload.estado,
+      notas: payload.notas,
+      referenciaEnvio: payload.referenciaEnvio,
+    },
+  });
+  return mapOrderResponse(data);
+}
+
 export { mapOrderResponse };
