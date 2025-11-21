@@ -20,6 +20,28 @@ const mapProduct = (p = {}) => ({
   descripcionCorta: p.descripcion ?? "",
 });
 
+const dataUrlToBlob = async (dataUrl) => {
+  const res = await fetch(dataUrl);
+  return await res.blob();
+};
+
+const resolveImageUrl = async (payload) => {
+  const raw = payload?.imagen ?? payload?.imagenUrl ?? "";
+  if (!raw) return "";
+  if (!/^data:/i.test(raw)) return raw;
+
+  const blob = await dataUrlToBlob(raw);
+  const formData = new FormData();
+  formData.append("file", blob, payload?.imagenNombre || "product-image.png");
+
+  const result = await apiFetch("/api/uploads/images", {
+    method: "POST",
+    auth: true,
+    body: formData,
+  });
+  return result?.url || "";
+};
+
 export async function fetchAdminProducts() {
   const data = await apiFetch("/api/products");
   if (!Array.isArray(data)) return [];
@@ -32,12 +54,13 @@ export async function fetchAdminProduct(id) {
 }
 
 export async function createAdminProduct(payload) {
+  const imagenUrl = await resolveImageUrl(payload);
   const body = {
     nombre: payload.nombre,
     descripcion: payload.descripcion ?? "",
     precio: Number(payload.precio ?? 0),
     stock: Number(payload.stock ?? 0),
-    imagenUrl: payload.imagen ?? payload.imagenUrl ?? "",
+    imagenUrl,
     categoriaSlug: slugify(payload.categoria ?? "general"),
   };
   const data = await apiFetch("/api/products", { method: "POST", auth: true, body });
@@ -45,12 +68,13 @@ export async function createAdminProduct(payload) {
 }
 
 export async function updateAdminProduct(id, payload) {
+  const imagenUrl = await resolveImageUrl(payload);
   const body = {
     nombre: payload.nombre,
     descripcion: payload.descripcion ?? "",
     precio: Number(payload.precio ?? 0),
     stock: Number(payload.stock ?? 0),
-    imagenUrl: payload.imagen ?? payload.imagenUrl ?? "",
+    imagenUrl,
     categoriaSlug: slugify(payload.categoria ?? "general"),
   };
   const data = await apiFetch(`/api/products/${id}`, { method: "PUT", auth: true, body });
