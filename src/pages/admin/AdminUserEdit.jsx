@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import UserForm from "@/components/users/UserForm.jsx";
-import { createUser, getUserById, updateUser } from "@/services/userService.js";
+import { createAdminUser, fetchAdminUser, updateAdminUser } from "@/services/adminUserApi.js";
 
 const AdminUserEdit = () => {
   const { id } = useParams();
@@ -9,11 +9,30 @@ const AdminUserEdit = () => {
   const isNew = !id || id === "nuevo";
   const numericId = isNew ? null : Number(id);
   const [errorMessage, setErrorMessage] = useState("");
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(!isNew);
 
-  const user = useMemo(() => {
-    if (isNew) return null;
-    if (numericId === null || Number.isNaN(numericId)) return null;
-    return getUserById(numericId);
+  useEffect(() => {
+    if (isNew || numericId === null || Number.isNaN(numericId)) {
+      setUser(null);
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    fetchAdminUser(numericId)
+      .then((data) => {
+        if (!cancelled) setUser(data);
+      })
+      .catch(() => {
+        if (!cancelled) setUser(null);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [isNew, numericId]);
 
   const initialUser = useMemo(
@@ -31,6 +50,7 @@ const AdminUserEdit = () => {
         comuna: "",
         direccion: "",
         email: "",
+        telefono: "",
         registeredAt: new Date().toISOString(),
       },
     [user],
@@ -39,7 +59,7 @@ const AdminUserEdit = () => {
   const handleSubmit = async (formData) => {
     try {
       if (isNew) {
-        const created = createUser(formData);
+        const created = await createAdminUser(formData);
         navigate("/admin/usuarios", {
           replace: true,
           state: { status: "created", userId: created.id },
@@ -48,7 +68,7 @@ const AdminUserEdit = () => {
         if (!user) {
           throw new Error("No se encontró el usuario para editar.");
         }
-        const updated = updateUser(user.id, formData);
+        const updated = await updateAdminUser(user.id, formData);
         navigate("/admin/usuarios", {
           replace: true,
           state: { status: "updated", userId: updated.id },
@@ -65,6 +85,16 @@ const AdminUserEdit = () => {
   const handleCancel = () => {
     navigate(-1);
   };
+
+  if (loading) {
+    return (
+      <section className="admin-paper admin-user-edit">
+        <div className="admin-page-header">
+          <h1 className="admin-page-title">Cargando usuario...</h1>
+        </div>
+      </section>
+    );
+  }
 
   if (!isNew && !user) {
     return (

@@ -15,10 +15,62 @@ const mapUser = (u) => ({
   comuna: u.comuna,
   direccion: u.direccion,
   avatarUrl: u.avatarUrl,
+  telefono: u.telefono,
 });
 
 export async function fetchAdminUsers() {
   const data = await apiFetch("/api/admin/users", { auth: true });
   if (!Array.isArray(data)) return [];
   return data.map(mapUser);
+}
+
+export async function fetchAdminUser(id) {
+  const data = await apiFetch(`/api/admin/users/${id}`, { auth: true });
+  return data ? mapUser(data) : null;
+}
+
+export async function createAdminUser(payload) {
+  const body = {
+    email: payload.email,
+    username: payload.username,
+    password: payload.password || undefined,
+    role: (payload.role || "cliente").toUpperCase(),
+    nombre: payload.nombre,
+    apellido: payload.apellido,
+    rut: payload.run,
+    fechaNacimiento: payload.fechaNacimiento,
+    region: payload.region,
+    comuna: payload.comuna,
+    direccion: payload.direccion,
+    telefono: payload.telefono,
+    avatarUrl: payload.avatarUrl,
+    active: payload.active ?? true,
+  };
+  const data = await apiFetch("/api/admin/users", { method: "POST", auth: true, body });
+  return mapUser(data);
+}
+
+export async function updateAdminUser(id, payload) {
+  const body = {
+    email: payload.email,
+    username: payload.username,
+    password: payload.password || undefined,
+    role: (payload.role || "cliente").toUpperCase(),
+    nombre: payload.nombre,
+    apellido: payload.apellido,
+    rut: payload.run,
+    fechaNacimiento: payload.fechaNacimiento,
+    region: payload.region,
+    comuna: payload.comuna,
+    direccion: payload.direccion,
+    telefono: payload.telefono,
+    avatarUrl: payload.avatarUrl,
+    active: payload.active ?? true,
+  };
+  const data = await apiFetch(`/api/admin/users/${id}`, { method: "PUT", auth: true, body });
+  return mapUser(data);
+}
+
+export async function deactivateAdminUser(id) {
+  await apiFetch(`/api/admin/users/${id}`, { method: "DELETE", auth: true });
 }
