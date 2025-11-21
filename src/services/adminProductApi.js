@@ -15,6 +15,7 @@ const mapProduct = (p = {}) => ({
   descripcion: p.descripcion ?? "",
   precio: Number(p.precio ?? 0),
   stock: Number(p.stock ?? 0),
+  stockBase: Number(p.stockBase ?? p.stock ?? 0),
   categoria: p.categoria ?? "",
   imagen: p.imagenUrl ?? "",
   descripcionCorta: p.descripcion ?? "",
@@ -60,6 +61,7 @@ export async function createAdminProduct(payload) {
     descripcion: payload.descripcion ?? "",
     precio: Number(payload.precio ?? 0),
     stock: Number(payload.stock ?? 0),
+    stockBase: payload.stockBase !== undefined ? Number(payload.stockBase) : undefined,
     imagenUrl,
     categoriaSlug: slugify(payload.categoria ?? "general"),
   };
@@ -74,6 +76,7 @@ export async function updateAdminProduct(id, payload) {
     descripcion: payload.descripcion ?? "",
     precio: Number(payload.precio ?? 0),
     stock: Number(payload.stock ?? 0),
+    stockBase: payload.stockBase !== undefined ? Number(payload.stockBase) : undefined,
     imagenUrl,
     categoriaSlug: slugify(payload.categoria ?? "general"),
   };

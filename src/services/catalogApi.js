@@ -37,6 +37,7 @@ const mapProduct = (p) => {
     categoria: p.categoria ?? p.category ?? null,
     precio: Number(p.precio ?? p.price ?? 0),
     stock: Number(p.stock ?? 0),
+    stockBase: Number(p.stockBase ?? p.stock ?? 0),
     imagen: p.imagenUrl ?? p.imagen ?? "",
     discountPct: offer.discountPct ?? p.discountPct ?? 0,
     endsAt: offer.endsAt ?? p.endsAt ?? null,
