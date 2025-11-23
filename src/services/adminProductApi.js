@@ -19,6 +19,7 @@ const mapProduct = (p = {}) => ({
   categoria: p.categoria ?? "",
   imagen: p.imagenUrl ?? "",
   descripcionCorta: p.descripcion ?? "",
+  active: p.active !== false,
 });
 
 const dataUrlToBlob = async (dataUrl) => {
@@ -44,13 +45,13 @@ const resolveImageUrl = async (payload) => {
 };
 
 export async function fetchAdminProducts() {
-  const data = await apiFetch("/api/products");
+  const data = await apiFetch("/api/products/manage?includeInactive=true", { auth: true });
   if (!Array.isArray(data)) return [];
   return data.map(mapProduct);
 }
 
 export async function fetchAdminProduct(id) {
-  const data = await apiFetch(`/api/products/${id}`);
+  const data = await apiFetch(`/api/products/manage/${id}`, { auth: true });
   return mapProduct(data);
 }
 
@@ -85,5 +86,13 @@ export async function updateAdminProduct(id, payload) {
 }
 
 export async function deleteAdminProduct(id) {
-  await apiFetch(`/api/products/${id}`, { method: "DELETE", auth: true });
+  await apiFetch(`/api/products/${id}?hard=true`, { method: "DELETE", auth: true });
+}
+
+export async function setAdminProductActive(id, active) {
+  const data = await apiFetch(`/api/products/${id}/status?active=${active ? "true" : "false"}`, {
+    method: "PATCH",
+    auth: true,
+  });
+  return mapProduct(data);
 }

@@ -4,7 +4,7 @@ import ProductFilters from "@/components/products/ProductFilters.jsx";
 import ProductTable from "@/components/products/ProductTable.jsx";
 import Paginator from "@/components/common/Paginator.jsx";
 import useAuthSession from "@/hooks/useAuthSession.js";
-import { fetchAdminProducts } from "@/services/adminProductApi.js";
+import { deleteAdminProduct, fetchAdminProducts, setAdminProductActive } from "@/services/adminProductApi.js";
 import useAdminProducts from "@/hooks/useAdminProducts.js";
 
 const DEFAULT_SORT = "id:asc";
@@ -23,6 +23,9 @@ const AdminProducts = () => {
   const [sortOption, setSortOption] = useState(DEFAULT_SORT);
   const [currentPage, setCurrentPage] = useState(1);
   const [products, setProducts] = useState([]);
+  const [actionMessage, setActionMessage] = useState("");
+  const [actionError, setActionError] = useState("");
+  const [processingId, setProcessingId] = useState(null);
   const productsInitial = useAdminProducts();
 
   useEffect(() => {
@@ -101,6 +104,7 @@ const AdminProducts = () => {
     }
   }, [status, updatedProductId]);
   const showFeedback = Boolean(feedbackMessage);
+  const showActionFeedback = Boolean(actionMessage || actionError);
 
   useEffect(() => {
     if (!showFeedback) return undefined;
@@ -109,6 +113,15 @@ const AdminProducts = () => {
     }, 4000);
     return () => clearTimeout(timeout);
   }, [showFeedback, location.pathname, navigate]);
+
+  useEffect(() => {
+    if (!showActionFeedback) return undefined;
+    const timeout = setTimeout(() => {
+      setActionMessage("");
+      setActionError("");
+    }, 4000);
+    return () => clearTimeout(timeout);
+  }, [showActionFeedback, actionMessage, actionError]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -140,6 +153,42 @@ const AdminProducts = () => {
     setSortOption(DEFAULT_SORT);
     setCurrentPage(1);
     navigate(location.pathname, { replace: true });
+  };
+
+  const handleToggleActive = async (productId, nextActive) => {
+    if (!productId) return;
+    setProcessingId(productId);
+    try {
+      await setAdminProductActive(productId, nextActive);
+      setActionMessage(`Producto #${productId} ${nextActive ? "activado" : "desactivado"} correctamente.`);
+      setActionError("");
+      await refresh();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "No se pudo actualizar el estado del producto.";
+      setActionMessage("");
+      setActionError(message);
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  const handleDelete = async (productId) => {
+    if (!productId) return;
+    const confirmed = window.confirm("¿Eliminar este producto de forma permanente? Esta acción no se puede deshacer.");
+    if (!confirmed) return;
+    setProcessingId(productId);
+    try {
+      await deleteAdminProduct(productId);
+      setActionMessage(`Producto #${productId} eliminado correctamente.`);
+      setActionError("");
+      await refresh();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "No se pudo eliminar el producto.";
+      setActionMessage("");
+      setActionError(message);
+    } finally {
+      setProcessingId(null);
+    }
   };
 
   const stockMetrics = useMemo(() => {
@@ -208,8 +257,21 @@ const AdminProducts = () => {
           {feedbackMessage}
         </div>
       )}
+      {showActionFeedback && (
+        <div
+          className={`admin-products__alert${actionError ? " admin-products__alert--error" : ""}`}
+          role={actionError ? "alert" : "status"}
+        >
+          {actionError || actionMessage}
+        </div>
+      )}
 
-      <ProductTable products={paginatedProducts} />
+      <ProductTable
+        products={paginatedProducts}
+        onToggleActive={handleToggleActive}
+        onDelete={handleDelete}
+        processingId={processingId}
+      />
 
       <Paginator currentPage={currentPageClamped} totalPages={totalPages} onPageChange={handlePageChange} pageSize={PAGE_SIZE} totalItems={sortedProducts.length} />
     </section>

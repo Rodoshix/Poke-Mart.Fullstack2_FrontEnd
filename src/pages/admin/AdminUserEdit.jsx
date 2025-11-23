@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import UserForm from "@/components/users/UserForm.jsx";
-import { createAdminUser, fetchAdminUser, updateAdminUser, deactivateAdminUser, setAdminUserActive } from "@/services/adminUserApi.js";
+import { createAdminUser, fetchAdminUser, updateAdminUser, deactivateAdminUser, setAdminUserActive, deleteAdminUser } from "@/services/adminUserApi.js";
+import useAuthSession from "@/hooks/useAuthSession.js";
 
 const AdminUserEdit = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { profile } = useAuthSession();
   const isNew = !id || id === "nuevo";
   const numericId = isNew ? null : Number(id);
   const [errorMessage, setErrorMessage] = useState("");
@@ -109,6 +111,24 @@ const AdminUserEdit = () => {
     }
   };
 
+  const handleDelete = async () => {
+    if (!user?.id) return;
+    const confirmed = window.confirm("¿Eliminar este usuario de forma permanente? Esta acción no se puede deshacer.");
+    if (!confirmed) return;
+    try {
+      await deleteAdminUser(user.id);
+      navigate("/admin/usuarios", { replace: true, state: { status: "updated", userId: user.id } });
+    } catch (err) {
+      setErrorMessage(err?.message || "No se pudo eliminar el usuario.");
+    }
+  };
+
+  const canDelete =
+    !isNew &&
+    user &&
+    (user.role || "").toLowerCase() !== "admin" &&
+    (!profile?.id || Number(profile.id) !== Number(user.id));
+
   if (loading) {
     return (
       <section className="admin-paper admin-user-edit">
@@ -181,6 +201,15 @@ const AdminUserEdit = () => {
                 onClick={handleActivate}
               >
                 Reactivar
+              </button>
+            )}
+            {canDelete && (
+              <button
+                type="button"
+                className="admin-products__action-button admin-products__action-button--danger"
+                onClick={handleDelete}
+              >
+                Eliminar
               </button>
             )}
           </div>

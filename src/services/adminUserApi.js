@@ -82,3 +82,7 @@ export async function setAdminUserActive(id, active) {
   });
   return mapUser(data);
 }
+
+export async function deleteAdminUser(id) {
+  await apiFetch(`/api/admin/users/${id}?hard=true`, { method: "DELETE", auth: true });
+}
