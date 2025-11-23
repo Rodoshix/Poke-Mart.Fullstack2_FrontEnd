@@ -101,6 +101,28 @@ export default function RegistroPage() {
             required
           />
 
+          <div className="registro__row registro__row--telefono">
+            <Field
+              label="Codigo"
+              name="telefonoCodigo"
+              as="select"
+              value={form.telefonoCodigo}
+              onChange={(e) => setField("telefonoCodigo", e.target.value)}
+              options={[{ value: "+56", label: "+56 (Chile)" }]}
+              required
+              className="registro__field--codigo"
+            />
+            <Field
+              label="Telefono"
+              name="telefonoNumero"
+              type="tel"
+              value={form.telefonoNumero}
+              onChange={(e) => setField("telefonoNumero", e.target.value.replace(/\D/g, ""))}
+              placeholder="912345678"
+              required
+            />
+          </div>
+
           <StatusMessage text={status.text} error={status.error} />
 
           <div className="registro__row">

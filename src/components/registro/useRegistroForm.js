@@ -14,6 +14,8 @@ export function useRegistroForm({ onSuccess } = {}) {
     region: "",
     comuna: "",
     direccion: "",
+    telefonoCodigo: "+56",
+    telefonoNumero: "",
     username: "",
     email: "",
     password: "",
@@ -45,6 +47,7 @@ export function useRegistroForm({ onSuccess } = {}) {
       direccion: (form.direccion || "").replace(/\s+/g, " ").trim(),
       email: norm.email(form.email),
       username: form.username.trim(),
+      telefono: `${form.telefonoCodigo}${(form.telefonoNumero || "").replace(/\D/g, "")}`,
     };
 
     const errors = validate(baseUsers, data);
@@ -66,7 +69,7 @@ export function useRegistroForm({ onSuccess } = {}) {
         region: data.region,
         comuna: data.comuna,
         fechaNacimiento: data.fechaNacimiento,
-        telefono: "",
+        telefono: data.telefono,
       });
 
       const { token, refreshToken, expiresAt, profile } = payload || {};
