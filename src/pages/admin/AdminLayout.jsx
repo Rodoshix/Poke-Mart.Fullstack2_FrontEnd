@@ -22,6 +22,7 @@ const sellerAllowedPath = (pathname = "") => {
     ];
     return !disallowedProductPaths.some((prefix) => pathname.startsWith(prefix));
   }
+  if (pathname.startsWith("/admin/ofertas")) return true;
   return false;
 };
 

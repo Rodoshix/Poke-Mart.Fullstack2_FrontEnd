@@ -12,7 +12,7 @@ import AdminSidebarProfile from "./AdminSidebarProfile.jsx";
 const filterNavItemsByRole = (items, role) => {
   const normalized = (role || "").toLowerCase();
   if (normalized === "vendedor") {
-    return items.filter((item) => item.code === "OR" || item.code === "PR");
+    return items.filter((item) => item.code === "OR" || item.code === "PR" || item.code === "OF");
   }
   return items;
 };

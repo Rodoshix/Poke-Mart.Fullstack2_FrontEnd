@@ -3374,3 +3374,125 @@
 
 .admin-order-update-form{margin-top:1rem;border:1px solid #e6ecf5;border-radius:12px;padding:1rem;background:#f9fbff}.admin-order-update-form__grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem}.admin-order-update-form__field{margin-top:1rem}.admin-order-update-form input,.admin-order-update-form select,.admin-order-update-form textarea{width:100%;border:1px solid #cfd6e4;border-radius:8px;padding:0.55rem;outline:none}.admin-order-update-form textarea{resize:vertical}.admin-order-update-form__actions{margin-top:1rem;display:flex;justify-content:flex-start}
 
+/* Offers */
+.admin-offers {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.admin-offers__panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 18px;
+}
+
+.admin-offers__form-card,
+.admin-offers__list-card {
+  border: 1px solid rgba(216, 190, 161, 0.6);
+  border-radius: calc(var(--admin-radius) - 4px);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 12px 28px rgba(36, 21, 12, 0.12);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.admin-offers__section-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-offers__title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--admin-primary-strong);
+}
+
+.admin-offers__subtitle {
+  margin: 0;
+  color: var(--admin-text-muted);
+  font-size: 0.95rem;
+}
+
+.admin-offers__form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.admin-offers__fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px 16px;
+}
+
+.admin-offers__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-offers__label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--admin-text-muted);
+  font-weight: 600;
+}
+
+.admin-offers__input {
+  border: 1px solid rgba(30, 73, 182, 0.25);
+  border-radius: 12px;
+  padding: 11px 14px;
+  font-size: 0.95rem;
+  color: var(--admin-text);
+  background: #fff;
+  font-family: var(--admin-font-family);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.admin-offers__input:focus {
+  outline: none;
+  border-color: rgba(20, 54, 132, 0.6);
+  box-shadow: 0 0 0 4px rgba(30, 73, 182, 0.15);
+}
+
+.admin-offers__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.admin-offers__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(30, 73, 182, 0.1);
+  color: var(--admin-primary-strong);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.admin-offers__hint {
+  margin: -4px 0 0;
+  color: var(--admin-text-muted);
+  font-size: 0.85rem;
+}
+
+.admin-offers__product {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-offers__list-card .admin-product-table {
+  border-radius: calc(var(--admin-radius) - 8px);
+}
+
