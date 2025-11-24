@@ -1,5 +1,4 @@
 // src/pages/tienda/ProductDetailPage.jsx
-import { useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import PageBorders from "@/components/layout/PageBorders";
 import "@/assets/styles/product-detail.css";
@@ -12,11 +11,12 @@ import ProductBuyBox from "@/components/product/ProductBuyBox";
 import { RelatedProducts } from "@/components/catalog/RelatedProducts.jsx";
 import { Reviews } from "@/components/reviews/Reviews.jsx";
 
-import reviewsData from "@/data/reviews.json";
-import useProductsData from "@/hooks/useProductsData.js";
+import { useProductReviews } from "@/hooks/useProductReviews.js";
+import useAuthSession from "@/hooks/useAuthSession.js";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
+  const { session } = useAuthSession();
 
   const {
     product,
@@ -29,20 +29,8 @@ export default function ProductDetailPage() {
     addToCart,
     related,
   } = useProductDetail(id);
-  const products = useProductsData();
-
-  const reviewKey = useMemo(() => {
-    const arr = Array.isArray(products) ? products : [];
-    const idx = arr.findIndex((p) => String(p.id) === String(id));
-    return idx >= 0 ? String(idx + 1) : null;
-  }, [products, id]);
-
-  const reviews = useMemo(() => {
-    if (!reviewKey) return [];
-    const list =
-      reviewsData && typeof reviewsData === "object" ? reviewsData[reviewKey] : [];
-    return Array.isArray(list) ? list : [];
-  }, [reviewKey]);
+  const { items: reviews, addReview } = useProductReviews(id);
+  const canReview = Boolean(session);
 
   if (!product) {
     return (
@@ -85,8 +73,7 @@ export default function ProductDetailPage() {
         </section>
 
         <RelatedProducts items={related} />
-        {/* Pasamos el array resuelto para evitar el banner de clave faltante */}
-        <Reviews reviews={reviews} />
+        <Reviews reviews={reviews} onSubmit={addReview} canReview={canReview} />
       </main>
     </>
   );

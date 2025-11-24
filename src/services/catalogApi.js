@@ -42,6 +42,8 @@ const mapProduct = (p) => {
     discountPct: offer.discountPct ?? p.discountPct ?? 0,
     endsAt: offer.endsAt ?? p.endsAt ?? null,
     offer,
+    reviewCount: p.reviewCount ?? 0,
+    reviewAvg: Number(p.reviewAvg ?? 0),
   };
 };
 

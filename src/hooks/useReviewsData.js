@@ -2,22 +2,8 @@
 // src/hooks/useReviewsData.js
 import { useMemo, useState } from "react";
 
-export function useReviewsData({ reviews = [], productId, reviewsDict }) {
-  const autoFromDict = useMemo(() => {
-    if (!productId || !reviewsDict || typeof reviewsDict !== "object") return [];
-    const k0 = String(productId).trim();
-    const k1 = k0.replace(/^0+/, "");
-    const n  = Number(k0);
-    const k2 = Number.isFinite(n) ? String(n) : null;
-    const candidates = [k0, k1, k2].filter(Boolean);
-    for (const k of candidates) {
-      const val = reviewsDict[k];
-      if (Array.isArray(val)) return val;
-    }
-    return [];
-  }, [productId, reviewsDict]);
-
-  const data = (reviews && reviews.length) ? reviews : autoFromDict;
+export function useReviewsData({ reviews = [] }) {
+  const data = Array.isArray(reviews) ? reviews : [];
 
   const count = data.length;
   const avg = count ? data.reduce((a, r) => a + (r.rating || 0), 0) / count : 0;
@@ -34,7 +20,5 @@ export function useReviewsData({ reviews = [], productId, reviewsDict }) {
     return base.slice(0, 6);
   }, [data, filter]);
 
-  const showMissingBanner = !reviews?.length && productId && reviewsDict && typeof reviewsDict === "object" && !count;
-
-  return { data, count, avg, dist, filter, setFilter, filtered, showMissingBanner };
+  return { data, count, avg, dist, filter, setFilter, filtered };
 }
