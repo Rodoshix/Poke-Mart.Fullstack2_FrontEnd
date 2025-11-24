@@ -1,5 +1,6 @@
 // src/pages/tienda/ProductDetailPage.jsx
 import { useParams, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import PageBorders from "@/components/layout/PageBorders";
 import "@/assets/styles/product-detail.css";
 
@@ -13,10 +14,12 @@ import { Reviews } from "@/components/reviews/Reviews.jsx";
 
 import { useProductReviews } from "@/hooks/useProductReviews.js";
 import useAuthSession from "@/hooks/useAuthSession.js";
+import LoaderOverlay from "@/components/common/LoaderOverlay.jsx";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
   const { session } = useAuthSession();
+  const [delayLoader, setDelayLoader] = useState(true);
 
   const {
     product,
@@ -32,7 +35,19 @@ export default function ProductDetailPage() {
   const { items: reviews, addReview } = useProductReviews(id);
   const canReview = Boolean(session);
 
+  useEffect(() => {
+    const t = setTimeout(() => setDelayLoader(false), 3000);
+    return () => clearTimeout(t);
+  }, []);
+
   if (!product) {
+    if (delayLoader) {
+      return (
+        <main className="container py-5">
+          <LoaderOverlay text="Cargando producto..." />
+        </main>
+      );
+    }
     return (
       <main className="container py-5">
         <h2 className="mb-2">Ups…</h2>

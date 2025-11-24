@@ -8,13 +8,14 @@ import PageBorders from "@/components/layout/PageBorders";
 import CategorySidebar from "@/components/catalog/CategorySidebar.jsx";
 import SortToolbar from "@/components/catalog/SortToolbar.jsx";
 import useProductsData from "@/hooks/useProductsData.js";
+import LoaderOverlay from "@/components/common/LoaderOverlay.jsx";
 
 const PAGE_SIZE = 12;
 
 const normalize = (p = {}) => ({
   id: p.id ?? "",
   nombre: p.nombre ?? "Producto",
-  categoria: p.categoria ?? "—",
+  categoria: p.categoria ?? "",
   precio: Number(p.precio ?? 0),
   stock: Number(p.stock ?? 0),
   imagen: p.imagen || "/src/assets/img/placeholder.png",
@@ -36,6 +37,7 @@ export default function CategoriaPage() {
 
   const [sort, setSort] = useState(searchParams.get("sort") || "recomendados");
   const [page, setPage] = useState(Number(searchParams.get("page") || 1));
+  const [delayLoader, setDelayLoader] = useState(true);
   const rawProducts = useProductsData();
 
   const all = useMemo(() => {
@@ -45,15 +47,12 @@ export default function CategoriaPage() {
 
   const categorias = useMemo(() => uniqueCats(all), [all]);
 
-  // categoría seleccionada (query param o slug)
   const selectedCat = searchParams.get("cat") || params?.slug || "";
 
-  // filtro por categoría
   const filtered = useMemo(() => {
     return all.filter((p) => !selectedCat || p.categoria === selectedCat);
   }, [all, selectedCat]);
 
-  // orden
   const sorted = useMemo(() => {
     const arr = [...filtered];
     switch (sort) {
@@ -61,7 +60,7 @@ export default function CategoriaPage() {
       case "precio-desc": arr.sort((a, b) => b.precio - a.precio); break;
       case "nombre-asc":  arr.sort((a, b) => a.nombre.localeCompare(b.nombre)); break;
       case "nombre-desc": arr.sort((a, b) => b.nombre.localeCompare(a.nombre)); break;
-      default: /* recomendados: orden original */ break;
+      default: break;
     }
     return arr;
   }, [filtered, sort]);
@@ -72,7 +71,6 @@ export default function CategoriaPage() {
     return sorted.slice(start, start + PAGE_SIZE);
   }, [sorted, page]);
 
-  // sync a la URL
   useEffect(() => {
     const next = new URLSearchParams();
     next.set("page", String(page));
@@ -81,23 +79,27 @@ export default function CategoriaPage() {
     setSearchParams(next, { replace: true });
   }, [sort, selectedCat, page, setSearchParams]);
 
-  // resetear página cuando cambian filtros/orden
   useEffect(() => setPage(1), [sort, selectedCat]);
+
+  useEffect(() => {
+    const t = setTimeout(() => setDelayLoader(false), 3000);
+    return () => clearTimeout(t);
+  }, []);
+
+  const showLoader = delayLoader && items.length === 0;
 
   return (
     <>
       <PageBorders />
       <main className="site-main container pb-5 flex-grow-1">
-        {/* migas */}
         <nav className="mb-3" aria-label="breadcrumb">
           <ol className="breadcrumb mb-0">
-            <li className="breadcrumb-item"><Link to="/">Página principal</Link></li>
+            <li className="breadcrumb-item"><Link to="/">Pǭgina principal</Link></li>
             <li className="breadcrumb-item active" aria-current="page">{selectedCat || "Categorías"}</li>
           </ol>
         </nav>
 
         <div className="row g-4">
-          {/* sidebar filtros */}
           <aside className="col-12 col-lg-3">
             <h2 className="h5 fw-bold mb-3">Filtros</h2>
             <CategorySidebar
@@ -112,17 +114,19 @@ export default function CategoriaPage() {
             />
           </aside>
 
-          {/* contenido */}
           <section className="col-12 col-lg-9">
             <div className="d-flex align-items-center justify-content-between mb-3">
               <SortToolbar sort={sort} onChange={setSort} />
-              {/* pill decorativo tipo "trends" */}
               <button type="button" className="btn btn-light border rounded-pill px-3" disabled>
                 <strong className="me-1">trends</strong>
               </button>
             </div>
 
-            <ProductsGrid items={items} />
+            {showLoader ? (
+              <LoaderOverlay text="Cargando productos..." />
+            ) : (
+              <ProductsGrid items={items} />
+            )}
 
             <Pagination
               page={page}
