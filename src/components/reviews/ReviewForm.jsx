@@ -31,12 +31,12 @@ export default function ReviewForm({ onSubmit, disabled }) {
   };
 
   return (
-    <form className="review-form card p-3 mb-4" onSubmit={handleSubmit}>
+    <form className="review-form card p-3 mb-3" onSubmit={handleSubmit}>
       <div className="d-flex justify-content-between align-items-center mb-2">
-        <strong>Deja tu opini\u00f3n</strong>
+        <strong>Deja tu opinion</strong>
       </div>
       <div className="mb-3">
-        <label className="form-label fw-semibold">Calificaci\u00f3n</label>
+        <label className="form-label fw-semibold">Calificacion</label>
         <div className="d-flex gap-2">
           {ratingOptions.map((value) => (
             <button
