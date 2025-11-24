@@ -1,6 +1,3 @@
-import rawProducts from "@/data/productos.json";
-
-const productDataset = Array.isArray(rawProducts) ? rawProducts : rawProducts?.products ?? [];
 const PRODUCT_STORAGE_KEY = "pokemart.admin.products";
 const PRODUCTS_EVENT = "products-data-changed";
 
@@ -25,7 +22,7 @@ const mapProduct = (product, baseStockFallback) => {
   return {
     id: Number(product.id),
     nombre: String(product.nombre ?? "").trim(),
-    categoria: String(product.categoria ?? "Sin categoría").trim() || "Sin categoría",
+    categoria: String(product.categoria ?? "Sin categoria").trim() || "Sin categoria",
     precio: Number(product.precio) || 0,
     stock,
     stockBase,
@@ -33,14 +30,13 @@ const mapProduct = (product, baseStockFallback) => {
     imagenNombre: normalizeImageName(product),
     descripcion: String(
       product.descripcion ??
-        "Producto del catálogo Poké Mart. Actualizaremos su descripción más adelante.",
+        "Producto del catalogo Pokemart. Actualizaremos su descripcion mas adelante.",
     ).trim(),
   };
 };
 
-const baseProducts = productDataset.map((product) =>
-  mapProduct({ ...product, stockBase: product.stock }, product.stock),
-);
+// Base dataset moved to backend; keep overrides/localStorage for admin tools.
+const baseProducts = [];
 
 const emitChange = () => {
   if (typeof window !== "undefined") {
@@ -140,11 +136,11 @@ const createProduct = (productData) => {
 const updateProduct = (productId, changes) => {
   const numericId = Number(productId);
   if (Number.isNaN(numericId)) {
-    throw new Error("ID de producto inválido");
+    throw new Error("ID de producto invalido");
   }
   const existing = getProductById(numericId);
   if (!existing) {
-    throw new Error(`No se encontró el producto ${numericId}`);
+    throw new Error(`No se encontro el producto ${numericId}`);
   }
 
   const overrides = readOverrides();

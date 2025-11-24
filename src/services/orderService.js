@@ -1,5 +1,3 @@
-import { seedOrders } from "@/data/seedOrders.js";
-
 const ORDER_STORAGE_KEY = "pokemart.admin.orders";
 const ORDERS_EVENT = "orders-data-changed";
 const TAX_RATE = 0.19;
@@ -51,13 +49,13 @@ const normalizeStatusHistory = (
   if (!Array.isArray(history) || history.length === 0) {
     return [
       { status: "created", label: "Orden creada", timestamp: createdAt },
-      { status: "Pendiente de Envío", label: "Pendiente de Envío", timestamp: updatedAt },
+      { status: "Pendiente de Envio", label: "Pendiente de Envio", timestamp: updatedAt },
     ];
   }
   return history
     .map((entry) => ({
       status: coerceString(entry.status || "created"),
-      label: coerceString(entry.label || entry.status || "Actualización"),
+      label: coerceString(entry.label || entry.status || "Actualizacion"),
       timestamp: entry.timestamp ?? createdAt,
     }))
     .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
@@ -99,7 +97,7 @@ const mapOrder = (order) => {
     updatedAt,
     items,
     payment: {
-      method: coerceString(order.payment?.method || "Pago en línea"),
+      method: coerceString(order.payment?.method || "Pago en linea"),
       status: coerceString(order.payment?.status || "Pagado"),
       transactionId: coerceString(order.payment?.transactionId),
       capturedAt: order.payment?.capturedAt ?? updatedAt,
@@ -130,9 +128,7 @@ const mapOrder = (order) => {
   };
 };
 
-const baseOrders = Array.isArray(seedOrders)
-  ? seedOrders.map((order) => mapOrder(order)).filter(Boolean)
-  : [];
+const baseOrders = [];
 
 const emitChange = () => {
   if (typeof window !== "undefined") {

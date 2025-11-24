@@ -1,10 +1,8 @@
-import rawUsers from "@/data/users.json";
-
 const USER_STORAGE_KEY = "pokemart.admin.users";
 const REGISTERED_USER_STORAGE_KEY = "pm_registeredUsers";
 const USERS_EVENT = "users-data-changed";
 
-const rawUsersArray = Array.isArray(rawUsers?.users) ? rawUsers.users : Array.isArray(rawUsers) ? rawUsers : [];
+const rawUsersArray = [];
 
 const normalizeRole = (role = "") => role.toString().trim().toLowerCase();
 const normalizeEmail = (email = "") => email.toString().trim().toLowerCase();
@@ -56,7 +54,7 @@ const readOverrides = () => {
         : {};
     return { added, updated };
   } catch (error) {
-    console.warn("No se pudo leer la información de usuarios personalizada", error);
+    console.warn("No se pudo leer la informacion de usuarios personalizada", error);
     return { added: [], updated: {} };
   }
 };
@@ -86,7 +84,7 @@ const readRegisteredUsers = () => {
       .map((item, index) => mapUser(item, computeDefaultRegisteredAt(index + 2000)))
       .filter((user) => Number.isFinite(user.id));
   } catch (error) {
-    console.warn("No se pudo leer la información de usuarios registrados en tienda", error);
+    console.warn("No se pudo leer la informacion de usuarios registrados en tienda", error);
     return [];
   }
 };
@@ -166,7 +164,7 @@ const ensureUniqueCredentials = (users, { username, email }, currentId) => {
     normalizedEmail &&
     users.some((user) => user.email === normalizedEmail && user.id !== currentId)
   ) {
-    throw new Error("Ya existe un usuario con ese correo electrónico.");
+    throw new Error("Ya existe un usuario con ese correo electronico.");
   }
 };
 
@@ -193,11 +191,11 @@ const createUser = (userData) => {
 const updateUser = (userId, changes) => {
   const numericId = Number(userId);
   if (Number.isNaN(numericId)) {
-    throw new Error("ID de usuario inválido");
+    throw new Error("ID de usuario invalido");
   }
   const existing = getUserById(numericId);
   if (!existing) {
-    throw new Error(`No se encontró el usuario ${numericId}`);
+    throw new Error(`No se encontro el usuario ${numericId}`);
   }
 
   ensureUniqueCredentials(getAllUsers(), changes, numericId);
