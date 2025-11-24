@@ -5,6 +5,7 @@ const ADMIN_SIDEBAR_NAV_ITEMS = [
   { to: "/admin/ofertas", label: "Ofertas", code: "OF" },
   { to: "/admin/categorias", label: "Categorias", code: "CT" },
   { to: "/admin/usuarios", label: "Usuarios", code: "US" },
+  { to: "/admin/resenas", label: "Reseñas", code: "RV" },
   { to: "/admin/reportes", label: "Reportes", code: "RP" },
 ];
 

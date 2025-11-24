@@ -23,6 +23,7 @@ const sellerAllowedPath = (pathname = "") => {
     return !disallowedProductPaths.some((prefix) => pathname.startsWith(prefix));
   }
   if (pathname.startsWith("/admin/ofertas")) return true;
+  if (pathname.startsWith("/admin/resenas")) return false; // solo admin
   return false;
 };
 

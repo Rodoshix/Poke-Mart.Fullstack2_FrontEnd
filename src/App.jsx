@@ -35,6 +35,7 @@ import AdminUserHistory from "@/pages/admin/AdminUserHistory.jsx";
 import AdminOffers from "@/pages/admin/AdminOffers.jsx";
 import AdminReports from "@/pages/admin/AdminReports.jsx";
 import AdminProfile from "@/pages/admin/AdminProfile.jsx";
+import AdminReviews from "@/pages/admin/AdminReviews.jsx";
 
 const ReviewsPage = () => <h1 className="h3">Reseñas</h1>;
 const NotFound    = () => <div className="text-center"><h1 className="display-4">404</h1></div>;
@@ -70,6 +71,7 @@ const App = () => {
         <Route path="usuarios/:id" element={<AdminUserEdit />} />
         <Route path="usuarios/:id/historial" element={<AdminUserHistory />} />
         <Route path="ofertas" element={<AdminOffers />} />
+        <Route path="resenas" element={<AdminReviews />} />
         <Route path="reportes" element={<AdminReports />} />
         <Route path="perfil" element={<AdminProfile />} />
         <Route path="*" element={<Navigate to="/admin" replace />} />
