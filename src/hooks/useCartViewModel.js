@@ -32,7 +32,8 @@ export function useCartViewModel() {
       const price = Number(raw.price ?? prod?.precio ?? 0);
       const stock = Number(prod?.stock ?? raw.stock ?? raw.qty ?? 0);
       const name = prod?.nombre ?? raw.name ?? "Producto";
-      const image = resolveImg(prod?.imagen ?? raw.image ?? FALLBACK_IMAGE);
+      const srcImage = prod?.imagen ?? raw.image ?? "";
+      const image = srcImage ? resolveImg(srcImage) : FALLBACK_IMAGE;
       const descripcion = prod?.descripcion ?? "";
 
       return {

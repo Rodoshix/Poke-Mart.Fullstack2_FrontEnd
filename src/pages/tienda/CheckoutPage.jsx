@@ -84,6 +84,7 @@ export default function CheckoutPage() {
           departamento: form.departamento,
           notas: form.notas?.trim(),
           metodoPago: form.paymentMethod,
+          costoEnvio: shipping,
           items: items.map((item) => ({
             productoId: item.product?.id ?? Number(item.id),
             cantidad: Math.max(1, Number(item.qty) || 0),

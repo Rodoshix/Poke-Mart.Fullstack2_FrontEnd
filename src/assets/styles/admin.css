@@ -3511,6 +3511,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
   gap: 18px;
+  align-items: start;
 }
 
 .admin-blogs__form-card,
@@ -3526,6 +3527,10 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
+}
+
+.admin-blogs__table {
+  overflow-x: auto;
 }
 
 .admin-product-filters__group--grow {

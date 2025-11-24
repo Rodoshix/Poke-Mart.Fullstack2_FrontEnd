@@ -345,7 +345,7 @@ const AdminBlogs = () => {
           {loading ? (
             <LoaderOverlay text="Cargando blogs..." />
           ) : (
-            <div className="admin-product-table admin-review-table">
+            <div className="admin-product-table admin-review-table admin-blogs__table">
               <table className="admin-table admin-product-table__inner">
                 <thead>
                   <tr>

@@ -12,6 +12,7 @@ const mapOrderItem = (item = {}) => ({
 const mapOrderResponse = (order = {}) => {
   const estado = typeof order.estado === "string" ? order.estado.toLowerCase() : order.estado;
   const items = Array.isArray(order.items) ? order.items.map(mapOrderItem) : [];
+  const usedOffers = Boolean(order.ofertasAplicadas);
   return {
     id: order.numeroOrden ?? order.id,
     backendId: order.id,
@@ -28,6 +29,7 @@ const mapOrderResponse = (order = {}) => {
       discount: Number(order.descuento ?? order.discount ?? 0),
       taxes: Number(order.impuestos ?? order.taxes ?? 0),
       total: Number(order.total ?? 0),
+      usedOffers,
     },
     payment: {
       method: order.metodoPago ?? "Pago en linea",
@@ -50,6 +52,7 @@ const mapOrderResponse = (order = {}) => {
     notes: order.notas,
     currency: "CLP",
     items,
+    usedOffers,
   };
 };
 
