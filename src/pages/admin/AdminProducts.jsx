@@ -18,6 +18,9 @@ const AdminProducts = () => {
   const isAdmin = role === "admin";
   const presetCategory = location.state?.presetCategory ?? "";
   const presetSearch = location.state?.presetSearch ?? "";
+  const productsInitial = useAdminProducts();
+  const loading = productsInitial?.loading;
+  const loadError = productsInitial?.error;
   const [searchTerm, setSearchTerm] = useState(presetSearch);
   const [selectedCategory, setSelectedCategory] = useState(presetCategory);
   const [sortOption, setSortOption] = useState(DEFAULT_SORT);
@@ -27,7 +30,6 @@ const AdminProducts = () => {
   const [actionMessage, setActionMessage] = useState("");
   const [actionError, setActionError] = useState("");
   const [processingId, setProcessingId] = useState(null);
-  const productsInitial = useAdminProducts();
 
   useEffect(() => {
     setProducts(productsInitial);
@@ -235,6 +237,16 @@ const AdminProducts = () => {
       </div>
 
       <div className="admin-products__actions">
+        {loading && (
+          <div className="admin-products__alert" role="status">
+            Cargando productos...
+          </div>
+        )}
+        {loadError && (
+          <div className="admin-products__alert admin-products__alert--error" role="alert">
+            {loadError}
+          </div>
+        )}
         {isAdmin ? (
           <>
             <Link to="/admin/productos/nuevo" className="admin-products__action-button admin-products__action-button--primary">
@@ -322,4 +334,3 @@ const AdminProducts = () => {
 };
 
 export default AdminProducts;
-

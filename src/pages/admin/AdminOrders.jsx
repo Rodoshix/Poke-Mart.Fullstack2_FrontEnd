@@ -43,6 +43,8 @@ const AdminOrders = () => {
   const [sortOption, setSortOption] = useState(DEFAULT_SORT);
 
   const ordersDataset = useOrdersData();
+  const loading = ordersDataset?.loading;
+  const loadError = ordersDataset?.error;
 
   const filteredAndSortedOrders = useMemo(() => {
     const base = Array.isArray(ordersDataset) ? ordersDataset : [];
@@ -65,6 +67,17 @@ const AdminOrders = () => {
         onSearchChange={setSearchTerm}
         onSortChange={setSortOption}
       />
+
+      {loading && (
+        <div className="admin-products__alert" role="status">
+          Cargando ordenes...
+        </div>
+      )}
+      {loadError && (
+        <div className="admin-products__alert admin-products__alert--error" role="alert">
+          {loadError}
+        </div>
+      )}
 
       <div className="admin-orders__meta">
         Mostrando {filteredAndSortedOrders.length} de {Array.isArray(ordersDataset) ? ordersDataset.length : 0} ordenes registradas.

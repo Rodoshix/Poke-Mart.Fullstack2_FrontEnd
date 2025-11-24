@@ -4,15 +4,24 @@ import { getAllProducts } from "@/services/productService.js";
 
 const useProductsData = () => {
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
+      setLoading(true);
+      setError("");
       try {
         const data = await fetchProducts();
         if (!cancelled) setProducts(Array.isArray(data) ? data : []);
       } catch (_) {
-        if (!cancelled) setProducts(getAllProducts());
+        if (!cancelled) {
+          setProducts(getAllProducts());
+          setError("Usando datos locales por falla de red");
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
       }
     };
     load();
@@ -21,7 +30,7 @@ const useProductsData = () => {
     };
   }, []);
 
-  return products;
+  return Object.assign(products, { loading, error });
 };
 
 export default useProductsData;

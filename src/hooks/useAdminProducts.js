@@ -3,16 +3,24 @@ import { fetchAdminProducts } from "@/services/adminProductApi.js";
 
 export default function useAdminProducts() {
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
+      setLoading(true);
+      setError("");
       try {
         const data = await fetchAdminProducts();
         if (!cancelled) setProducts(Array.isArray(data) ? data : []);
       } catch (err) {
-        if (!cancelled) setProducts([]);
+        if (!cancelled) {
+          setProducts([]);
+          setError(err instanceof Error ? err.message : "No se pudieron cargar los productos");
+        }
       }
+      if (!cancelled) setLoading(false);
     };
     load();
     return () => {
@@ -20,5 +28,5 @@ export default function useAdminProducts() {
     };
   }, []);
 
-  return products;
+  return Object.assign(products, { loading, error });
 }

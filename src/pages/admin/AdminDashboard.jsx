@@ -25,8 +25,11 @@ const AdminDashboard = () => {
   const products = useAdminProducts();
   const users = useUsersData();
   const quickLinks = QUICK_LINKS;
+  const anyLoading = orders?.loading || products?.loading || users?.loading;
+  const firstError = orders?.error || products?.error || users?.error;
 
   const metrics = useMemo(() => {
+    if (anyLoading) return null;
     const now = Date.now();
     const safeOrders = Array.isArray(orders) ? orders : [];
     const safeProducts = Array.isArray(products) ? products : [];
@@ -110,9 +113,9 @@ const AdminDashboard = () => {
     };
 
     return { orderStats, inventoryStats, userStats };
-  }, [orders, products, users]);
+  }, [orders, products, users, anyLoading]);
 
-  const { orderStats, inventoryStats, userStats } = metrics;
+  const { orderStats, inventoryStats, userStats } = metrics || {};
 
   return (
     <section className="admin-paper admin-dashboard">
@@ -124,11 +127,24 @@ const AdminDashboard = () => {
         </p>
       </div>
 
-      <div className="admin-dashboard__metrics">
-        <StatCard {...orderStats} />
-        <StatCard {...inventoryStats} />
-        <StatCard {...userStats} />
-      </div>
+      {anyLoading && (
+        <div className="admin-products__alert" role="status">
+          Cargando métricas...
+        </div>
+      )}
+      {firstError && (
+        <div className="admin-products__alert admin-products__alert--error" role="alert">
+          {firstError}
+        </div>
+      )}
+
+      {metrics && (
+        <div className="admin-dashboard__metrics">
+          <StatCard {...orderStats} />
+          <StatCard {...inventoryStats} />
+          <StatCard {...userStats} />
+        </div>
+      )}
 
       <div className="admin-dashboard__quick-links">
         <div className="admin-dashboard__quick-links-header">
