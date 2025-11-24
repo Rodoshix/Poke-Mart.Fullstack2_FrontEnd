@@ -18,12 +18,12 @@ export async function fetchBlogs({ categoria, q } = {}) {
   const params = new URLSearchParams();
   if (categoria) params.set("categoria", categoria);
   if (q) params.set("q", q);
-  const data = await apiFetch(`/api/blogs${params.toString() ? `?${params.toString()}` : ""}`);
+  const data = await apiFetch(`/api/v1/blogs${params.toString() ? `?${params.toString()}` : ""}`);
   if (!Array.isArray(data)) return [];
   return data.map(mapBlog);
 }
 
 export async function fetchBlogBySlug(slug) {
-  const data = await apiFetch(`/api/blogs/${encodeURIComponent(slug)}`);
+  const data = await apiFetch(`/api/v1/blogs/${encodeURIComponent(slug)}`);
   return mapBlog(data);
 }

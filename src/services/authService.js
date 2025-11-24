@@ -26,7 +26,7 @@ async function handle(response) {
 }
 
 export async function login({ identifier, password }) {
-  const response = await fetch(`${API_BASE_URL}/auth/login`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
     method: "POST",
     headers: defaultHeaders,
     body: JSON.stringify({ identifier, password }),
@@ -35,7 +35,7 @@ export async function login({ identifier, password }) {
 }
 
 export async function register({ email, username, password, nombre, apellido, rut, direccion, region, comuna, fechaNacimiento, telefono }) {
-  const response = await fetch(`${API_BASE_URL}/auth/register`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/auth/register`, {
     method: "POST",
     headers: defaultHeaders,
     body: JSON.stringify({ email, username, password, nombre, apellido, rut, direccion, region, comuna, fechaNacimiento, telefono }),
@@ -44,7 +44,7 @@ export async function register({ email, username, password, nombre, apellido, ru
 }
 
 export async function refreshToken(refreshToken) {
-  const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/auth/refresh`, {
     method: "POST",
     headers: defaultHeaders,
     body: JSON.stringify({ refreshToken }),

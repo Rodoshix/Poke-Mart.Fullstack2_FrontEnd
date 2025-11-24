@@ -21,13 +21,13 @@ export async function fetchAdminBlogs({ categoria, estado, q } = {}) {
   if (categoria) params.set("categoria", categoria);
   if (estado) params.set("estado", estado);
   if (q) params.set("q", q);
-  const data = await apiFetch(`/api/admin/blogs${params.toString() ? `?${params.toString()}` : ""}`, { auth: true });
+  const data = await apiFetch(`/api/v1/admin/blogs${params.toString() ? `?${params.toString()}` : ""}`, { auth: true });
   if (!Array.isArray(data)) return [];
   return data.map(mapBlog);
 }
 
 export async function createAdminBlog(payload) {
-  const data = await apiFetch("/api/admin/blogs", {
+  const data = await apiFetch("/api/v1/admin/blogs", {
     method: "POST",
     body: payload,
     auth: true,
@@ -36,7 +36,7 @@ export async function createAdminBlog(payload) {
 }
 
 export async function updateAdminBlog(id, payload) {
-  const data = await apiFetch(`/api/admin/blogs/${id}`, {
+  const data = await apiFetch(`/api/v1/admin/blogs/${id}`, {
     method: "PUT",
     body: payload,
     auth: true,
@@ -45,7 +45,7 @@ export async function updateAdminBlog(id, payload) {
 }
 
 export async function updateAdminBlogStatus(id, estado) {
-  const data = await apiFetch(`/api/admin/blogs/${id}/estado`, {
+  const data = await apiFetch(`/api/v1/admin/blogs/${id}/estado`, {
     method: "PATCH",
     body: { estado },
     auth: true,
@@ -54,5 +54,5 @@ export async function updateAdminBlogStatus(id, estado) {
 }
 
 export async function deleteAdminBlog(id) {
-  await apiFetch(`/api/admin/blogs/${id}`, { method: "DELETE", auth: true });
+  await apiFetch(`/api/v1/admin/blogs/${id}`, { method: "DELETE", auth: true });
 }

@@ -9,7 +9,7 @@ const mapReview = (r = {}) => ({
 });
 
 export async function fetchProductReviews(productId) {
-  const data = await apiFetch(`/api/products/${productId}/reviews`);
+  const data = await apiFetch(`/api/v1/products/${productId}/reviews`);
   if (!Array.isArray(data)) return [];
   return data.map(mapReview);
 }
@@ -19,10 +19,10 @@ export async function createProductReview(productId, payload) {
     rating: Number(payload.rating),
     comment: payload.comment,
   };
-  const data = await apiFetch(`/api/products/${productId}/reviews`, { method: "POST", auth: true, body });
+  const data = await apiFetch(`/api/v1/products/${productId}/reviews`, { method: "POST", auth: true, body });
   return mapReview(data);
 }
 
 export async function deleteReviewAdmin(id) {
-  await apiFetch(`/api/admin/reviews/${id}`, { method: "DELETE", auth: true });
+  await apiFetch(`/api/v1/admin/reviews/${id}`, { method: "DELETE", auth: true });
 }

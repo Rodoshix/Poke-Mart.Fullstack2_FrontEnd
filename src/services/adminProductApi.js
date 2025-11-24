@@ -36,7 +36,7 @@ const resolveImageUrl = async (payload) => {
   const formData = new FormData();
   formData.append("file", blob, payload?.imagenNombre || "product-image.png");
 
-  const result = await apiFetch("/api/uploads/images", {
+  const result = await apiFetch("/api/v1/uploads/images", {
     method: "POST",
     auth: true,
     body: formData,
@@ -45,13 +45,13 @@ const resolveImageUrl = async (payload) => {
 };
 
 export async function fetchAdminProducts() {
-  const data = await apiFetch("/api/products/manage?includeInactive=true", { auth: true });
+  const data = await apiFetch("/api/v1/products/manage?includeInactive=true", { auth: true });
   if (!Array.isArray(data)) return [];
   return data.map(mapProduct);
 }
 
 export async function fetchAdminProduct(id) {
-  const data = await apiFetch(`/api/products/manage/${id}`, { auth: true });
+  const data = await apiFetch(`/api/v1/products/manage/${id}`, { auth: true });
   return mapProduct(data);
 }
 
@@ -66,7 +66,7 @@ export async function createAdminProduct(payload) {
     imagenUrl,
     categoriaSlug: slugify(payload.categoria ?? "general"),
   };
-  const data = await apiFetch("/api/products", { method: "POST", auth: true, body });
+  const data = await apiFetch("/api/v1/products", { method: "POST", auth: true, body });
   return mapProduct(data);
 }
 
@@ -81,16 +81,16 @@ export async function updateAdminProduct(id, payload) {
     imagenUrl,
     categoriaSlug: slugify(payload.categoria ?? "general"),
   };
-  const data = await apiFetch(`/api/products/${id}`, { method: "PUT", auth: true, body });
+  const data = await apiFetch(`/api/v1/products/${id}`, { method: "PUT", auth: true, body });
   return mapProduct(data);
 }
 
 export async function deleteAdminProduct(id) {
-  await apiFetch(`/api/products/${id}?hard=true`, { method: "DELETE", auth: true });
+  await apiFetch(`/api/v1/products/${id}?hard=true`, { method: "DELETE", auth: true });
 }
 
 export async function setAdminProductActive(id, active) {
-  const data = await apiFetch(`/api/products/${id}/status?active=${active ? "true" : "false"}`, {
+  const data = await apiFetch(`/api/v1/products/${id}/status?active=${active ? "true" : "false"}`, {
     method: "PATCH",
     auth: true,
   });

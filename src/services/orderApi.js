@@ -57,7 +57,7 @@ const mapOrderResponse = (order = {}) => {
 };
 
 export async function createOrder(payload, { auth = true } = {}) {
-  const data = await apiFetch("/api/orders", {
+  const data = await apiFetch("/api/v1/orders", {
     method: "POST",
     body: payload,
     auth,
@@ -66,13 +66,13 @@ export async function createOrder(payload, { auth = true } = {}) {
 }
 
 export async function fetchAdminOrders() {
-  const data = await apiFetch("/api/admin/orders", { auth: true });
+  const data = await apiFetch("/api/v1/admin/orders", { auth: true });
   if (!Array.isArray(data)) return [];
   return data.map(mapOrderResponse);
 }
 
 export async function updateAdminOrder(id, payload) {
-  const data = await apiFetch(`/api/admin/orders/${id}`, {
+  const data = await apiFetch(`/api/v1/admin/orders/${id}`, {
     method: "PATCH",
     auth: true,
     body: {

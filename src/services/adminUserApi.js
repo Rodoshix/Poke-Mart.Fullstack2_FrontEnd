@@ -20,13 +20,13 @@ const mapUser = (u) => ({
 });
 
 export async function fetchAdminUsers() {
-  const data = await apiFetch("/api/admin/users", { auth: true });
+  const data = await apiFetch("/api/v1/admin/users", { auth: true });
   if (!Array.isArray(data)) return [];
   return data.map(mapUser);
 }
 
 export async function fetchAdminUser(id) {
-  const data = await apiFetch(`/api/admin/users/${id}`, { auth: true });
+  const data = await apiFetch(`/api/v1/admin/users/${id}`, { auth: true });
   return data ? mapUser(data) : null;
 }
 
@@ -47,7 +47,7 @@ export async function createAdminUser(payload) {
     avatarUrl: payload.avatarUrl,
     active: payload.active ?? true,
   };
-  const data = await apiFetch("/api/admin/users", { method: "POST", auth: true, body });
+  const data = await apiFetch("/api/v1/admin/users", { method: "POST", auth: true, body });
   return mapUser(data);
 }
 
@@ -68,16 +68,16 @@ export async function updateAdminUser(id, payload) {
     avatarUrl: payload.avatarUrl,
     active: payload.active ?? true,
   };
-  const data = await apiFetch(`/api/admin/users/${id}`, { method: "PUT", auth: true, body });
+  const data = await apiFetch(`/api/v1/admin/users/${id}`, { method: "PUT", auth: true, body });
   return mapUser(data);
 }
 
 export async function deactivateAdminUser(id) {
-  await apiFetch(`/api/admin/users/${id}`, { method: "DELETE", auth: true });
+  await apiFetch(`/api/v1/admin/users/${id}`, { method: "DELETE", auth: true });
 }
 
 export async function setAdminUserActive(id, active) {
-  const data = await apiFetch(`/api/admin/users/${id}/status?active=${active ? "true" : "false"}`, {
+  const data = await apiFetch(`/api/v1/admin/users/${id}/status?active=${active ? "true" : "false"}`, {
     method: "PATCH",
     auth: true,
   });
@@ -85,5 +85,5 @@ export async function setAdminUserActive(id, active) {
 }
 
 export async function deleteAdminUser(id) {
-  await apiFetch(`/api/admin/users/${id}?hard=true`, { method: "DELETE", auth: true });
+  await apiFetch(`/api/v1/admin/users/${id}?hard=true`, { method: "DELETE", auth: true });
 }

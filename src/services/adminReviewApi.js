@@ -12,11 +12,11 @@ const mapReview = (r = {}) => ({
 });
 
 export async function fetchAdminReviews() {
-  const data = await apiFetch("/api/admin/reviews", { auth: true });
+  const data = await apiFetch("/api/v1/admin/reviews", { auth: true });
   if (!Array.isArray(data)) return [];
   return data.map(mapReview);
 }
 
 export async function deleteAdminReview(id) {
-  await apiFetch(`/api/admin/reviews/${id}`, { method: "DELETE", auth: true });
+  await apiFetch(`/api/v1/admin/reviews/${id}`, { method: "DELETE", auth: true });
 }

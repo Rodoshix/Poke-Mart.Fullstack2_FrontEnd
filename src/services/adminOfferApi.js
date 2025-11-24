@@ -11,13 +11,13 @@ const mapOffer = (o = {}) => ({
 });
 
 export async function fetchAdminOffers() {
-  const data = await apiFetch("/api/admin/offers", { auth: true });
+  const data = await apiFetch("/api/v1/admin/offers", { auth: true });
   if (!Array.isArray(data)) return [];
   return data.map(mapOffer);
 }
 
 export async function fetchAdminOffer(id) {
-  const data = await apiFetch(`/api/admin/offers/${id}`, { auth: true });
+  const data = await apiFetch(`/api/v1/admin/offers/${id}`, { auth: true });
   return mapOffer(data);
 }
 
@@ -28,7 +28,7 @@ export async function createAdminOffer(payload) {
     endsAt: payload.endsAt || null,
     active: payload.active ?? true,
   };
-  const data = await apiFetch("/api/admin/offers", { method: "POST", auth: true, body });
+  const data = await apiFetch("/api/v1/admin/offers", { method: "POST", auth: true, body });
   return mapOffer(data);
 }
 
@@ -39,12 +39,12 @@ export async function updateAdminOffer(id, payload) {
     endsAt: payload.endsAt || null,
     active: payload.active,
   };
-  const data = await apiFetch(`/api/admin/offers/${id}`, { method: "PUT", auth: true, body });
+  const data = await apiFetch(`/api/v1/admin/offers/${id}`, { method: "PUT", auth: true, body });
   return mapOffer(data);
 }
 
 export async function setAdminOfferActive(id, active) {
-  const data = await apiFetch(`/api/admin/offers/${id}/status?active=${active ? "true" : "false"}`, {
+  const data = await apiFetch(`/api/v1/admin/offers/${id}/status?active=${active ? "true" : "false"}`, {
     method: "PUT",
     auth: true,
   });
@@ -52,5 +52,5 @@ export async function setAdminOfferActive(id, active) {
 }
 
 export async function deleteAdminOffer(id, hard = false) {
-  await apiFetch(`/api/admin/offers/${id}?hard=${hard ? "true" : "false"}`, { method: "DELETE", auth: true });
+  await apiFetch(`/api/v1/admin/offers/${id}?hard=${hard ? "true" : "false"}`, { method: "DELETE", auth: true });
 }

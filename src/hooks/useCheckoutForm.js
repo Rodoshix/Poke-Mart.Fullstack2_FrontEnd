@@ -78,10 +78,26 @@ export function useCheckoutForm() {
     }
   };
 
+  const validate = () => {
+    const errors = [];
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!form.nombre.trim()) errors.push("El nombre es obligatorio.");
+    if (!form.apellido.trim()) errors.push("El apellido es obligatorio.");
+    if (!form.email.trim() || !emailRegex.test(form.email.trim())) errors.push("Ingresa un correo válido.");
+    if (!form.calle.trim()) errors.push("La calle/dirección es obligatoria.");
+    if (!form.region.trim()) errors.push("Selecciona una región.");
+    if (!form.comuna.trim()) errors.push("Selecciona una comuna.");
+    if (!form.paymentMethod) errors.push("Selecciona un método de pago.");
+
+    return errors;
+  };
+
   return {
     form,
     setField,
     setRegion,
     resetForm,
+    validate,
   };
 }

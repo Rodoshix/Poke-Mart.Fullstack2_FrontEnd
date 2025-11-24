@@ -49,18 +49,18 @@ const mapProduct = (p) => {
 
 export async function fetchProducts(category) {
   const query = category ? `?category=${encodeURIComponent(category)}` : "";
-  const data = await request(`/api/products${query}`);
+  const data = await request(`/api/v1/products${query}`);
   if (!Array.isArray(data)) return [];
   return data.map(mapProduct).filter(Boolean);
 }
 
 export async function fetchProduct(id) {
-  const data = await request(`/api/products/${id}`);
+  const data = await request(`/api/v1/products/${id}`);
   return mapProduct(data);
 }
 
 export async function fetchOffers() {
-  const data = await request("/api/offers");
+  const data = await request("/api/v1/offers");
   if (!Array.isArray(data)) return [];
   return data.map(mapProduct).filter(Boolean);
 }
