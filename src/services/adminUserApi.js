@@ -7,6 +7,7 @@ const mapUser = (u) => ({
   role: (u.role || "").toLowerCase(),
   active: u.active,
   registeredAt: u.createdAt,
+  lastLoginAt: u.lastLoginAt,
   nombre: u.nombre,
   apellido: u.apellido,
   run: u.rut,
