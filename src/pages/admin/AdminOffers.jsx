@@ -1,12 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
-import { fetchAdminOffers, createAdminOffer, updateAdminOffer, setAdminOfferActive, deleteAdminOffer } from "@/services/adminOfferApi.js";
+import {
+  fetchAdminOffers,
+  createAdminOffer,
+  updateAdminOffer,
+  setAdminOfferActive,
+  deleteAdminOffer,
+} from "@/services/adminOfferApi.js";
 import { fetchAdminProducts } from "@/services/adminProductApi.js";
+import useAuthSession from "@/hooks/useAuthSession.js";
 
 const formatDateTime = (value) => {
   if (!value) return "";
   try {
     const date = new Date(value);
-    return isNaN(date.getTime()) ? value : date.toLocaleString("es-CL");
+    return Number.isNaN(date.getTime()) ? value : date.toLocaleString("es-CL");
   } catch {
     return value;
   }
@@ -26,6 +33,10 @@ const emptyForm = {
 };
 
 const AdminOffers = () => {
+  const { profile } = useAuthSession();
+  const role = (profile?.role || "").toLowerCase();
+  const isAdmin = role === "admin";
+
   const [offers, setOffers] = useState([]);
   const [products, setProducts] = useState([]);
   const [categoryFilter, setCategoryFilter] = useState("");
@@ -70,6 +81,7 @@ const AdminOffers = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (!isAdmin) return;
     resetFeedback();
     setLoading(true);
     try {
@@ -94,6 +106,7 @@ const AdminOffers = () => {
   };
 
   const handleEdit = (offer) => {
+    if (!isAdmin) return;
     resetFeedback();
     setForm({
       id: offer.id,
@@ -110,6 +123,7 @@ const AdminOffers = () => {
   };
 
   const handleToggleActive = async (offer) => {
+    if (!isAdmin) return;
     resetFeedback();
     setProcessingId(offer.id);
     try {
@@ -125,6 +139,7 @@ const AdminOffers = () => {
   };
 
   const handleDelete = async (offer) => {
+    if (!isAdmin) return;
     resetFeedback();
     const confirmed = window.confirm("Eliminar esta oferta de forma permanente?");
     if (!confirmed) return;
@@ -171,95 +186,95 @@ const AdminOffers = () => {
         </div>
       )}
 
-      <div className="admin-offers__form-card">
-        <div className="admin-offers__section-head">
-          <h2 className="admin-offers__title">{form.id ? "Editar oferta" : "Crear oferta"}</h2>
-          <p className="admin-offers__subtitle">Selecciona el producto, define el descuento y una fecha de término opcional.</p>
+      {isAdmin && (
+        <div className="admin-offers__form-card">
+          <div className="admin-offers__section-head">
+            <h2 className="admin-offers__title">{form.id ? "Editar oferta" : "Crear oferta"}</h2>
+            <p className="admin-offers__subtitle">Selecciona el producto, define el descuento y una fecha de término opcional.</p>
+          </div>
+
+          <form className="admin-offers__form" onSubmit={handleSubmit}>
+            <div className="admin-offers__fields">
+              <label className="admin-offers__field">
+                <span className="admin-offers__label">Categoria</span>
+                <select
+                  name="categoria"
+                  value={categoryFilter}
+                  onChange={handleCategoryChange}
+                  className="admin-offers__input"
+                >
+                  <option value="">Todas</option>
+                  {categories.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="admin-offers__field">
+                <span className="admin-offers__label">Producto</span>
+                <select
+                  name="productId"
+                  value={form.productId}
+                  onChange={handleChange}
+                  className="admin-offers__input"
+                  required
+                >
+                  <option value="">Selecciona un producto</option>
+                  {productOptions.map((product) => (
+                    <option key={product.id} value={product.id}>
+                      #{product.id} - {product.nombre}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="admin-offers__field">
+                <span className="admin-offers__label">Descuento (%)</span>
+                <input
+                  type="number"
+                  name="discountPct"
+                  min="1"
+                  max="99"
+                  value={form.discountPct}
+                  onChange={handleChange}
+                  className="admin-offers__input"
+                  placeholder="Ej: 15"
+                  required
+                />
+              </label>
+
+              <label className="admin-offers__field">
+                <span className="admin-offers__label">Termina (opcional)</span>
+                <input
+                  type="datetime-local"
+                  name="endsAt"
+                  value={form.endsAt}
+                  onChange={handleChange}
+                  className="admin-offers__input"
+                />
+                <small className="admin-offers__hint">Formato local: fecha y hora.</small>
+              </label>
+            </div>
+
+            <div className="admin-offers__actions">
+              <button type="submit" className="admin-products__action-button admin-products__action-button--primary" disabled={loading}>
+                {form.id ? "Guardar cambios" : "Crear oferta"}
+              </button>
+              <button type="button" className="admin-products__action-button" onClick={handleClear} disabled={loading}>
+                Limpiar
+              </button>
+              {form.id && <span className="admin-offers__pill">Editando oferta #{form.id}</span>}
+            </div>
+          </form>
         </div>
-
-        <form className="admin-offers__form" onSubmit={handleSubmit}>
-          <div className="admin-offers__fields">
-            <label className="admin-offers__field">
-              <span className="admin-offers__label">Categoria</span>
-              <select
-                name="categoria"
-                value={categoryFilter}
-                onChange={handleCategoryChange}
-                className="admin-offers__input"
-              >
-                <option value="">Todas</option>
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="admin-offers__field">
-              <span className="admin-offers__label">Producto</span>
-              <select
-                name="productId"
-                value={form.productId}
-                onChange={handleChange}
-                className="admin-offers__input"
-                required
-              >
-                <option value="">Selecciona un producto</option>
-                {productOptions.map((product) => (
-                  <option key={product.id} value={product.id}>
-                    #{product.id} - {product.nombre}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="admin-offers__field">
-              <span className="admin-offers__label">Descuento (%)</span>
-              <input
-                type="number"
-                name="discountPct"
-                min="1"
-                max="99"
-                value={form.discountPct}
-                onChange={handleChange}
-                className="admin-offers__input"
-                placeholder="Ej: 15"
-                required
-              />
-            </label>
-
-            <label className="admin-offers__field">
-              <span className="admin-offers__label">Termina (opcional)</span>
-              <input
-                type="datetime-local"
-                name="endsAt"
-                value={form.endsAt}
-                onChange={handleChange}
-                className="admin-offers__input"
-              />
-              <small className="admin-offers__hint">Formato local: fecha y hora.</small>
-            </label>
-          </div>
-
-          <div className="admin-offers__actions">
-            <button type="submit" className="admin-products__action-button admin-products__action-button--primary" disabled={loading}>
-              {form.id ? "Guardar cambios" : "Crear oferta"}
-            </button>
-            <button type="button" className="admin-products__action-button" onClick={handleClear} disabled={loading}>
-              Limpiar
-            </button>
-            {form.id && (
-              <span className="admin-offers__pill">Editando oferta #{form.id}</span>
-            )}
-          </div>
-        </form>
-      </div>
+      )}
 
       <div className="admin-offers__list-card">
         <div className="admin-offers__section-head">
           <h2 className="admin-offers__title">Listado de ofertas</h2>
-          <p className="admin-offers__subtitle">Activa, pausa o elimina promociones vigentes.</p>
+          <p className="admin-offers__subtitle">Activa o edita las promociones vigentes.</p>
         </div>
         <div className="admin-product-table">
           <table className="admin-table admin-product-table__inner">
@@ -302,7 +317,7 @@ const AdminOffers = () => {
                             type="button"
                             className="admin-product-table__action"
                             onClick={() => handleEdit(offer)}
-                            disabled={processingId === offer.id}
+                            disabled={processingId === offer.id || !isAdmin}
                           >
                             Editar
                           </button>
@@ -310,7 +325,7 @@ const AdminOffers = () => {
                             type="button"
                             className="admin-product-table__action"
                             onClick={() => handleToggleActive(offer)}
-                            disabled={processingId === offer.id}
+                            disabled={processingId === offer.id || !isAdmin}
                           >
                             {offer.active ? "Desactivar" : "Activar"}
                           </button>
@@ -318,7 +333,7 @@ const AdminOffers = () => {
                             type="button"
                             className="admin-product-table__action admin-product-table__action--danger"
                             onClick={() => handleDelete(offer)}
-                            disabled={processingId === offer.id}
+                            disabled={processingId === offer.id || !isAdmin}
                           >
                             Eliminar
                           </button>

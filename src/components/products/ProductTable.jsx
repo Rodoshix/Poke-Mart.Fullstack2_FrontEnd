@@ -33,7 +33,7 @@ const resolveProductImage = (imagePath) => {
   return resolveImg(imagePath);
 };
 
-const ProductTable = ({ products, onToggleActive, onDelete, processingId }) => (
+const ProductTable = ({ products, onToggleActive, onDelete, processingId, readOnly = false }) => (
   <div className="admin-product-table">
     <table className="admin-table admin-product-table__inner">
       <thead>
@@ -84,7 +84,11 @@ const ProductTable = ({ products, onToggleActive, onDelete, processingId }) => (
                 </td>
                 <td>
                   <div className="admin-product-table__actions">
-                    <Link to={`/admin/productos/${product.id}/editar`} className="admin-product-table__action">
+                    <Link
+                      to={`/admin/productos/${product.id}/editar`}
+                      className={`admin-product-table__action${readOnly ? " disabled" : ""}`}
+                      onClick={(e) => readOnly && e.preventDefault()}
+                    >
                       Editar
                     </Link>
                     {typeof onToggleActive === "function" && (
@@ -92,7 +96,7 @@ const ProductTable = ({ products, onToggleActive, onDelete, processingId }) => (
                         type="button"
                         className="admin-product-table__action"
                         onClick={() => onToggleActive(product.id, !product.active)}
-                        disabled={isProcessing}
+                        disabled={isProcessing || readOnly}
                       >
                         {product.active ? "Desactivar" : "Activar"}
                       </button>
@@ -102,7 +106,7 @@ const ProductTable = ({ products, onToggleActive, onDelete, processingId }) => (
                         type="button"
                         className="admin-product-table__action admin-product-table__action--danger"
                         onClick={() => onDelete(product.id)}
-                        disabled={isProcessing}
+                        disabled={isProcessing || readOnly}
                       >
                         Eliminar
                       </button>

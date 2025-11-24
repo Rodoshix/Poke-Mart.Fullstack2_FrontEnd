@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import ProductFilters from "@/components/products/ProductFilters.jsx";
 import ProductTable from "@/components/products/ProductTable.jsx";
@@ -22,6 +22,7 @@ const AdminProducts = () => {
   const [selectedCategory, setSelectedCategory] = useState(presetCategory);
   const [sortOption, setSortOption] = useState(DEFAULT_SORT);
   const [currentPage, setCurrentPage] = useState(1);
+  const [stockFilter, setStockFilter] = useState("all");
   const [products, setProducts] = useState([]);
   const [actionMessage, setActionMessage] = useState("");
   const [actionError, setActionError] = useState("");
@@ -56,9 +57,18 @@ const AdminProducts = () => {
         String(product.id).includes(searchTerm.trim()) ||
         product.nombre.toLowerCase().includes(searchTerm.trim().toLowerCase());
       const matchesCategory = selectedCategory ? product.categoria === selectedCategory : true;
-      return matchesSearch && matchesCategory;
+      const base = Number(product.stockBase ?? product.stock ?? 0);
+      const current = Number(product.stock ?? 0);
+      const ratio = base > 0 ? current / base : 1;
+      const matchesStock =
+        stockFilter === "all"
+          ? true
+          : stockFilter === "critical"
+            ? ratio <= 0.1
+            : ratio > 0.1 && ratio <= 0.3;
+      return matchesSearch && matchesCategory && matchesStock;
     });
-  }, [products, searchTerm, selectedCategory]);
+  }, [products, searchTerm, selectedCategory, stockFilter]);
 
   const sortedProducts = useMemo(() => {
     const [key, direction] = sortOption.split(":");
@@ -174,7 +184,7 @@ const AdminProducts = () => {
 
   const handleDelete = async (productId) => {
     if (!productId) return;
-    const confirmed = window.confirm("¿Eliminar este producto de forma permanente? Esta acción no se puede deshacer.");
+    const confirmed = window.confirm("Â¿Eliminar este producto de forma permanente? Esta acciÃ³n no se puede deshacer.");
     if (!confirmed) return;
     setProcessingId(productId);
     try {
@@ -194,7 +204,7 @@ const AdminProducts = () => {
   const stockMetrics = useMemo(() => {
     let critical = 0;
     let low = 0;
-    filteredProducts.forEach((p) => {
+    products.forEach((p) => {
       const base = Number(p.stockBase ?? p.stock ?? 0);
       const current = Number(p.stock ?? 0);
       if (base <= 0) return;
@@ -203,7 +213,7 @@ const AdminProducts = () => {
       else if (ratio <= 0.3) low += 1;
     });
     return { critical, low };
-  }, [filteredProducts]);
+  }, [products]);
 
   return (
     <section className="admin-paper admin-products">
@@ -224,22 +234,54 @@ const AdminProducts = () => {
         </div>
       </div>
 
-      {isAdmin && (
-        <div className="admin-products__actions">
-          <Link to="/admin/productos/nuevo" className="admin-products__action-button admin-products__action-button--primary">
-            + Agregar producto
-          </Link>
-          <Link to="/admin/productos/criticos" className="admin-products__action-button">
-            Productos criticos
-          </Link>
-          <Link to="/admin/productos/reportes" className="admin-products__action-button">
-            Reportes de productos
-          </Link>
-          <button type="button" className="admin-products__action-button" onClick={handleRestoreDefaults}>
-            Refrescar catalogo
-          </button>
-        </div>
-      )}
+      <div className="admin-products__actions">
+        {isAdmin ? (
+          <>
+            <Link to="/admin/productos/nuevo" className="admin-products__action-button admin-products__action-button--primary">
+              + Agregar producto
+            </Link>
+            <Link to="/admin/productos/criticos" className="admin-products__action-button">
+              Productos criticos
+            </Link>
+            <Link to="/admin/productos/reportes" className="admin-products__action-button">
+              Reportes de productos
+            </Link>
+          </>
+        ) : (
+          <div className="admin-products__action-group">
+            <div className="admin-products__filters-inline">
+              <button
+                type="button"
+                className={`admin-products__action-button${stockFilter === "critical" ? " admin-products__action-button--ghost" : ""}`}
+                onClick={() => setStockFilter("critical")}
+                disabled={stockMetrics.critical === 0}
+              >
+                Ver críticos ({stockMetrics.critical})
+              </button>
+              <button
+                type="button"
+                className={`admin-products__action-button${stockFilter === "low" ? " admin-products__action-button--ghost" : ""}`}
+                onClick={() => setStockFilter("low")}
+                disabled={stockMetrics.low === 0}
+              >
+                Stock bajo ({stockMetrics.low})
+              </button>
+              {stockFilter !== "all" && (
+                <button
+                  type="button"
+                  className="admin-products__action-button"
+                  onClick={() => setStockFilter("all")}
+                >
+                  Ver todos
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+        <button type="button" className="admin-products__action-button" onClick={handleRestoreDefaults}>
+          Refrescar catalogo
+        </button>
+      </div>
 
       <ProductFilters
         searchTerm={searchTerm}
@@ -268,8 +310,9 @@ const AdminProducts = () => {
 
       <ProductTable
         products={paginatedProducts}
-        onToggleActive={handleToggleActive}
-        onDelete={handleDelete}
+        readOnly={!isAdmin}
+        onToggleActive={isAdmin ? handleToggleActive : undefined}
+        onDelete={isAdmin ? handleDelete : undefined}
         processingId={processingId}
       />
 
@@ -279,3 +322,4 @@ const AdminProducts = () => {
 };
 
 export default AdminProducts;
+

@@ -1,10 +1,10 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import OrderSummary from "@/components/orderDetail/OrderSummary.jsx";
 import OrderItems from "@/components/orderDetail/OrderItems.jsx";
 import useOrdersData from "@/hooks/useOrdersData.js";
+import useAuthSession from "@/hooks/useAuthSession.js";
 import { updateAdminOrder } from "@/services/orderApi.js";
-import { useEffect } from "react";
 
 const formatDateTime = (value) => {
   if (!value) return "No disponible";
@@ -23,6 +23,9 @@ const formatDateTime = (value) => {
 const AdminOrderDetail = () => {
   const { id: orderId = "" } = useParams();
   const navigate = useNavigate();
+  const { profile } = useAuthSession();
+  const role = (profile?.role || "").toLowerCase();
+  const isAdmin = role === "admin";
 
   const orders = useOrdersData();
   const order = useMemo(() => {
@@ -51,7 +54,7 @@ const AdminOrderDetail = () => {
 
   const handleUpdate = async (event) => {
     event.preventDefault();
-    if (!order) return;
+    if (!order || !isAdmin) return;
     setSaving(true);
     setError("");
     setSuccess("");
@@ -108,6 +111,7 @@ const AdminOrderDetail = () => {
                     value={estado}
                     onChange={(e) => setEstado(e.target.value)}
                     required
+                    disabled={!isAdmin}
                   >
                     <option value="">Selecciona estado</option>
                     <option value="creada">Creada</option>
@@ -125,6 +129,7 @@ const AdminOrderDetail = () => {
                     value={referencia}
                     onChange={(e) => setReferencia(e.target.value)}
                     placeholder="Instrucciones o referencia"
+                    disabled={!isAdmin}
                   />
                 </div>
               </div>
@@ -136,6 +141,7 @@ const AdminOrderDetail = () => {
                   value={notas}
                   onChange={(e) => setNotas(e.target.value)}
                   placeholder="Notas internas sobre el pedido"
+                  disabled={!isAdmin}
                 />
               </div>
               {error && (
@@ -148,15 +154,17 @@ const AdminOrderDetail = () => {
                   {success}
                 </div>
               )}
-              <div className="admin-order-update-form__actions">
-                <button
-                  type="submit"
-                  className="admin-products__action-button admin-products__action-button--primary"
-                  disabled={saving}
-                >
-                  {saving ? "Guardando..." : "Guardar cambios"}
-                </button>
-              </div>
+              {isAdmin && (
+                <div className="admin-order-update-form__actions">
+                  <button
+                    type="submit"
+                    className="admin-products__action-button admin-products__action-button--primary"
+                    disabled={saving}
+                  >
+                    {saving ? "Guardando..." : "Guardar cambios"}
+                  </button>
+                </div>
+              )}
             </form>
           </section>
 
