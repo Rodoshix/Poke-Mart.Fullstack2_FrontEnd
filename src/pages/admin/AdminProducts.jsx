@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import ProductFilters from "@/components/products/ProductFilters.jsx";
 import ProductTable from "@/components/products/ProductTable.jsx";
@@ -186,7 +186,7 @@ const AdminProducts = () => {
 
   const handleDelete = async (productId) => {
     if (!productId) return;
-    const confirmed = window.confirm("Â¿Eliminar este producto de forma permanente? Esta acciÃ³n no se puede deshacer.");
+    const confirmed = window.confirm("¿Eliminar este producto de forma permanente? Esta acción no se puede deshacer.");
     if (!confirmed) return;
     setProcessingId(productId);
     try {

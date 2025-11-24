@@ -94,7 +94,7 @@ export default function CategoriaPage() {
       <main className="site-main container pb-5 flex-grow-1">
         <nav className="mb-3" aria-label="breadcrumb">
           <ol className="breadcrumb mb-0">
-            <li className="breadcrumb-item"><Link to="/">Pǭgina principal</Link></li>
+            <li className="breadcrumb-item"><Link to="/">Página principal</Link></li>
             <li className="breadcrumb-item active" aria-current="page">{selectedCat || "Categorías"}</li>
           </ol>
         </nav>
