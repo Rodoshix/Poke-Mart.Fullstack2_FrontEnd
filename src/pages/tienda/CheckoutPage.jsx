@@ -1,12 +1,12 @@
 // src/pages/tienda/CheckoutPage.jsx
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import "@/assets/styles/checkout.css";
 
 import * as cartStore from "@/lib/cartStore";
 import { getAuth, getProfile } from "@/components/auth/session";
-import { applyProductSale } from "@/services/productService.js";
 import { createOrder as createOrderApi } from "@/services/orderApi.js";
+import { fetchProduct } from "@/services/catalogApi.js";
 
 import { useCartViewModel } from "@/hooks/useCartViewModel";
 import { useCheckoutForm } from "@/hooks/useCheckoutForm";
@@ -29,6 +29,37 @@ export default function CheckoutPage() {
   const { subtotal, shipping, total } = totals;
 
   const { form, setField, validate } = useCheckoutForm();
+
+  const ensureStockAvailable = useCallback(async () => {
+    const issues = [];
+
+    await Promise.all(
+      items.map(async (item) => {
+        const productId = item.product?.id ?? Number(item.id);
+        if (!Number.isFinite(productId)) return;
+        try {
+          const latest = await fetchProduct(productId);
+          const available = Math.max(0, Number(latest?.stock ?? 0));
+          const desired = Math.max(1, Number(item.qty) || 0);
+          if (!latest || available <= 0) {
+            cartStore.removeItem(productId);
+            issues.push(`"${item.name}" ya no tiene stock disponible y se elimin\u00f3 del carrito.`);
+            return;
+          }
+          if (desired > available) {
+            cartStore.setItemQty(productId, available, available);
+            issues.push(`"${item.name}" ajustado a ${available} unidades por stock disponible.`);
+          }
+        } catch (err) {
+          issues.push(
+            `"${item.name}" no pudo verificarse en el cat\u00e1logo. Intenta nuevamente en unos segundos.`,
+          );
+        }
+      }),
+    );
+
+    return issues;
+  }, [items]);
 
   const estimatedWindow = useMemo(() => {
     const now = new Date();
@@ -58,11 +89,15 @@ export default function CheckoutPage() {
     try {
       const profile = getProfile();
 
-      const adjustments = items.map(({ id, qty, product }) => ({
-        id,
-        productId: product?.id ?? id,
-        quantity: qty,
-      }));
+      const stockIssues = await ensureStockAvailable();
+      if (stockIssues.length) {
+        sessionStorage.removeItem("pm_lastOrder");
+        navigate("/compra/error", {
+          replace: true,
+          state: { message: stockIssues },
+        });
+        return;
+      }
 
       const PAYMENT_METHOD_LABELS = {
         credit: "Tarjeta de crédito",
@@ -93,7 +128,6 @@ export default function CheckoutPage() {
         { auth: true },
       );
 
-      applyProductSale(adjustments);
       const orderSnapshot = {
         id: orderRecord.id,
         paymentMethod: selectedPaymentLabel,

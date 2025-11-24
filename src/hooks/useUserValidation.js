@@ -1,13 +1,7 @@
 import { useCallback } from "react";
-import {
-  norm,
-  validate as validateRegistration,
-  validateEmail,
-  validateRun,
-} from "@/components/registro/validators";
-import { getAllUsers } from "@/services/userService.js";
+import { norm, validate as validateRegistration, validateEmail, validateRun } from "@/components/registro/validators";
 
-const useUserValidation = ({ formState, isNew }) =>
+const useUserValidation = ({ formState, isNew, existingUsers = [] }) =>
   useCallback(() => {
     if (isNew) {
       const data = {
@@ -24,7 +18,7 @@ const useUserValidation = ({ formState, isNew }) =>
         passwordConfirm: formState.passwordConfirm,
         telefono: formState.telefono.trim(),
       };
-      const issues = validateRegistration(getAllUsers(), data);
+      const issues = validateRegistration(existingUsers, data);
       return Array.isArray(issues) ? issues.map((issue) => issue.message) : [];
     }
 
@@ -74,6 +68,6 @@ const useUserValidation = ({ formState, isNew }) =>
     }
 
     return validationErrors;
-  }, [formState, isNew]);
+  }, [existingUsers, formState, isNew]);
 
 export default useUserValidation;

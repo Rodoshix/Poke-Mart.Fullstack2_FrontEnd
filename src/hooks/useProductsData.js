@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { fetchProducts } from "@/services/catalogApi.js";
-import { getAllProducts } from "@/services/productService.js";
 
 const useProductsData = () => {
   const [products, setProducts] = useState([]);
@@ -17,8 +16,8 @@ const useProductsData = () => {
         if (!cancelled) setProducts(Array.isArray(data) ? data : []);
       } catch (_) {
         if (!cancelled) {
-          setProducts(getAllProducts());
-          setError("Usando datos locales por falla de red");
+          setProducts([]);
+          setError("No se pudieron cargar los productos. Intenta nuevamente en un momento.");
         }
       } finally {
         if (!cancelled) setLoading(false);
