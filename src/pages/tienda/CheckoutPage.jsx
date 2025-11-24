@@ -124,8 +124,7 @@ export default function CheckoutPage() {
       navigate("/compra/error", {
         replace: true,
         state: {
-          message:
-            "No pudimos completar tu pedido. Inténtalo nuevamente en unos minutos.",
+          message: error?.message || "No pudimos completar tu pedido. Inténtalo nuevamente en unos minutos.",
         },
       });
     }
