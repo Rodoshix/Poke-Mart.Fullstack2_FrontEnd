@@ -15,7 +15,9 @@ const buildInitialState = (initialUser) => ({
   comuna: initialUser?.comuna ?? "",
   direccion: initialUser?.direccion ?? "",
   email: initialUser?.email ?? "",
+  telefono: initialUser?.telefono ?? "",
   registeredAt: initialUser?.registeredAt ?? new Date().toISOString(),
+  active: initialUser?.active ?? true,
 });
 
 const useUserFormState = ({ initialUser, isNew }) => {

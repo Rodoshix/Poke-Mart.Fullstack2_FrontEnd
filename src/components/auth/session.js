@@ -43,10 +43,11 @@ export const getProfile = () => {
 
 export const setAuth = ({
   token,
+  refreshToken,
   expiresAt = Date.now() + SESSION_DURATION,
   profile,
 }) => {
-  sessionStorage.setItem(AUTH_KEY, JSON.stringify({ token, expiresAt }));
+  sessionStorage.setItem(AUTH_KEY, JSON.stringify({ token, refreshToken, expiresAt }));
 
   if (profile) {
     try {

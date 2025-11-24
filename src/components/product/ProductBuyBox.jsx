@@ -8,16 +8,36 @@ const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 export default function ProductBuyBox({
   name,
   price,
+  basePrice,
+  offer,
   description,
   available = 0,
   qty,
   setQty,
   onAdd,
 }) {
+  const priceBase = Number.isFinite(basePrice) ? basePrice : price;
+  const onSale = offer?.onSale;
+  const displayPrice = onSale && Number.isFinite(offer.price) ? offer.price : price;
+
   return (
     <aside className="product__info col-12 col-lg-5">
       <h1 className="h3 mb-2">{name}</h1>
-      <div className="h4 text-primary mb-3">{money(price)}</div>
+      <div className="d-flex align-items-baseline gap-2 mb-3">
+        {onSale && (
+          <span className="text-muted text-decoration-line-through small">
+            {money(priceBase)}
+          </span>
+        )}
+        <div className={`h4 m-0 ${onSale ? "text-danger" : "text-primary"}`}>
+          {money(displayPrice)}
+        </div>
+        {onSale && (
+          <span className="badge text-bg-warning text-dark">
+            -{offer.discountPct}%
+          </span>
+        )}
+      </div>
 
       <p className="product__desc text-secondary">{description}</p>
 

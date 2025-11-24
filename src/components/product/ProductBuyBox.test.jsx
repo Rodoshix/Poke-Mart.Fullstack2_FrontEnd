@@ -57,4 +57,19 @@ describe("Testing ProductBuyBox", () => {
     fireEvent.click(screen.getByRole("button", { name: "Añadir al carrito" }));
     expect(baseProps.onAdd).toHaveBeenCalledTimes(1);
   });
+
+  it("CP-ProductBuyBox5: Muestra precio tachado y badge en oferta", () => {
+    render(
+      <ProductBuyBox
+        {...baseProps}
+        basePrice={10000}
+        price={8000}
+        offer={{ onSale: true, price: 8000, discountPct: 20 }}
+      />,
+    );
+
+    expect(screen.getByText("$10000")).toBeInTheDocument();
+    expect(screen.getByText("$8000")).toBeInTheDocument();
+    expect(screen.getByText(/-20%/)).toBeInTheDocument();
+  });
 });

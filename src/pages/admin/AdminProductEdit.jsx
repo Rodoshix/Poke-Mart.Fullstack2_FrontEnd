@@ -1,20 +1,41 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import ProductForm from "@/components/products/ProductForm.jsx";
-import { getProductById, updateProduct } from "@/services/productService.js";
-import useProductsData from "@/hooks/useProductsData.js";
+import { fetchAdminProduct, updateAdminProduct, fetchAdminProducts } from "@/services/adminProductApi.js";
 
 const AdminProductEdit = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const numericId = Number(id);
   const [errorMessage, setErrorMessage] = useState("");
-  const products = useProductsData();
+  const [product, setProduct] = useState(null);
+  const [productsList, setProductsList] = useState([]);
 
-  const product = useMemo(() => getProductById(numericId), [numericId]);
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const data = await fetchAdminProduct(numericId);
+        if (!cancelled) setProduct(data);
+      } catch (err) {
+        if (!cancelled) setProduct(null);
+      }
+      try {
+        const list = await fetchAdminProducts();
+        if (!cancelled) setProductsList(Array.isArray(list) ? list : []);
+      } catch {
+        if (!cancelled) setProductsList([]);
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [numericId]);
+
   const categories = useMemo(() => {
     const set = new Set(
-      (products ?? [])
+      (productsList ?? [])
         .map((item) => (item?.categoria ?? "").toString().trim())
         .filter(Boolean),
     );
@@ -22,11 +43,12 @@ const AdminProductEdit = () => {
       set.add(product.categoria.trim());
     }
     return Array.from(set).sort((a, b) => a.localeCompare(b, "es"));
-  }, [products, product?.categoria]);
+  }, [productsList, product?.categoria]);
 
   const handleSubmit = async (updatedProduct) => {
     try {
-      await updateProduct(product.id, updatedProduct);
+      await updateAdminProduct(product.id, updatedProduct);
+      await fetchAdminProducts();
       setErrorMessage("");
       navigate("/admin/productos", {
         replace: true,

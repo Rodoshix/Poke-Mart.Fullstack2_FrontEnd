@@ -8,7 +8,12 @@ const QuickLinks = ({ links }) => {
   return (
     <div className="admin-quick-links">
       {links.map(({ id, to, title, description, icon }) => (
-        <Link key={id ?? to} to={to} className="admin-quick-link-card">
+        <Link
+          key={id ?? to}
+          to={to}
+          className="admin-quick-link-card"
+          aria-label={[title, description].filter(Boolean).join(" ").trim() || title}
+        >
           {icon && (
             <span className="admin-quick-link-card__icon" aria-hidden="true">
               {icon}

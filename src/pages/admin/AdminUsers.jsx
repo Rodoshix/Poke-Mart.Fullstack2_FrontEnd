@@ -3,7 +3,6 @@ import { useEffect, useMemo, useState } from "react";
 import useUsersData from "@/hooks/useUsersData.js";
 import UserFilters from "@/components/users/UserFilters.jsx";
 import UserTable from "@/components/users/UserTable.jsx";
-import { resetUsers } from "@/services/userService.js";
 
 const SORT_OPTIONS = [
   { value: "id-asc", label: "ID ascendente" },
@@ -135,18 +134,6 @@ const AdminUsers = () => {
     setSortOption("id-asc");
   };
 
-  const handleRestoreUsers = () => {
-    const confirmed =
-      typeof window === "undefined"
-        ? true
-        : window.confirm("¿Restaurar los datos originales de usuarios? Esta acción eliminará cambios locales.");
-    if (!confirmed) return;
-
-    resetUsers({ includeRegistered: true });
-    handleResetFilters();
-    navigate(location.pathname, { replace: true, state: { status: "reset" } });
-  };
-
   return (
     <section className="admin-paper admin-users">
       <div className="admin-page-header">
@@ -194,13 +181,6 @@ const AdminUsers = () => {
         >
           + Agregar usuario
         </Link>
-        <button
-          type="button"
-          className="admin-products__action-button admin-products__action-button--danger"
-          onClick={handleRestoreUsers}
-        >
-          Restaurar usuarios
-        </button>
       </div>
 
       <UserFilters

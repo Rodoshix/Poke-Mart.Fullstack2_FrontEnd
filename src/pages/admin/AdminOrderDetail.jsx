@@ -1,8 +1,10 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import OrderSummary from "@/components/orderDetail/OrderSummary.jsx";
 import OrderItems from "@/components/orderDetail/OrderItems.jsx";
 import useOrdersData from "@/hooks/useOrdersData.js";
+import useAuthSession from "@/hooks/useAuthSession.js";
+import { updateAdminOrder } from "@/services/orderApi.js";
 
 const formatDateTime = (value) => {
   if (!value) return "No disponible";
@@ -21,6 +23,9 @@ const formatDateTime = (value) => {
 const AdminOrderDetail = () => {
   const { id: orderId = "" } = useParams();
   const navigate = useNavigate();
+  const { profile } = useAuthSession();
+  const role = (profile?.role || "").toLowerCase();
+  const isAdmin = role === "admin";
 
   const orders = useOrdersData();
   const order = useMemo(() => {
@@ -28,8 +33,44 @@ const AdminOrderDetail = () => {
     return list.find((item) => String(item.id) === String(orderId)) ?? null;
   }, [orders, orderId]);
 
+  const [estado, setEstado] = useState(order?.status ?? "");
+  const [notas, setNotas] = useState(order?.notes ?? order?.notas ?? order?.summary?.notes ?? "");
+  const [referencia, setReferencia] = useState(order?.shipping?.address?.reference ?? order?.referenciaEnvio ?? "");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  useEffect(() => {
+    if (order) {
+      setEstado(order.status ?? "");
+      setNotas(order.notes ?? order.notas ?? order.summary?.notes ?? "");
+      setReferencia(order.shipping?.address?.reference ?? order.referenciaEnvio ?? "");
+    }
+  }, [order]);
+
   const handleBack = () => {
     navigate(-1);
+  };
+
+  const handleUpdate = async (event) => {
+    event.preventDefault();
+    if (!order || !isAdmin) return;
+    setSaving(true);
+    setError("");
+    setSuccess("");
+    try {
+      const payload = {
+        estado: estado ? estado.toUpperCase() : undefined,
+        notas: notas ?? "",
+        referenciaEnvio: referencia ?? "",
+      };
+      await updateAdminOrder(order.backendId ?? order.id, payload);
+      setSuccess("Orden actualizada correctamente.");
+    } catch (err) {
+      setError(err?.message || "No se pudo actualizar la orden.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -58,6 +99,74 @@ const AdminOrderDetail = () => {
         <>
           <OrderSummary order={order} />
           <OrderItems items={order.items} currency={order.currency} />
+
+          <section className="admin-order-detail__form">
+            <h3>Actualizar orden</h3>
+            <form onSubmit={handleUpdate} className="admin-order-update-form">
+              <div className="admin-order-update-form__grid">
+                <div>
+                  <label htmlFor="order-status">Estado</label>
+                  <select
+                    id="order-status"
+                    value={estado}
+                    onChange={(e) => setEstado(e.target.value)}
+                    required
+                    disabled={!isAdmin}
+                  >
+                    <option value="">Selecciona estado</option>
+                    <option value="creada">Creada</option>
+                    <option value="pagada">Pagada</option>
+                    <option value="enviada">Enviada</option>
+                    <option value="completada">Completada</option>
+                    <option value="cancelada">Cancelada</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="order-reference">Referencia de envío</label>
+                  <input
+                    id="order-reference"
+                    type="text"
+                    value={referencia}
+                    onChange={(e) => setReferencia(e.target.value)}
+                    placeholder="Instrucciones o referencia"
+                    disabled={!isAdmin}
+                  />
+                </div>
+              </div>
+              <div className="admin-order-update-form__field">
+                <label htmlFor="order-notas">Notas</label>
+                <textarea
+                  id="order-notas"
+                  rows={3}
+                  value={notas}
+                  onChange={(e) => setNotas(e.target.value)}
+                  placeholder="Notas internas sobre el pedido"
+                  disabled={!isAdmin}
+                />
+              </div>
+              {error && (
+                <div className="admin-products__alert admin-products__alert--error" role="alert">
+                  {error}
+                </div>
+              )}
+              {success && (
+                <div className="admin-products__alert" role="status">
+                  {success}
+                </div>
+              )}
+              {isAdmin && (
+                <div className="admin-order-update-form__actions">
+                  <button
+                    type="submit"
+                    className="admin-products__action-button admin-products__action-button--primary"
+                    disabled={saving}
+                  >
+                    {saving ? "Guardando..." : "Guardar cambios"}
+                  </button>
+                </div>
+              )}
+            </form>
+          </section>
 
           {Array.isArray(order.statusHistory) && order.statusHistory.length > 0 && (
             <section className="admin-order-timeline">

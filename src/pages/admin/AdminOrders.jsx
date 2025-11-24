@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import OrderFilters from "@/components/orders/OrderFilters.jsx";
 import OrderTable from "@/components/orders/OrderTable.jsx";
 import useOrdersData from "@/hooks/useOrdersData.js";
-import { resetOrders } from "@/services/orderService.js";
 
 const DEFAULT_SORT = "createdAt:desc";
 
@@ -44,6 +43,8 @@ const AdminOrders = () => {
   const [sortOption, setSortOption] = useState(DEFAULT_SORT);
 
   const ordersDataset = useOrdersData();
+  const loading = ordersDataset?.loading;
+  const loadError = ordersDataset?.error;
 
   const filteredAndSortedOrders = useMemo(() => {
     const base = Array.isArray(ordersDataset) ? ordersDataset : [];
@@ -51,37 +52,13 @@ const AdminOrders = () => {
     return sortOrders(filtered, sortOption);
   }, [ordersDataset, searchTerm, sortOption]);
 
-  const handleRestoreOrders = () => {
-    const confirmed =
-      typeof window === "undefined"
-        ? true
-        : window.confirm(
-            "¿Restaurar el historial de órdenes original? Se eliminarán las órdenes agregadas localmente.",
-          );
-    if (!confirmed) return;
-
-    resetOrders();
-    navigate(location.pathname, { replace: true, state: { status: "reset" } });
-  };
-
   return (
     <section className="admin-paper admin-orders">
       <div className="admin-page-header">
-        <h1 className="admin-page-title">Órdenes</h1>
+        <h1 className="admin-page-title">Ordenes</h1>
         <p className="admin-page-subtitle">
-          Revisa el histórico de compras de la tienda, identifica a los clientes y accede al detalle completo de cada
-          boleta.
+          Revisa el historico de compras de la tienda, identifica a los clientes y accede al detalle de cada boleta.
         </p>
-      </div>
-
-      <div className="admin-orders__actions">
-        <button
-          type="button"
-          className="admin-products__action-button admin-products__action-button--danger"
-          onClick={handleRestoreOrders}
-        >
-          Restaurar órdenes
-        </button>
       </div>
 
       <OrderFilters
@@ -91,8 +68,19 @@ const AdminOrders = () => {
         onSortChange={setSortOption}
       />
 
+      {loading && (
+        <div className="admin-products__alert" role="status">
+          Cargando ordenes...
+        </div>
+      )}
+      {loadError && (
+        <div className="admin-products__alert admin-products__alert--error" role="alert">
+          {loadError}
+        </div>
+      )}
+
       <div className="admin-orders__meta">
-        Mostrando {filteredAndSortedOrders.length} de {Array.isArray(ordersDataset) ? ordersDataset.length : 0} órdenes registradas.
+        Mostrando {filteredAndSortedOrders.length} de {Array.isArray(ordersDataset) ? ordersDataset.length : 0} ordenes registradas.
       </div>
 
       <OrderTable orders={filteredAndSortedOrders} />

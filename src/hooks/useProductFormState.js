@@ -11,6 +11,10 @@ const buildInitialState = (initialProduct) => ({
     initialProduct?.stock !== undefined && initialProduct?.stock !== null
       ? String(initialProduct.stock)
       : "",
+  stockBase:
+    initialProduct?.stockBase !== undefined && initialProduct?.stockBase !== null
+      ? String(initialProduct.stockBase)
+      : "",
   imagen: initialProduct?.imagen ?? "",
   imagenNombre:
     initialProduct?.imagenNombre ??

@@ -7,6 +7,14 @@ const dateFormatter = new Intl.DateTimeFormat("es-CL", {
   day: "numeric",
 });
 
+const dateTimeFormatter = new Intl.DateTimeFormat("es-CL", {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
 const UserTable = ({ users }) => {
   const { profile } = useAuthSession();
   const activeAdminId = profile?.id != null ? Number(profile.id) : null;
@@ -23,6 +31,7 @@ const UserTable = ({ users }) => {
             <th>Rol</th>
             <th>Ubicación</th>
             <th>Registrado</th>
+            <th>Último ingreso</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -50,6 +59,11 @@ const UserTable = ({ users }) => {
                     {user.registeredAt
                       ? dateFormatter.format(new Date(user.registeredAt))
                       : "—"}
+                  </td>
+                  <td>
+                    {user.lastLoginAt
+                      ? dateTimeFormatter.format(new Date(user.lastLoginAt))
+                      : "Nunca"}
                   </td>
                   <td className="admin-users__actions-cell">
                     <Link to={editHref} className="admin-users__action">

@@ -16,7 +16,10 @@ export default function AuthMenu() {
   const navigate = useNavigate();
   const { session, profile } = useAuthSession();
   const isLogged = !!session && !!profile;
-  const isAdmin = (profile?.role || "").toLowerCase() === "admin";
+  const role = (profile?.role || "").toLowerCase();
+  const isAdmin = role === "admin";
+  const isSeller = role === "vendedor";
+  const isAdminOrSeller = isAdmin || isSeller;
 
   if (!isLogged) {
     return (
@@ -49,7 +52,7 @@ export default function AuthMenu() {
 
   return (
     <div className="header-auth d-flex align-items-center gap-2">
-      {isAdmin ? (
+      {isAdminOrSeller ? (
         <button
           type="button"
           className="auth-chip auth-chip--link d-flex align-items-center"
