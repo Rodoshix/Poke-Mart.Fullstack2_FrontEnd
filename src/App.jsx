@@ -1,4 +1,4 @@
-﻿import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { Header } from "./components/layout/Header.jsx";
 import { Footer } from "./components/layout/Footer.jsx";
 import useAuthSession from "@/hooks/useAuthSession.js";
@@ -39,7 +39,11 @@ import AdminReviews from "@/pages/admin/AdminReviews.jsx";
 import AdminBlogs from "@/pages/admin/AdminBlogs.jsx";
 
 const ReviewsPage = () => <h1 className="h3">Resenas</h1>;
-const NotFound    = () => <div className="text-center"><h1 className="display-4">404</h1></div>;
+const NotFound = () => (
+  <div className="text-center">
+    <h1 className="display-4">404</h1>
+  </div>
+);
 
 const StoreLayout = () => (
   <div className="d-flex flex-column min-vh-100 app-shell">
@@ -51,13 +55,26 @@ const StoreLayout = () => (
   </div>
 );
 
+const AdminRoute = () => {
+  const location = useLocation();
+  const { session, profile } = useAuthSession();
+  const role = (profile?.role || "").toLowerCase();
+  const isAllowed = Boolean(session) && (role === "admin" || role === "vendedor");
+
+  if (!isAllowed) {
+    return <Navigate to="/login" replace state={{ redirect: location.pathname }} />;
+  }
+
+  return <AdminLayout />;
+};
+
 const App = () => {
   const { session } = useAuthSession();
   const isAuthenticated = Boolean(session);
 
   return (
     <Routes>
-      <Route path="/admin" element={<AdminLayout />}>
+      <Route path="/admin" element={<AdminRoute />}>
         <Route index element={<AdminDashboard />} />
         <Route path="ordenes" element={<AdminOrders />} />
         <Route path="ordenes/:id" element={<AdminOrderDetail />} />
@@ -93,9 +110,7 @@ const App = () => {
         />
         <Route
           path="registro"
-          element={
-            isAuthenticated ? <Navigate to="/" replace /> : <RegistroPage />
-          }
+          element={isAuthenticated ? <Navigate to="/" replace /> : <RegistroPage />}
         />
         <Route path="blog" element={<BlogPage />} />
         <Route path="blog/:slug" element={<BlogDetailPage />} />
@@ -113,6 +128,3 @@ const App = () => {
 };
 
 export default App;
-
-
-

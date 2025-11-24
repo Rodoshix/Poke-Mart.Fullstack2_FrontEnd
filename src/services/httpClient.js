@@ -44,8 +44,19 @@ export async function apiFetch(path, { method = "GET", headers, body, auth = fal
   const response = await fetch(url, options);
   const data = await parseResponse(response);
 
-  if (response.status === 401 && auth) {
+  if (response.status === 401) {
     clearAuth();
+    if (auth && typeof window !== "undefined") {
+      const currentPath = window.location?.pathname || "";
+      if (!currentPath.startsWith("/login")) {
+        const params = new URLSearchParams();
+        if (currentPath) {
+          params.set("redirect", currentPath.startsWith("/admin") ? "admin" : currentPath);
+        }
+        const query = params.toString();
+        window.location.href = `/login${query ? `?${query}` : ""}`;
+      }
+    }
   }
 
   if (!response.ok) {
