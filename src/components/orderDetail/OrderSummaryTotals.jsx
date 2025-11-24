@@ -18,12 +18,10 @@ const OrderSummaryTotals = ({ summary, total, currency }) => (
           <span>-{formatCurrency(summary.discount, currency)}</span>
         </li>
       ) : null}
-      {summary?.usedOffers ? (
-        <li>
-          <span>Ofertas aplicadas</span>
-          <span>Sí</span>
-        </li>
-      ) : null}
+      <li>
+        <span>Ofertas aplicadas</span>
+        <span>{summary?.usedOffers ? "Sí" : "No"}</span>
+      </li>
       <li className="admin-order-summary__totals-total">
         <span>Total pagado</span>
         <span>{formatCurrency(summary?.total ?? total ?? 0, currency)}</span>

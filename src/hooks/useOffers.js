@@ -1,5 +1,5 @@
 // src/hooks/useOffers.js
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import useProductsData from "@/hooks/useProductsData.js";
 import * as cartStore from "@/lib/cartStore";
 import { getOfferInfo } from "@/lib/offers";
@@ -7,6 +7,14 @@ import { resolveImg } from "@/utils/resolveImg";
 
 export function useOffers() {
   const products = useProductsData();
+  const [loading, setLoading] = useState(true);
+  const startRef = useRef(Date.now());
+  useEffect(() => {
+    const elapsed = Date.now() - startRef.current;
+    const wait = Math.max(0, 3000 - elapsed);
+    const t = setTimeout(() => setLoading(false), wait);
+    return () => clearTimeout(t);
+  }, [products]);
 
   const items = useMemo(() => {
     const raw = Array.isArray(products) ? products : [];
@@ -70,5 +78,5 @@ export function useOffers() {
     window.dispatchEvent(new Event("cart:updated"));
   };
 
-  return { sort, setSort, items: sorted, hasItems: sorted.length > 0, addToCart };
+  return { sort, setSort, items: sorted, hasItems: sorted.length > 0, addToCart, loading };
 }
