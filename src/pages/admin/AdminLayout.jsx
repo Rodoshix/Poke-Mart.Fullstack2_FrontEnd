@@ -12,7 +12,7 @@ const isDesktopViewport = () => (typeof window === "undefined" ? true : window.i
 
 const sellerAllowedPath = (pathname = "") => {
   if (!pathname.startsWith("/admin")) return false;
-  if (pathname === "/admin" || pathname === "/admin/") return true;
+  if (pathname === "/admin" || pathname === "/admin/") return false;
   if (pathname.startsWith("/admin/ordenes")) return true;
   if (pathname.startsWith("/admin/productos")) {
     const disallowedProductPaths = [
