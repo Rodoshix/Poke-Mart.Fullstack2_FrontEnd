@@ -76,11 +76,13 @@ const ProductForm = ({ initialProduct, onSubmit, onCancel, submitLabel = "Guarda
       categoria: formState.categoria.trim(),
       precio: Number(formState.precio),
       stock: Number(formState.stock),
-      stockBase: formState.stockBase === "" ? undefined : Number(formState.stockBase),
       imagen: formState.imagen,
       imagenNombre: formState.imagenNombre,
       descripcion: formState.descripcion.trim(),
     };
+    if (formState.stockBase !== "" && formState.stockBase !== undefined) {
+      payload.stockBase = Number(formState.stockBase);
+    }
 
     try {
       await onSubmit?.(payload);

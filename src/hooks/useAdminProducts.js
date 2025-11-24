@@ -17,7 +17,7 @@ export default function useAdminProducts() {
       } catch (err) {
         if (!cancelled) {
           setProducts([]);
-          setError(err instanceof Error ? err.message : "No se pudieron cargar los productos");
+          setError("No se pudieron cargar los productos");
         }
       }
       if (!cancelled) setLoading(false);

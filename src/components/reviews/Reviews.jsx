@@ -6,8 +6,8 @@ import ReviewsList from "./ReviewsList";
 import ReviewForm from "./ReviewForm.jsx";
 import "@/assets/styles/reviews.css";
 
-export function Reviews({ reviews = [], onSubmit, canReview }) {
-  const { count, avg, dist, filter, setFilter, filtered } = useReviewsData({ reviews });
+export function Reviews({ reviews = [], productId, reviewsDict = {}, onSubmit, canReview }) {
+  const { count, avg, dist, filter, setFilter, filtered, showMissingBanner } = useReviewsData({ reviews, productId, reviewsDict });
 
   return (
     <section className="reviews-section">
@@ -28,6 +28,11 @@ export function Reviews({ reviews = [], onSubmit, canReview }) {
             <div className="reviews-card__title">Opiniones recientes</div>
             <ReviewsFilterMenu value={filter} onChange={setFilter} />
           </div>
+          {showMissingBanner && (
+            <div className="alert alert-warning mb-3" role="alert">
+              No hay reseñas en reviews.json para este producto ({productId}).
+            </div>
+          )}
           <ReviewsList items={filtered} />
         </div>
       </div>

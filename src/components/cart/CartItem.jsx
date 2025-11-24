@@ -7,6 +7,8 @@ export default function CartItem({ item, onInc, onDec, onChangeQty, onRemove }) 
   const subtotalItem = item.qty * item.price;
   const showOffer = item._offer && (item._offer.discountPct > 0 || item.basePrice > item.price);
   const basePrice = showOffer ? (item._offer?.base ?? item.basePrice ?? item.price) : item.price;
+  const offerPrice = showOffer ? (item._offer?.price ?? item.price) : item.price;
+  const discount = item._offer?.discountPct;
 
   return (
     <article className="cart-item">
@@ -32,6 +34,16 @@ export default function CartItem({ item, onInc, onDec, onChangeQty, onRemove }) 
           )}
         </div>
         <div className="cart-item__meta">Stock disponible: {max}</div>
+        {showOffer && (
+          <div className="small text-success">
+            Oferta aplicada:{" "}
+            <del className="text-muted me-1">
+              {new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP" }).format(basePrice)}
+            </del>
+            {new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP" }).format(offerPrice)}{" "}
+            {typeof discount === "number" ? `(-${discount}%)` : ""}
+          </div>
+        )}
       </div>
 
       <div className="cart-item__price">

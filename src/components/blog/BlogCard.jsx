@@ -42,7 +42,7 @@ export default function BlogCard({ blog }) {
         </span>
         <h2 className="blog-card__title">{blog?.titulo || "Título"}</h2>
         <p className="blog-card__excerpt">
-          {blog?.descripcion || "Pronto más detalles..."}
+          {blog?.descripcion || "Pronto más detalles…"}
         </p>
         <Link className="blog-card__link" to={detailHref}>
           Leer más

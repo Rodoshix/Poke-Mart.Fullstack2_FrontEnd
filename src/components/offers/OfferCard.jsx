@@ -38,7 +38,7 @@ export default function OfferCard({ product }) {
         <Link
           className={`btn w-100 mt-2 ${out ? "btn-outline-secondary" : "btn-primary"}`}
           to={href}
-          aria-label={`Ver ${product.nombre} con oferta`}
+          aria-label="Ver oferta"
         >
           {out ? "Sin stock" : "Ver oferta"}
         </Link>
