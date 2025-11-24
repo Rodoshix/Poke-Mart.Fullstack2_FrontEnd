@@ -3,9 +3,14 @@ const STATUS_MAP = {
   processing: { label: "En proceso", variant: "warning" },
   pending: { label: "Pendiente", variant: "warning" },
   "pendiente de envío": { label: "Pendiente de Envío", variant: "warning" },
-  "ready_to_ship": { label: "Pendiente de Envío", variant: "warning" },
+  ready_to_ship: { label: "Pendiente de Envío", variant: "warning" },
   cancelled: { label: "Cancelada", variant: "danger" },
   refunded: { label: "Reembolsada", variant: "neutral" },
+  creada: { label: "Creada", variant: "warning" },
+  pagada: { label: "Pagada", variant: "success" },
+  enviada: { label: "Enviada", variant: "accent" },
+  completada: { label: "Completada", variant: "success" },
+  cancelada: { label: "Cancelada", variant: "danger" },
 };
 
 const normalize = (value) => (typeof value === "string" ? value.trim().toLowerCase() : "");

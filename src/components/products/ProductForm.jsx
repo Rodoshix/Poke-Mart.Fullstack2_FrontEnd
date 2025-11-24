@@ -80,6 +80,9 @@ const ProductForm = ({ initialProduct, onSubmit, onCancel, submitLabel = "Guarda
       imagenNombre: formState.imagenNombre,
       descripcion: formState.descripcion.trim(),
     };
+    if (formState.stockBase !== "" && formState.stockBase !== undefined) {
+      payload.stockBase = Number(formState.stockBase);
+    }
 
     try {
       await onSubmit?.(payload);

@@ -1,11 +1,12 @@
 // src/pages/tienda/CheckoutPage.jsx
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import "@/assets/styles/checkout.css";
 
 import * as cartStore from "@/lib/cartStore";
 import { getAuth, getProfile } from "@/components/auth/session";
-import { applyProductSale } from "@/services/productService.js";
+import { createOrder as createOrderApi } from "@/services/orderApi.js";
+import { fetchProduct } from "@/services/catalogApi.js";
 
 import { useCartViewModel } from "@/hooks/useCartViewModel";
 import { useCheckoutForm } from "@/hooks/useCheckoutForm";
@@ -14,7 +15,6 @@ import OrderSummaryTable from "@/components/checkout/OrderSummaryTable";
 import CheckoutAddressForm from "@/components/checkout/CheckoutAddressForm";
 
 import { money } from "@/utils/money";
-import { createOrder } from "@/services/orderService.js";
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
@@ -30,6 +30,37 @@ export default function CheckoutPage() {
 
   const { form, setField, validate } = useCheckoutForm();
 
+  const ensureStockAvailable = useCallback(async () => {
+    const issues = [];
+
+    await Promise.all(
+      items.map(async (item) => {
+        const productId = item.product?.id ?? Number(item.id);
+        if (!Number.isFinite(productId)) return;
+        try {
+          const latest = await fetchProduct(productId);
+          const available = Math.max(0, Number(latest?.stock ?? 0));
+          const desired = Math.max(1, Number(item.qty) || 0);
+          if (!latest || available <= 0) {
+            cartStore.removeItem(productId);
+            issues.push(`"${item.name}" ya no tiene stock disponible y se elimin\u00f3 del carrito.`);
+            return;
+          }
+          if (desired > available) {
+            cartStore.setItemQty(productId, available, available);
+            issues.push(`"${item.name}" ajustado a ${available} unidades por stock disponible.`);
+          }
+        } catch (err) {
+          issues.push(
+            `"${item.name}" no pudo verificarse en el cat\u00e1logo. Intenta nuevamente en unos segundos.`,
+          );
+        }
+      }),
+    );
+
+    return issues;
+  }, [items]);
+
   const estimatedWindow = useMemo(() => {
     const now = new Date();
     const start = new Date(now.getTime() + 2 * 86_400_000);
@@ -42,7 +73,7 @@ export default function CheckoutPage() {
     };
   }, []);
 
-  const pagarAhora = () => {
+  const pagarAhora = async () => {
     if (!items.length) return;
 
     const errs = validate();
@@ -57,24 +88,17 @@ export default function CheckoutPage() {
 
     try {
       const profile = getProfile();
-      const now = new Date();
 
-      const adjustments = items.map(({ id, qty, product }) => ({
-        id,
-        productId: product?.id ?? id,
-        quantity: qty,
-      }));
+      const stockIssues = await ensureStockAvailable();
+      if (stockIssues.length) {
+        sessionStorage.removeItem("pm_lastOrder");
+        navigate("/compra/error", {
+          replace: true,
+          state: { message: stockIssues },
+        });
+        return;
+      }
 
-      const orderItems = items.map((item) => ({
-        productId: item.product?.id ?? Number(item.id),
-        sku: String(item.product?.id ?? item.id),
-        name: item.name,
-        quantity: Math.max(1, Number(item.qty) || 0),
-        unitPrice: Math.max(0, Number(item.price) || 0),
-      }));
-
-      const shippingMethod = "Despacho a domicilio";
-      const shippingCarrier = "Pendiente";
       const PAYMENT_METHOD_LABELS = {
         credit: "Tarjeta de crédito",
         debit: "Tarjeta de débito",
@@ -83,46 +107,27 @@ export default function CheckoutPage() {
       const selectedPaymentLabel =
         PAYMENT_METHOD_LABELS[form.paymentMethod] ?? PAYMENT_METHOD_LABELS.credit;
 
-      const orderRecord = createOrder({
-        customerId: profile?.id,
-        customer:
-          `${form.nombre} ${form.apellido}`.trim() ||
-          profile?.nombre ||
-          profile?.username ||
-          "Cliente tienda",
-        customerEmail: form.email || profile?.email || "",
-        customerPhone: profile?.telefono || profile?.phone || "",
-        status: "Pendiente de Envío",
-        currency: "CLP",
-        items: orderItems,
-        summary: {
-          subtotal: Math.round(subtotal),
-          shipping: Math.round(shipping),
-          discount: 0,
-          total: Math.round(total),
+      const orderRecord = await createOrderApi(
+        {
+          nombre: form.nombre,
+          apellido: form.apellido,
+          correo: form.email || profile?.email || "",
+          telefono: form.telefono || profile?.telefono || profile?.phone || "",
+          region: form.region,
+          comuna: form.comuna,
+          calle: form.calle,
+          departamento: form.departamento,
+          notas: form.notas?.trim(),
+          metodoPago: form.paymentMethod,
+          costoEnvio: shipping,
+          items: items.map((item) => ({
+            productoId: item.product?.id ?? Number(item.id),
+            cantidad: Math.max(1, Number(item.qty) || 0),
+          })),
         },
-        payment: {
-          method: selectedPaymentLabel,
-          status: "Pagado",
-          transactionId: `PAY-${Date.now()}`,
-          capturedAt: now.toISOString(),
-        },
-        shipping: {
-          method: shippingMethod,
-          carrier: shippingCarrier,
-          cost: Math.round(shipping),
-          address: {
-            street: form.calle,
-            city: form.comuna,
-            region: form.region,
-            reference: form.departamento,
-            country: "Chile",
-          },
-        },
-        notes: form.notas?.trim(),
-      });
+        { auth: true },
+      );
 
-      applyProductSale(adjustments);
       const orderSnapshot = {
         id: orderRecord.id,
         paymentMethod: selectedPaymentLabel,
@@ -153,8 +158,7 @@ export default function CheckoutPage() {
       navigate("/compra/error", {
         replace: true,
         state: {
-          message:
-            "No pudimos completar tu pedido. Inténtalo nuevamente en unos minutos.",
+          message: error?.message || "No pudimos completar tu pedido. Inténtalo nuevamente en unos minutos.",
         },
       });
     }

@@ -1,6 +1,6 @@
 // src/pages/tienda/RegistroPage.jsx
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "@/assets/styles/registro.css";
 
 import { REGIONES as REGIONS } from "@/data/regiones";
@@ -15,7 +15,10 @@ export default function RegistroPage() {
     return () => document.body.classList.remove("page--registro");
   }, []);
 
-  const { form, setField, status, comunas, onBlurRun, onChangeRegion, onSubmit } = useRegistroForm();
+  const navigate = useNavigate();
+  const { form, setField, status, comunas, onBlurRun, onChangeRegion, onSubmit } = useRegistroForm({
+    onSuccess: () => navigate("/", { replace: true }),
+  });
 
   return (
     <main className="registro" role="main">
@@ -97,6 +100,28 @@ export default function RegistroPage() {
             placeholder="Oficina Central Poke Mart"
             required
           />
+
+          <div className="registro__row registro__row--telefono">
+            <Field
+              label="Codigo"
+              name="telefonoCodigo"
+              as="select"
+              value={form.telefonoCodigo}
+              onChange={(e) => setField("telefonoCodigo", e.target.value)}
+              options={[{ value: "+56", label: "+56 (Chile)" }]}
+              required
+              className="registro__field--codigo"
+            />
+            <Field
+              label="Telefono"
+              name="telefonoNumero"
+              type="tel"
+              value={form.telefonoNumero}
+              onChange={(e) => setField("telefonoNumero", e.target.value.replace(/\D/g, ""))}
+              placeholder="912345678"
+              required
+            />
+          </div>
 
           <StatusMessage text={status.text} error={status.error} />
 

@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { Header } from "./components/layout/Header.jsx";
 import { Footer } from "./components/layout/Footer.jsx";
 import useAuthSession from "@/hooks/useAuthSession.js";
@@ -35,10 +35,15 @@ import AdminUserHistory from "@/pages/admin/AdminUserHistory.jsx";
 import AdminOffers from "@/pages/admin/AdminOffers.jsx";
 import AdminReports from "@/pages/admin/AdminReports.jsx";
 import AdminProfile from "@/pages/admin/AdminProfile.jsx";
-import AdminLogin from "@/pages/admin/AdminLogin.jsx";
+import AdminReviews from "@/pages/admin/AdminReviews.jsx";
+import AdminBlogs from "@/pages/admin/AdminBlogs.jsx";
 
-const ReviewsPage = () => <h1 className="h3">Reseñas</h1>;
-const NotFound    = () => <div className="text-center"><h1 className="display-4">404</h1></div>;
+const ReviewsPage = () => <h1 className="h3">Resenas</h1>;
+const NotFound = () => (
+  <div className="text-center">
+    <h1 className="display-4">404</h1>
+  </div>
+);
 
 const StoreLayout = () => (
   <div className="d-flex flex-column min-vh-100 app-shell">
@@ -50,14 +55,26 @@ const StoreLayout = () => (
   </div>
 );
 
+const AdminRoute = () => {
+  const location = useLocation();
+  const { session, profile } = useAuthSession();
+  const role = (profile?.role || "").toLowerCase();
+  const isAllowed = Boolean(session) && (role === "admin" || role === "vendedor");
+
+  if (!isAllowed) {
+    return <Navigate to="/login" replace state={{ redirect: location.pathname }} />;
+  }
+
+  return <AdminLayout />;
+};
+
 const App = () => {
   const { session } = useAuthSession();
   const isAuthenticated = Boolean(session);
 
   return (
     <Routes>
-      <Route path="/admin/login" element={<AdminLogin />} />
-      <Route path="/admin" element={<AdminLayout />}>
+      <Route path="/admin" element={<AdminRoute />}>
         <Route index element={<AdminDashboard />} />
         <Route path="ordenes" element={<AdminOrders />} />
         <Route path="ordenes/:id" element={<AdminOrderDetail />} />
@@ -72,6 +89,8 @@ const App = () => {
         <Route path="usuarios/:id" element={<AdminUserEdit />} />
         <Route path="usuarios/:id/historial" element={<AdminUserHistory />} />
         <Route path="ofertas" element={<AdminOffers />} />
+        <Route path="resenas" element={<AdminReviews />} />
+        <Route path="blogs" element={<AdminBlogs />} />
         <Route path="reportes" element={<AdminReports />} />
         <Route path="perfil" element={<AdminProfile />} />
         <Route path="*" element={<Navigate to="/admin" replace />} />
@@ -81,7 +100,7 @@ const App = () => {
         <Route index element={<HomePage />} />
         <Route path="catalogo" element={<CatalogPage />} />
         <Route path="producto/:id" element={<ProductDetailPage />} />
-        <Route path="reseñas" element={<ReviewsPage />} />
+        <Route path="resenas" element={<ReviewsPage />} />
         <Route path="carrito" element={<CartPage />} />
         <Route path="nosotros" element={<NosotrosPage />} />
         <Route path="contacto" element={<ContactoPage />} />
@@ -91,12 +110,10 @@ const App = () => {
         />
         <Route
           path="registro"
-          element={
-            isAuthenticated ? <Navigate to="/" replace /> : <RegistroPage />
-          }
+          element={isAuthenticated ? <Navigate to="/" replace /> : <RegistroPage />}
         />
         <Route path="blog" element={<BlogPage />} />
-        <Route path="blog/:id" element={<BlogDetailPage />} />
+        <Route path="blog/:slug" element={<BlogDetailPage />} />
         <Route path="ofertas" element={<OffersPage />} />
         <Route path="compra" element={<CheckoutPage />} />
         <Route path="compra/exito" element={<CheckoutSuccessPage />} />

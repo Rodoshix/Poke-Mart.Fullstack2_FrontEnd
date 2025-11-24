@@ -34,17 +34,14 @@ describe("Testing OfferCard", () => {
       expiresInMs: 60000,
     },
   };
-  const onAdd = vi.fn();
-
   beforeEach(() => {
     vi.clearAllMocks();
     hoisted.money.mockClear();
     hoisted.countdown.mockClear();
-    onAdd.mockClear();
   });
 
   it("CP-OfferCard1: Renderiza precios, badge y contador cuando corresponde", () => {
-    renderWithRouter(<OfferCard product={baseProduct} onAdd={onAdd} />);
+    renderWithRouter(<OfferCard product={baseProduct} />);
 
     expect(hoisted.money).toHaveBeenCalledWith(baseProduct.offer.price);
     expect(hoisted.money).toHaveBeenCalledWith(baseProduct.offer.basePrice);
@@ -53,11 +50,12 @@ describe("Testing OfferCard", () => {
     expect(screen.getByText("Termina en 60000ms")).toBeInTheDocument();
   });
 
-  it("CP-OfferCard2: Llama a onAdd al añadir y navega al detalle", () => {
-    renderWithRouter(<OfferCard product={baseProduct} onAdd={onAdd} />);
+  it("CP-OfferCard2: Botón principal redirige al detalle de producto", () => {
+    renderWithRouter(<OfferCard product={baseProduct} />);
 
-    fireEvent.click(screen.getByRole("button", { name: /Añadir/i }));
-    expect(onAdd).toHaveBeenCalledWith(baseProduct);
+    const cta = screen.getByRole("link", { name: /Ver oferta/i });
+    expect(cta).toHaveAttribute("href", "/producto/1");
+
     expect(screen.getByRole("link", { name: "Ver detalle" })).toHaveAttribute(
       "href",
       "/producto/1",
@@ -68,12 +66,11 @@ describe("Testing OfferCard", () => {
     renderWithRouter(
       <OfferCard
         product={{ ...baseProduct, stock: 0, offer: { ...baseProduct.offer, discountPct: 0 } }}
-        onAdd={onAdd}
       />,
     );
 
-    const button = screen.getByRole("button", { name: /Añadir Pikachu Plush al carrito/i });
-    expect(button).toBeDisabled();
+    const button = screen.getByRole("link", { name: /Ver oferta/i });
+    expect(button).toHaveClass("btn-outline-secondary");
     expect(screen.queryByText(/-%/)).toBeNull();
 
     const image = screen.getByAltText("Pikachu Plush");

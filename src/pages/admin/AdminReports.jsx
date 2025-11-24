@@ -1,7 +1,7 @@
 import { useMemo } from "react";
-import { getAllUsers } from "@/services/userService.js";
-import { getAllProducts } from "@/services/productService.js";
 import useOrdersData from "@/hooks/useOrdersData.js";
+import useAdminProducts from "@/hooks/useAdminProducts.js";
+import useUsersData from "@/hooks/useUsersData.js";
 
 const CURRENCY_FORMATTER = new Intl.NumberFormat("es-CL", {
   style: "currency",
@@ -15,9 +15,9 @@ const THIRTY_DAYS = 30 * 86_400_000;
 const normalizeRole = (role = "") => role.toString().trim().toLowerCase();
 
 const AdminReports = () => {
-  const users = useMemo(() => getAllUsers(), []);
-  const products = useMemo(() => getAllProducts(), []);
   const orders = useOrdersData();
+  const products = useAdminProducts();
+  const users = useUsersData();
   const normalizedOrders = useMemo(
     () => (Array.isArray(orders) ? orders : []),
     [orders],
@@ -25,7 +25,7 @@ const AdminReports = () => {
 
   const productById = useMemo(() => {
     const map = new Map();
-    products.forEach((product) => {
+    (products || []).forEach((product) => {
       map.set(product.id, product);
     });
     return map;
@@ -33,8 +33,10 @@ const AdminReports = () => {
 
   const summary = useMemo(() => {
     const now = Date.now();
-    const totalUsers = users.length;
-    const totalProducts = products.length;
+    const safeUsers = Array.isArray(users) ? users : [];
+    const safeProducts = Array.isArray(products) ? products : [];
+    const totalUsers = safeUsers.length;
+    const totalProducts = safeProducts.length;
     const totalOrders = normalizedOrders.length;
     const totalRevenue = normalizedOrders.reduce(
       (acc, order) => acc + (Number(order.total) || 0),
@@ -46,7 +48,7 @@ const AdminReports = () => {
     });
     const revenueLast30 = recentOrders.reduce((acc, order) => acc + (Number(order.total) || 0), 0);
     const averageTicket = totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 0;
-    const newUsers = users.filter((user) => {
+    const newUsers = safeUsers.filter((user) => {
       const timestamp = new Date(user.registeredAt).getTime();
       return !Number.isNaN(timestamp) && now - timestamp <= THIRTY_DAYS;
     }).length;
@@ -63,15 +65,16 @@ const AdminReports = () => {
   }, [normalizedOrders, products, users]);
 
   const userInsights = useMemo(() => {
-    const admins = users.filter((user) => normalizeRole(user.role) === "admin");
-    const clients = users.length - admins.length;
+    const safeUsers = Array.isArray(users) ? users : [];
+    const admins = safeUsers.filter((user) => normalizeRole(user.role) === "admin");
+    const clients = safeUsers.length - admins.length;
     const now = Date.now();
-    const newUsers = users.filter((user) => {
+    const newUsers = safeUsers.filter((user) => {
       const timestamp = new Date(user.registeredAt).getTime();
       return !Number.isNaN(timestamp) && now - timestamp <= THIRTY_DAYS;
     }).length;
 
-    const regionsCount = users.reduce((acc, user) => {
+    const regionsCount = safeUsers.reduce((acc, user) => {
       const region = user.region || "Sin región";
       acc.set(region, (acc.get(region) ?? 0) + 1);
       return acc;
@@ -93,7 +96,9 @@ const AdminReports = () => {
   }, [users]);
 
   const productInsights = useMemo(() => {
-    const categoriesCount = products.reduce((acc, product) => {
+    const safeProducts = Array.isArray(products) ? products : [];
+
+    const categoriesCount = safeProducts.reduce((acc, product) => {
       const category = product.categoria || "Sin categoría";
       acc.set(category, (acc.get(category) ?? 0) + 1);
       return acc;
@@ -104,20 +109,20 @@ const AdminReports = () => {
       .slice(0, 4)
       .map(([category, count]) => ({ category, count }));
 
-    const lowStock = products
+    const lowStock = safeProducts
       .filter((product) => product.stock <= Math.max(5, Math.round(product.stockBase * 0.15)))
       .sort((a, b) => a.stock - b.stock)
       .slice(0, 5);
 
     const stockCoverage =
-      products.length > 0
+      safeProducts.length > 0
         ? Math.round(
-            (products.reduce((acc, product) => {
+            (safeProducts.reduce((acc, product) => {
               const base = product.stockBase || 1;
               const ratio = Math.max(0, Math.min(1, product.stock / base));
               return acc + ratio;
             }, 0) /
-              products.length) *
+              safeProducts.length) *
               100,
           )
         : 0;

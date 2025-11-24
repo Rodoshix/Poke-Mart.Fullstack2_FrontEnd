@@ -21,7 +21,7 @@ export function countdown(ms) {
 
 export function getOfferInfo(p = {}, overlayById = null) {
   const basePrice = num(
-    pick(p, ["precio", "price", "precioBase", "precio_listado", "regularPrice"], 0)
+    pick(p, ["precioBase", "precio", "price", "precio_listado", "regularPrice"], 0)
   );
 
   let salePrice = num(p.precioOferta ?? p.offerPrice ?? p.salePrice);

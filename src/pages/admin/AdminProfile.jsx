@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import useAuthSession from "@/hooks/useAuthSession.js";
-import { getUserById, updateUser } from "@/services/userService.js";
+import { fetchAdminUser, updateAdminUser } from "@/services/adminUserApi.js";
 import { setAuth } from "@/components/auth/session";
 import { REGIONES } from "@/data/regiones";
 import {
@@ -35,11 +35,36 @@ const createInitialState = (user) => ({
   email: user?.email ?? "",
   registeredAt: user?.registeredAt ?? new Date().toISOString(),
   avatarUrl: user?.avatarUrl ?? "",
+  telefono: user?.telefono ?? "",
 });
 
 const AdminProfile = () => {
   const { session, profile } = useAuthSession();
-  const user = useMemo(() => (profile ? getUserById(profile.id) : null), [profile]);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!profile?.id) {
+      setUser(null);
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    fetchAdminUser(profile.id)
+      .then((data) => {
+        if (!cancelled) setUser(data);
+      })
+      .catch(() => {
+        if (!cancelled) setUser(null);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [profile?.id]);
 
   const [formState, setFormState] = useState(() => createInitialState(user));
   const [errors, setErrors] = useState([]);
@@ -192,7 +217,7 @@ const AdminProfile = () => {
     try {
       const payload = {
         username: formState.username.trim(),
-        password: formState.password.trim() || user.password || "",
+        password: formState.password.trim() || undefined,
         role: user.role,
         nombre: formState.nombre.trim(),
         apellido: formState.apellido.trim(),
@@ -202,11 +227,11 @@ const AdminProfile = () => {
         comuna: formState.comuna.trim(),
         direccion: formState.direccion.replace(/\s+/g, " ").trim(),
         email: norm.email(formState.email),
-        registeredAt: user.registeredAt,
         avatarUrl: formState.avatarUrl,
+        telefono: formState.telefono,
       };
 
-      const updated = updateUser(user.id, payload);
+      const updated = await updateAdminUser(user.id, payload);
       setFormState(createInitialState(updated));
       setErrors([]);
       setStatusMessage("Tu perfil se actualizó correctamente.");
@@ -246,6 +271,16 @@ const AdminProfile = () => {
       setIsSaving(false);
     }
   };
+
+  if (loading) {
+    return (
+      <section className="admin-paper admin-profile">
+        <div className="admin-page-header">
+          <h1 className="admin-page-title">Cargando perfil...</h1>
+        </div>
+      </section>
+    );
+  }
 
   if (!user) {
     return (
@@ -318,6 +353,21 @@ const AdminProfile = () => {
                 value={formState.id ?? ""}
                 disabled
                 readOnly
+              />
+            </div>
+
+            <div className="admin-user-form__group">
+              <label className="admin-user-form__label" htmlFor="admin-phone">
+                Telefono
+              </label>
+              <input
+                id="admin-phone"
+                name="telefono"
+                type="tel"
+                className="admin-user-form__input"
+                value={formState.telefono}
+                onChange={handleChange}
+                placeholder="+56912345678"
               />
             </div>
 

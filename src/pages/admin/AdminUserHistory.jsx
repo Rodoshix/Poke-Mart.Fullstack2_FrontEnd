@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getUserById } from "@/services/userService.js";
 import OrderTable from "@/components/orders/OrderTable.jsx";
 import useOrdersData from "@/hooks/useOrdersData.js";
+import useUsersData from "@/hooks/useUsersData.js";
 
 const currencyFormatter = new Intl.NumberFormat("es-CL", {
   style: "currency",
@@ -24,12 +24,12 @@ const AdminUserHistory = () => {
     () => (Array.isArray(orders) ? orders : []),
     [orders],
   );
+  const users = useUsersData();
 
   const user = useMemo(() => {
-    if (!id) return null;
-    if (Number.isNaN(numericId)) return null;
-    return getUserById(numericId) ?? null;
-  }, [id, numericId]);
+    if (!id || Number.isNaN(numericId)) return null;
+    return (users ?? []).find((u) => Number(u.id) === Number(numericId)) ?? null;
+  }, [id, numericId, users]);
 
   const userOrders = useMemo(() => {
     if (!user) return [];

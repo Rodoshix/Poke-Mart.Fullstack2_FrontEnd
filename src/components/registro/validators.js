@@ -4,12 +4,13 @@ import { REGIONES } from "@/data/regiones";
 
 export const norm = {
   username: (v) => String(v || "").trim().toLowerCase(),
-  email:    (v) => String(v || "").trim().toLowerCase(),
-  run:      (v) => String(v || "").replace(/[^0-9Kk]/g, "").toUpperCase(),
+  email: (v) => String(v || "").trim().toLowerCase(),
+  run: (v) => String(v || "").replace(/[^0-9Kk]/g, "").toUpperCase(),
 };
 
 export function calculateDv(body) {
-  let sum = 0, mult = 2;
+  let sum = 0,
+    mult = 2;
   for (let i = body.length - 1; i >= 0; i--) {
     sum += Number(body[i]) * mult;
     mult = mult === 7 ? 2 : mult + 1;
@@ -29,10 +30,10 @@ export function validateRun(run) {
   const body = cleaned.slice(0, -1);
   const dv = cleaned.slice(-1);
   if (!/^[0-9]+$/.test(body)) {
-    return { valid: false, message: "El RUN debe contener solo números y K al final." };
+    return { valid: false, message: "El RUN debe contener solo numeros y K al final." };
   }
   const expected = calculateDv(body);
-  if (expected !== dv) return { valid: false, message: "El RUN no es válido." };
+  if (expected !== dv) return { valid: false, message: "El RUN no es valido." };
   return { valid: true };
 }
 
@@ -88,15 +89,33 @@ export function validate(baseUsers, v) {
 
   if (!v.fechaNacimiento) issues.push({ field: "fechaNacimiento", message: "Debes indicar la fecha de nacimiento." });
 
-  if (!v.region) issues.push({ field: "region", message: "Selecciona una región." });
+  if (!v.region) issues.push({ field: "region", message: "Selecciona una region." });
   if (!v.comuna) issues.push({ field: "comuna", message: "Selecciona una ciudad/comuna." });
 
   if (!v.direccion) {
-    issues.push({ field: "direccion", message: "La dirección es obligatoria." });
+    issues.push({ field: "direccion", message: "La direccion es obligatoria." });
   } else {
     const normalizedDir = v.direccion.replace(/\s+/g, " ").trim();
-    if (normalizedDir.length < 6) issues.push({ field: "direccion", message: "La dirección debe tener al menos 6 caracteres." });
-    else if (normalizedDir.length > 300) issues.push({ field: "direccion", message: "La dirección no puede superar 300 caracteres." });
+    if (normalizedDir.length < 6) issues.push({ field: "direccion", message: "La direccion debe tener al menos 6 caracteres." });
+    else if (normalizedDir.length > 300) issues.push({ field: "direccion", message: "La direccion no puede superar 300 caracteres." });
+  }
+
+  const telefonoCodigo = String(v.telefonoCodigo || "").trim();
+  const telefonoNumero = String(v.telefonoNumero || "").trim();
+  if (!telefonoCodigo) {
+    issues.push({ field: "telefonoCodigo", message: "Selecciona el codigo de pais." });
+  } else if (!/^\+\d{1,4}$/.test(telefonoCodigo)) {
+    issues.push({ field: "telefonoCodigo", message: "Codigo de pais invalido." });
+  }
+
+  if (!telefonoNumero) {
+    issues.push({ field: "telefonoNumero", message: "El telefono es obligatorio." });
+  } else if (!/^\d{7,12}$/.test(telefonoNumero)) {
+    issues.push({ field: "telefonoNumero", message: "El telefono debe contener solo numeros (7 a 12 digitos)." });
+  }
+
+  if (!v.telefono) {
+    issues.push({ field: "telefono", message: "El telefono es obligatorio." });
   }
 
   if (!v.username) issues.push({ field: "username", message: "El nombre de usuario es obligatorio." });
@@ -104,10 +123,10 @@ export function validate(baseUsers, v) {
   const emailResult = validateEmail(v.email);
   if (!emailResult.valid) issues.push({ field: "email", message: emailResult.message });
 
-  if (!v.password) issues.push({ field: "password", message: "Debes definir una contraseña." });
-  if (!v.passwordConfirm) issues.push({ field: "passwordConfirm", message: "Confirma tu contraseña." });
+  if (!v.password) issues.push({ field: "password", message: "Debes definir una contrasena." });
+  if (!v.passwordConfirm) issues.push({ field: "passwordConfirm", message: "Confirma tu contrasena." });
   if (v.password && v.passwordConfirm && v.password !== v.passwordConfirm) {
-    issues.push({ field: "passwordConfirm", message: "Las contraseñas no coinciden." });
+    issues.push({ field: "passwordConfirm", message: "Las contrasenas no coinciden." });
   }
 
   const dup = findDuplicates(baseUsers, v);

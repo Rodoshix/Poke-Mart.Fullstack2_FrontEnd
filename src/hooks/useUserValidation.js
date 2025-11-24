@@ -1,13 +1,7 @@
 import { useCallback } from "react";
-import {
-  norm,
-  validate as validateRegistration,
-  validateEmail,
-  validateRun,
-} from "@/components/registro/validators";
-import { getAllUsers } from "@/services/userService.js";
+import { norm, validate as validateRegistration, validateEmail, validateRun } from "@/components/registro/validators";
 
-const useUserValidation = ({ formState, isNew }) =>
+const useUserValidation = ({ formState, isNew, existingUsers = [] }) =>
   useCallback(() => {
     if (isNew) {
       const data = {
@@ -22,8 +16,9 @@ const useUserValidation = ({ formState, isNew }) =>
         email: norm.email(formState.email),
         password: formState.password,
         passwordConfirm: formState.passwordConfirm,
+        telefono: formState.telefono.trim(),
       };
-      const issues = validateRegistration(getAllUsers(), data);
+      const issues = validateRegistration(existingUsers, data);
       return Array.isArray(issues) ? issues.map((issue) => issue.message) : [];
     }
 
@@ -38,6 +33,7 @@ const useUserValidation = ({ formState, isNew }) =>
     const comuna = formState.comuna.trim();
     const direccion = formState.direccion.trim();
     const email = formState.email.trim();
+    const telefono = formState.telefono.trim();
     const password = formState.password;
     const passwordConfirm = formState.passwordConfirm;
 
@@ -47,16 +43,17 @@ const useUserValidation = ({ formState, isNew }) =>
     if (!apellido) validationErrors.push("El apellido es requerido.");
     if (!run) validationErrors.push("El RUN es requerido.");
     if (!fechaNacimiento) validationErrors.push("La fecha de nacimiento es requerida.");
-    if (!region) validationErrors.push("La región es requerida.");
+    if (!region) validationErrors.push("La region es requerida.");
     if (!comuna) validationErrors.push("La comuna es requerida.");
-    if (!direccion) validationErrors.push("La dirección es requerida.");
-    if (!email) validationErrors.push("El correo electrónico es requerido.");
+    if (!direccion) validationErrors.push("La direccion es requerida.");
+    if (!email) validationErrors.push("El correo electronico es requerido.");
+    if (!telefono) validationErrors.push("El telefono es requerido.");
 
     if (password.trim() && !passwordConfirm.trim()) {
-      validationErrors.push("Confirma la nueva contraseña.");
+      validationErrors.push("Confirma la nueva contrasena.");
     }
     if (password && passwordConfirm && password !== passwordConfirm) {
-      validationErrors.push("Las contraseñas no coinciden.");
+      validationErrors.push("Las contrasenas no coinciden.");
     }
 
     const runValidation = validateRun(norm.run(run));
@@ -65,8 +62,12 @@ const useUserValidation = ({ formState, isNew }) =>
     const emailValidation = validateEmail(norm.email(email));
     if (!emailValidation.valid) validationErrors.push(emailValidation.message);
 
+    const phoneDigits = telefono.replace(/\D+/g, "");
+    if (phoneDigits && phoneDigits.length < 8) {
+      validationErrors.push("Ingresa un telefono valido (min 8 digitos).");
+    }
+
     return validationErrors;
-  }, [formState, isNew]);
+  }, [existingUsers, formState, isNew]);
 
 export default useUserValidation;
-

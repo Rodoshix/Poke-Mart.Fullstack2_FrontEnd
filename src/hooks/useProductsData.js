@@ -1,34 +1,55 @@
 import { useEffect, useState } from "react";
-import {
-  getAllProducts,
-  subscribeToProductChanges,
-  PRODUCT_STORAGE_KEY,
-} from "@/services/productService.js";
+import { fetchProducts } from "@/services/catalogApi.js";
+import { getOfferInfo } from "@/lib/offers.js";
+
+const enhanceProduct = (p = {}) => {
+  const offer = getOfferInfo({
+    ...p,
+    discountPct: p.discountPct ?? p.offer?.discountPct ?? 0,
+    endsAt: p.endsAt ?? p.offer?.endsAt ?? null,
+  });
+  const basePrice = Number(p.precio ?? 0);
+  const finalPrice = offer.onSale ? offer.price : basePrice;
+  return {
+    ...p,
+    precioBase: offer.basePrice ?? basePrice,
+    precio: finalPrice,
+    oferta: offer,
+  };
+};
 
 const useProductsData = () => {
-  const [products, setProducts] = useState(() => getAllProducts());
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const refresh = () => setProducts(getAllProducts());
-    const unsubscribe = subscribeToProductChanges(refresh);
-
-    if (typeof window !== "undefined") {
-      const handleStorage = (event) => {
-        if (event.key === null || event.key === PRODUCT_STORAGE_KEY) {
-          refresh();
+    let cancelled = false;
+    const load = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const data = await fetchProducts();
+        if (!cancelled) {
+          const mapped = Array.isArray(data) ? data.map(enhanceProduct) : [];
+          setProducts(mapped);
         }
-      };
-      window.addEventListener("storage", handleStorage);
-      return () => {
-        unsubscribe();
-        window.removeEventListener("storage", handleStorage);
-      };
-    }
-
-    return unsubscribe;
+      } catch (_) {
+        if (!cancelled) {
+          setProducts([]);
+          setError("No se pudieron cargar los productos. Intenta nuevamente en un momento.");
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  return products;
+  return Object.assign(products, { loading, error });
 };
 
 export default useProductsData;
