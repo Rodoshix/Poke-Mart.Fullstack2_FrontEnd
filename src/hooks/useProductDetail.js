@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import useProductsData from "@/hooks/useProductsData.js";
 import { addItem, getAvailableStock } from "@/lib/cartStore";
 import { resolveImg } from "@/utils/resolveImg";
+import { getOfferInfo } from "@/lib/offers";
 
 const PLACEHOLDER = "/src/assets/img/tienda/productos/poke-Ball.png";
 const MAX_QTY = 99;
@@ -12,21 +13,30 @@ const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 export function useProductDetail(productId) {
   const rawProducts = useProductsData();
 
-  const all = useMemo(
-    () =>
-      (rawProducts ?? []).map((p) => ({
+  const all = useMemo(() => {
+    return (rawProducts ?? []).map((p) => {
+      const offer = p.oferta ?? getOfferInfo({
+        ...p,
+        discountPct: p.discountPct ?? p.offer?.discountPct ?? 0,
+        endsAt: p.endsAt ?? p.offer?.endsAt ?? null,
+      });
+      const basePrice = Number(p.precioBase ?? p.precio ?? 0);
+      const price = offer.onSale ? offer.price : basePrice;
+      return {
         id: p.id ?? "",
         nombre: p.nombre ?? "Producto",
-        categoria: p.categoria ?? "—",
-        precio: Number(p.precio ?? 0),
+        categoria: p.categoria ?? "Sin categoria",
+        precio: price,
+        precioBase: basePrice,
+        oferta: offer,
         stock: Number(p.stock ?? 0),
         imagen: p.imagen || "",
         descripcion:
           p.descripcion ||
-          "Este producto forma parte del catálogo de Poké Mart. Pronto añadiremos una descripción más detallada.",
-      })),
-    [rawProducts]
-  );
+          "Este producto forma parte del catalogo de Poke Mart. Pronto anadiremos una descripcion mas detallada.",
+      };
+    });
+  }, [rawProducts]);
 
   const product = useMemo(
     () => all.find((x) => String(x.id) === String(productId)) || null,

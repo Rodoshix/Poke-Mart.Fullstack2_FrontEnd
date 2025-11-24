@@ -6,9 +6,10 @@ import { countdown } from "@/lib/offers";
 
 const FALLBACK = "/src/assets/img/tienda/productos/poke-Ball.png";
 
-export default function OfferCard({ product, onAdd }) {
+export default function OfferCard({ product }) {
   const out = product.stock <= 0;
   const showBadge = product.offer.discountPct >= 5;
+  const href = `/producto/${product.id}`;
 
   return (
     <article className="offer-card h-100">
@@ -25,22 +26,23 @@ export default function OfferCard({ product, onAdd }) {
         <h3 className="offer-card__title" title={product.nombre}>{product.nombre}</h3>
         <div className="offer-card__prices">
           <span className="offer-card__price">{money(product.offer.price)}</span>
-          <span className="offer-card__base">{money(product.offer.basePrice)}</span>
+          <span className="offer-card__base text-muted text-decoration-line-through">
+            {money(product.offer.basePrice)}
+          </span>
         </div>
         {product.offer.expiresInMs != null && (
           <div className="offer-card__ends text-secondary small">
             Termina en {countdown(product.offer.expiresInMs)}
           </div>
         )}
-        <button
+        <Link
           className={`btn w-100 mt-2 ${out ? "btn-outline-secondary" : "btn-primary"}`}
-          disabled={out}
-          onClick={() => onAdd(product)}
-          aria-label={`Añadir ${product.nombre} al carrito`}
+          to={href}
+          aria-label={`Ver ${product.nombre} con oferta`}
         >
-          {out ? "Sin stock" : "Añadir"}
-        </button>
-        <Link className="offer-card__link" to={`/producto/${product.id}`}>
+          {out ? "Sin stock" : "Ver oferta"}
+        </Link>
+        <Link className="offer-card__link" to={href}>
           Ver detalle
         </Link>
       </div>

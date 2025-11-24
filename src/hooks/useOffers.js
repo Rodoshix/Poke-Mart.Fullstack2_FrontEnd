@@ -1,7 +1,6 @@
 // src/hooks/useOffers.js
 import { useEffect, useMemo, useRef, useState } from "react";
 import useProductsData from "@/hooks/useProductsData.js";
-import * as cartStore from "@/lib/cartStore";
 import { getOfferInfo } from "@/lib/offers";
 import { resolveImg } from "@/utils/resolveImg";
 
@@ -20,16 +19,18 @@ export function useOffers() {
     const raw = Array.isArray(products) ? products : [];
     return raw
       .map((p) => {
-        const offer = getOfferInfo({
+        const offer = p.oferta ?? getOfferInfo({
           ...p,
           discountPct: p.discountPct ?? p.offer?.discountPct ?? 0,
           endsAt: p.endsAt ?? p.offer?.endsAt ?? null,
         });
+        const basePrice = Number(p.precioBase ?? p.precio ?? 0);
+        const offerPrice = offer.onSale ? offer.price : basePrice;
         return {
           ...p,
           img: resolveImg(p.imagen),
           stock: Number(p.stock ?? 0),
-          offer,
+          offer: { ...offer, price: offerPrice, basePrice },
         };
       })
       .filter((x) => x.offer.onSale);
@@ -55,28 +56,5 @@ export function useOffers() {
     return list;
   }, [items, sort]);
 
-  const addToCart = (p) => {
-    const available = cartStore.getAvailableStock(String(p.id), Number(p.stock ?? 0));
-    if (available <= 0) return;
-    const offerPrice = Number.isFinite(p.offer.price) ? p.offer.price : Number(p.precio ?? 0);
-
-    cartStore.addItem(
-      {
-        id: p.id,
-        nombre: p.nombre,
-        precio: offerPrice,
-        price: offerPrice,
-        _offer: {
-          base: Number(p.precio ?? 0),
-          price: offerPrice,
-          discountPct: p.offer.discountPct,
-          endsAt: p.offer.endsAt,
-        },
-      },
-      1
-    );
-    window.dispatchEvent(new Event("cart:updated"));
-  };
-
-  return { sort, setSort, items: sorted, hasItems: sorted.length > 0, addToCart, loading };
+  return { sort, setSort, items: sorted, hasItems: sorted.length > 0, loading };
 }

@@ -79,6 +79,8 @@ export default function ProductDetailPage() {
           <ProductBuyBox
             name={product.nombre}
             price={product.precio}
+            basePrice={product.precioBase}
+            offer={product.oferta}
             description={product.descripcion}
             available={available}
             qty={qty}

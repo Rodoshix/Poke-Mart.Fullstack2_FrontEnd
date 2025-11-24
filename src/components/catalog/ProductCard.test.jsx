@@ -17,22 +17,21 @@ import { money } from "@/utils/money";
 const PLACEHOLDER = "/src/assets/img/tienda/productos/poke-Ball.png";
 
 const baseProduct = {
-  id: "A-01/ñ",
+  id: "A-01/��",
   nombre: "Super Ball",
   categoria: "Poké Balls",
   precio: 1500,
   imagen: "/img/ball.png",
 };
 
-const renderWithRouter = (ui) =>
-  render(<MemoryRouter>{ui}</MemoryRouter>);
+const renderWithRouter = (ui) => render(<MemoryRouter>{ui}</MemoryRouter>);
 
 beforeEach(() => {
   vi.clearAllMocks();
 });
 
 describe("Testing ProductCard", () => {
-  it("CP-PC1: Render básico: título, links correctos, imagen (src via resolveImg), categoría y precio (money)", () => {
+  it("CP-PC1: Render básico: título, links correctos, imagen, categoría y precio", () => {
     renderWithRouter(<ProductCard product={baseProduct} />);
 
     const encodedId = encodeURIComponent(baseProduct.id);
@@ -46,18 +45,16 @@ describe("Testing ProductCard", () => {
     const titleLink = within(heading).getByRole("link", { name: baseProduct.nombre });
     expect(titleLink).toHaveAttribute("href", expectedHref);
 
-    // Imagen resuelta por resolveImg
     const img = screen.getByRole("img", { name: baseProduct.nombre });
     expect(resolveImg).toHaveBeenCalledWith(baseProduct.imagen);
     expect(img.getAttribute("src")).toContain(`RESOLVED:${baseProduct.imagen}`);
 
     expect(screen.getByText(baseProduct.categoria)).toBeInTheDocument();
-
     expect(money).toHaveBeenCalledWith(baseProduct.precio);
     expect(screen.getByText(`CLP ${baseProduct.precio}`)).toBeInTheDocument();
   });
 
-  it("CP-PC2: onError de la imagen → cae al PLACEHOLDER", () => {
+  it("CP-PC2: onError de la imagen cae al PLACEHOLDER", () => {
     renderWithRouter(<ProductCard product={baseProduct} />);
     const img = screen.getByRole("img", { name: baseProduct.nombre });
 
@@ -66,14 +63,14 @@ describe("Testing ProductCard", () => {
     expect(img.getAttribute("src")).toContain(PLACEHOLDER);
   });
 
-  it("CP-PC3: Si no hay categoría → muestra '—' como fallback", () => {
+  it("CP-PC3: Si no hay categoría muestra 'Sin categoria' como fallback", () => {
     const product = { ...baseProduct, categoria: undefined };
     renderWithRouter(<ProductCard product={product} />);
-    expect(screen.getByText("—")).toBeInTheDocument();
+    expect(screen.getByText("Sin categoria")).toBeInTheDocument();
   });
 
   it("CP-PC4: Enlaces usan correctamente encodeURIComponent en el id del producto", () => {
-    const weird = { ...baseProduct, id: "ID/with spaces/ñ" };
+    const weird = { ...baseProduct, id: "ID/with spaces/��" };
     renderWithRouter(<ProductCard product={weird} />);
     const encoded = encodeURIComponent(weird.id);
     const expectedHref = `/producto/${encoded}`;
@@ -83,5 +80,19 @@ describe("Testing ProductCard", () => {
 
     expect(mediaLink).toHaveAttribute("href", expectedHref);
     expect(titleLink).toHaveAttribute("href", expectedHref);
+  });
+
+  it("CP-PC5: Muestra precio tachado y badge cuando hay oferta", () => {
+    const productOnSale = {
+      ...baseProduct,
+      precio: 2000,
+      discountPct: 25,
+      endsAt: new Date(Date.now() + 3600_000).toISOString(),
+    };
+    renderWithRouter(<ProductCard product={productOnSale} />);
+
+    expect(screen.getByText(/-25%/)).toBeInTheDocument();
+    expect(screen.getByText("CLP 2000")).toBeInTheDocument(); // base tachado
+    expect(screen.getByText("CLP 1500")).toBeInTheDocument(); // precio con descuento
   });
 });

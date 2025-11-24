@@ -14,7 +14,7 @@ export default function OffersPage() {
     return () => document.body.classList.remove("page--ofertas");
   }, []);
 
-  const { sort, setSort, items, hasItems, addToCart, loading } = useOffers();
+  const { sort, setSort, items, hasItems, loading } = useOffers();
 
   return (
     <main className="site-main container py-4">
@@ -28,7 +28,7 @@ export default function OffersPage() {
         <section className="row g-3">
           {items.map((p) => (
             <div key={p.id} className="col-6 col-md-4 col-lg-3">
-              <OfferCard product={p} onAdd={addToCart} />
+              <OfferCard product={p} />
             </div>
           ))}
         </section>
