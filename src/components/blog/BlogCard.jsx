@@ -19,10 +19,12 @@ function fmt(iso) {
 }
 
 export default function BlogCard({ blog }) {
-  const date = blog?.fecha ? `Publicado ${fmt(blog.fecha)}` : "";
+  const published = blog?.fechaPublicacion || blog?.fecha;
+  const date = published ? `Publicado ${fmt(published)}` : "";
   const categoria = blog?.categoria ? ` | ${blog.categoria}` : "";
   const img = resolveImg(blog?.imagen);
-  const detailHref = `/blog/${encodeURIComponent(blog?.id)}`;
+  const slug = blog?.slug || blog?.id;
+  const detailHref = `/blog/${encodeURIComponent(slug)}`;
 
   return (
     <article className="blog-card">
@@ -40,7 +42,7 @@ export default function BlogCard({ blog }) {
         </span>
         <h2 className="blog-card__title">{blog?.titulo || "Título"}</h2>
         <p className="blog-card__excerpt">
-          {blog?.descripcion || "Pronto más detalles…"}
+          {blog?.descripcion || "Pronto más detalles..."}
         </p>
         <Link className="blog-card__link" to={detailHref}>
           Leer más

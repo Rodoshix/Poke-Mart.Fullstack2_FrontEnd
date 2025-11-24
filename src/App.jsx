@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+﻿import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { Header } from "./components/layout/Header.jsx";
 import { Footer } from "./components/layout/Footer.jsx";
 import useAuthSession from "@/hooks/useAuthSession.js";
@@ -36,8 +36,9 @@ import AdminOffers from "@/pages/admin/AdminOffers.jsx";
 import AdminReports from "@/pages/admin/AdminReports.jsx";
 import AdminProfile from "@/pages/admin/AdminProfile.jsx";
 import AdminReviews from "@/pages/admin/AdminReviews.jsx";
+import AdminBlogs from "@/pages/admin/AdminBlogs.jsx";
 
-const ReviewsPage = () => <h1 className="h3">Reseñas</h1>;
+const ReviewsPage = () => <h1 className="h3">Resenas</h1>;
 const NotFound    = () => <div className="text-center"><h1 className="display-4">404</h1></div>;
 
 const StoreLayout = () => (
@@ -72,6 +73,7 @@ const App = () => {
         <Route path="usuarios/:id/historial" element={<AdminUserHistory />} />
         <Route path="ofertas" element={<AdminOffers />} />
         <Route path="resenas" element={<AdminReviews />} />
+        <Route path="blogs" element={<AdminBlogs />} />
         <Route path="reportes" element={<AdminReports />} />
         <Route path="perfil" element={<AdminProfile />} />
         <Route path="*" element={<Navigate to="/admin" replace />} />
@@ -81,7 +83,7 @@ const App = () => {
         <Route index element={<HomePage />} />
         <Route path="catalogo" element={<CatalogPage />} />
         <Route path="producto/:id" element={<ProductDetailPage />} />
-        <Route path="reseñas" element={<ReviewsPage />} />
+        <Route path="resenas" element={<ReviewsPage />} />
         <Route path="carrito" element={<CartPage />} />
         <Route path="nosotros" element={<NosotrosPage />} />
         <Route path="contacto" element={<ContactoPage />} />
@@ -96,7 +98,7 @@ const App = () => {
           }
         />
         <Route path="blog" element={<BlogPage />} />
-        <Route path="blog/:id" element={<BlogDetailPage />} />
+        <Route path="blog/:slug" element={<BlogDetailPage />} />
         <Route path="ofertas" element={<OffersPage />} />
         <Route path="compra" element={<CheckoutPage />} />
         <Route path="compra/exito" element={<CheckoutSuccessPage />} />
@@ -111,3 +113,6 @@ const App = () => {
 };
 
 export default App;
+
+
+

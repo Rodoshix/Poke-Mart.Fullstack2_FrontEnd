@@ -3500,3 +3500,47 @@
   border-radius: calc(var(--admin-radius) - 8px);
 }
 
+/* Blogs */
+.admin-blogs {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.admin-blogs__layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 18px;
+}
+
+.admin-blogs__form-card,
+.admin-blogs__list-card {
+  border: 1px solid rgba(216, 190, 161, 0.6);
+  border-radius: calc(var(--admin-radius) - 4px);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 12px 28px rgba(36, 21, 12, 0.1);
+  padding: 18px 20px;
+}
+
+.admin-blogs__form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.admin-product-filters__group--grow {
+  flex: 2;
+  min-width: 220px;
+}
+
+.admin-blog__title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-blog__title .admin-table__cell--mono {
+  color: var(--admin-text-muted);
+  font-size: 0.82rem;
+}
+
