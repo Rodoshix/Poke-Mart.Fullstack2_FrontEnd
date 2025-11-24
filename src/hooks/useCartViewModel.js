@@ -35,17 +35,20 @@ export function useCartViewModel() {
       const srcImage = prod?.imagen ?? raw.image ?? "";
       const image = srcImage ? resolveImg(srcImage) : FALLBACK_IMAGE;
       const descripcion = prod?.descripcion ?? "";
+      const offer = prod?.oferta ?? raw._offer ?? null;
+      const basePrice = Number(prod?.precioBase ?? offer?.base ?? offer?.basePrice ?? price);
 
       return {
         id,
         qty: Number(raw.qty ?? 0),
         price,
+        basePrice,
         stock,
         name,
         image,
         descripcion,
         product: prod,
-        _offer: raw._offer ?? null,
+        _offer: offer,
       };
     });
     setItems(enriched);

@@ -12,14 +12,21 @@ import LoaderOverlay from "@/components/common/LoaderOverlay.jsx";
 
 const PAGE_SIZE = 12;
 
-const normalize = (p = {}) => ({
-  id: p.id ?? "",
-  nombre: p.nombre ?? "Producto",
-  categoria: p.categoria ?? "",
-  precio: Number(p.precio ?? 0),
-  stock: Number(p.stock ?? 0),
-  imagen: p.imagen || "/src/assets/img/placeholder.png",
-});
+const normalize = (p = {}) => {
+  const offer = p.oferta ?? p.offer;
+  const precioBase = Number(p.precioBase ?? p.precio ?? 0);
+  const precio = offer?.onSale ? Number(offer.price ?? p.precio ?? 0) : Number(p.precio ?? 0);
+  return {
+    id: p.id ?? "",
+    nombre: p.nombre ?? "Producto",
+    categoria: p.categoria ?? "",
+    precio,
+    precioBase,
+    oferta: offer,
+    stock: Number(p.stock ?? 0),
+    imagen: p.imagen || "/src/assets/img/placeholder.png",
+  };
+};
 
 const uniqueCats = (arr) =>
   Array.from(new Set(arr.map((p) => p.categoria).filter(Boolean))).sort((a, b) =>
