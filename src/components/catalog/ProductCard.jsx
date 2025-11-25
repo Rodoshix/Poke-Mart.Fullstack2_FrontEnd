@@ -39,18 +39,20 @@ export const ProductCard = ({ product }) => {
         <div className="text-muted small mb-2">{product.categoria ?? "Sin categoria"}</div>
 
         <div className="product-card__footer d-flex justify-content-between align-items-center mt-auto">
-          <div className="d-flex align-items-baseline gap-2">
+          <div className="product-card__pricing">
             {offer.onSale && (
-              <span className="text-muted text-decoration-line-through small">
-                {money(basePrice)}
+              <span className="product-card__discount badge text-bg-warning text-dark">-{offer.discountPct}%</span>
+            )}
+            <div className="product-card__prices-row d-flex align-items-baseline gap-2">
+              {offer.onSale && (
+                <span className="product-card__old-price text-muted text-decoration-line-through small">
+                  {money(basePrice)}
+                </span>
+              )}
+              <span className={`product-card__price fw-semibold ${offer.onSale ? "text-danger" : "text-primary"}`}>
+                {money(price)}
               </span>
-            )}
-            <span className={`product-card__price fw-semibold ${offer.onSale ? "text-danger" : "text-primary"}`}>
-              {money(price)}
-            </span>
-            {offer.onSale && (
-              <span className="badge text-bg-warning text-dark">-{offer.discountPct}%</span>
-            )}
+            </div>
           </div>
         </div>
       </div>

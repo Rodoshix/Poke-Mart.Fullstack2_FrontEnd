@@ -298,6 +298,7 @@ const AdminOffers = () => {
               ) : (
                 offerRows.map((offer) => {
                   const status = offer.active ? (offer.expired ? "Expirada" : "Activa") : "Inactiva";
+                  const isActionDisabled = processingId === offer.id || !isAdmin;
                   return (
                     <tr key={offer.id}>
                       <td className="admin-table__cell--mono">{offer.id}</td>
@@ -317,7 +318,9 @@ const AdminOffers = () => {
                             type="button"
                             className="admin-product-table__action"
                             onClick={() => handleEdit(offer)}
-                            disabled={processingId === offer.id || !isAdmin}
+                            disabled={isActionDisabled}
+                            aria-disabled={!isAdmin ? "true" : undefined}
+                            title={!isAdmin ? "Solo administradores pueden editar ofertas" : "Editar oferta"}
                           >
                             Editar
                           </button>
@@ -325,7 +328,9 @@ const AdminOffers = () => {
                             type="button"
                             className="admin-product-table__action"
                             onClick={() => handleToggleActive(offer)}
-                            disabled={processingId === offer.id || !isAdmin}
+                            disabled={isActionDisabled}
+                            aria-disabled={!isAdmin ? "true" : undefined}
+                            title={!isAdmin ? "Solo administradores pueden cambiar el estado" : "Activar o desactivar oferta"}
                           >
                             {offer.active ? "Desactivar" : "Activar"}
                           </button>
@@ -333,7 +338,9 @@ const AdminOffers = () => {
                             type="button"
                             className="admin-product-table__action admin-product-table__action--danger"
                             onClick={() => handleDelete(offer)}
-                            disabled={processingId === offer.id || !isAdmin}
+                            disabled={isActionDisabled}
+                            aria-disabled={!isAdmin ? "true" : undefined}
+                            title={!isAdmin ? "Solo administradores pueden eliminar ofertas" : "Eliminar oferta"}
                           >
                             Eliminar
                           </button>
