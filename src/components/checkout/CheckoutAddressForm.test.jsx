@@ -20,7 +20,6 @@ const baseForm = {
   region: "",
   comuna: "",
   notas: "",
-  paymentMethod: "credit",
 };
 
 describe("Testing CheckoutAddressForm", () => {
@@ -35,7 +34,7 @@ describe("Testing CheckoutAddressForm", () => {
 
     expect(screen.getByRole("heading", { name: /información del cliente/i })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /dirección de entrega/i })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /método de pago/i })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: /método de pago/i })).toBeNull();
 
     expect(screen.getByPlaceholderText(/calle principal 123/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/603/i)).toBeInTheDocument();
@@ -47,9 +46,6 @@ describe("Testing CheckoutAddressForm", () => {
 
     expect(screen.getByText(/debe ser una de:\s*kanto,\s*johto/i)).toBeInTheDocument();
 
-    expect(screen.getByLabelText(/tarjeta de crédito/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/tarjeta de débito/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/transferencia bancaria/i)).toBeInTheDocument();
   });
 
   it("CP-CAddr2: Cuando hay región válida se muestran las comunas correspondientes", () => {
@@ -87,22 +83,6 @@ describe("Testing CheckoutAddressForm", () => {
     expect(setField).toHaveBeenCalledWith("notas", "Dejar en portería");
   });
 
-  it("CP-CAddr4: Radios de pago: refleja el método seleccionado y cambia al hacer click", () => {
-    const form = { ...baseForm, paymentMethod: "debit" };
-    render(<CheckoutAddressForm form={form} setField={setField} />);
-
-    const credit = screen.getByLabelText(/tarjeta de crédito/i);
-    const debit = screen.getByLabelText(/tarjeta de débito/i);
-    const transfer = screen.getByLabelText(/transferencia bancaria/i);
-
-    expect(debit).toBeChecked();
-    expect(credit).not.toBeChecked();
-    expect(transfer).not.toBeChecked();
-
-    fireEvent.click(transfer);
-    expect(setField).toHaveBeenCalledWith("paymentMethod", "transfer");
-  });
-
   it("CP-CAddr5: Rellena valores controlados del formulario", () => {
     const form = {
       ...baseForm,
@@ -114,7 +94,6 @@ describe("Testing CheckoutAddressForm", () => {
       region: "Kanto",
       comuna: "Ciudad Celeste",
       notas: "Sin timbre, llamar por teléfono",
-      paymentMethod: "credit",
     };
 
     const { container } = render(<CheckoutAddressForm form={form} setField={setField} />);
@@ -130,6 +109,5 @@ describe("Testing CheckoutAddressForm", () => {
       screen.getByPlaceholderText(/entre calles, color del edificio, no tiene timbre/i)
     ).toHaveValue("Sin timbre, llamar por teléfono");
 
-    expect(screen.getByLabelText(/tarjeta de crédito/i)).toBeChecked();
   });
 });

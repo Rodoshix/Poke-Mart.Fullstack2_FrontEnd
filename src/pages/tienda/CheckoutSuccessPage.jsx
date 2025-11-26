@@ -35,6 +35,7 @@ const CheckoutSuccessPage = () => {
 
   const order = useMemo(() => readLastOrder(), [location?.key]);
   const deliveryWindow = formatDeliveryRange(order?.estimated);
+  const orderIdLabel = order?.id || order?.preferenceId || "en proceso";
 
   useEffect(() => {
     if (!order) {
@@ -89,7 +90,7 @@ const CheckoutSuccessPage = () => {
               {deliveryWindow ?? "Estamos preparando tu pedido"}
             </h2>
             <span className="checkout-result__card-subtitle">
-              Pedido #{order.id} · {order.paymentMethod}
+              Pedido #{orderIdLabel} · {order?.paymentMethod || "Mercado Pago"}
             </span>
           </header>
           <ul className="checkout-result__items">
