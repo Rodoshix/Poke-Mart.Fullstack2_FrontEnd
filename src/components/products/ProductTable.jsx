@@ -87,6 +87,9 @@ const ProductTable = ({ products, onToggleActive, onDelete, processingId, readOn
                     <Link
                       to={`/admin/productos/${product.id}/editar`}
                       className={`admin-product-table__action${readOnly ? " disabled" : ""}`}
+                      aria-disabled={readOnly ? "true" : undefined}
+                      tabIndex={readOnly ? -1 : undefined}
+                      title={readOnly ? "Solo administradores pueden editar productos" : "Editar producto"}
                       onClick={(e) => readOnly && e.preventDefault()}
                     >
                       Editar

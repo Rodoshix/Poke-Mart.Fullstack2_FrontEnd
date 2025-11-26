@@ -878,6 +878,24 @@
     transform: translateY(-1px);
   }
 
+  .admin-product-table__action.disabled,
+  .admin-product-table__action[aria-disabled="true"],
+  .admin-product-table__action:disabled {
+    background: #dcdcdc;
+    border-color: #c5c5c5;
+    color: #7a7a7a;
+    cursor: not-allowed;
+    pointer-events: none;
+    transform: none;
+  }
+
+  .admin-product-table__action.disabled:hover,
+  .admin-product-table__action[aria-disabled="true"]:hover,
+  .admin-product-table__action:disabled:hover {
+    background: #dcdcdc;
+    color: #7a7a7a;
+  }
+
   .admin-product-table__actions {
     display: inline-flex;
     gap: 8px;

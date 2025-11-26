@@ -5,8 +5,8 @@ import "@/assets/styles/checkout.css";
 
 import * as cartStore from "@/lib/cartStore";
 import { getAuth, getProfile } from "@/components/auth/session";
-import { createOrder as createOrderApi } from "@/services/orderApi.js";
 import { fetchProduct } from "@/services/catalogApi.js";
+import { createMercadoPagoPreference } from "@/services/paymentApi.js";
 
 import { useCartViewModel } from "@/hooks/useCartViewModel";
 import { useCheckoutForm } from "@/hooks/useCheckoutForm";
@@ -99,15 +99,7 @@ export default function CheckoutPage() {
         return;
       }
 
-      const PAYMENT_METHOD_LABELS = {
-        credit: "Tarjeta de crédito",
-        debit: "Tarjeta de débito",
-        transfer: "Transferencia bancaria",
-      };
-      const selectedPaymentLabel =
-        PAYMENT_METHOD_LABELS[form.paymentMethod] ?? PAYMENT_METHOD_LABELS.credit;
-
-      const orderRecord = await createOrderApi(
+      const preference = await createMercadoPagoPreference(
         {
           nombre: form.nombre,
           apellido: form.apellido,
@@ -118,19 +110,21 @@ export default function CheckoutPage() {
           calle: form.calle,
           departamento: form.departamento,
           notas: form.notas?.trim(),
-          metodoPago: form.paymentMethod,
           costoEnvio: shipping,
           items: items.map((item) => ({
             productoId: item.product?.id ?? Number(item.id),
             cantidad: Math.max(1, Number(item.qty) || 0),
           })),
         },
-        { auth: true },
+        { auth: false },
       );
 
+      const preferenceId = preference?.preferenceId || preference?.id;
+
       const orderSnapshot = {
-        id: orderRecord.id,
-        paymentMethod: selectedPaymentLabel,
+        id: preferenceId,
+        preferenceId,
+        paymentMethod: "Mercado Pago",
         email: form.email,
         estimated: {
           start: estimatedWindow.startISO,
@@ -146,19 +140,24 @@ export default function CheckoutPage() {
       };
 
       sessionStorage.setItem("pm_lastOrder", JSON.stringify(orderSnapshot));
-      cartStore.clearCart();
-      window.dispatchEvent(new Event("cart:updated"));
-      navigate("/compra/exito", {
+
+      const redirectUrl = preference?.initPoint || preference?.sandboxInitPoint || preference?.url;
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
+        return;
+      }
+
+      navigate("/compra/error", {
         replace: true,
-        state: { orderId: orderSnapshot.id },
+        state: { message: ["No pudimos iniciar el pago con Mercado Pago."] },
       });
     } catch (error) {
-      console.error("No se pudo registrar la orden", error);
+      console.error("No se pudo iniciar el pago", error);
       sessionStorage.removeItem("pm_lastOrder");
       navigate("/compra/error", {
         replace: true,
         state: {
-          message: error?.message || "No pudimos completar tu pedido. Inténtalo nuevamente en unos minutos.",
+          message: error?.message || "No pudimos iniciar el pago. Inténtalo nuevamente en unos minutos.",
         },
       });
     }
@@ -169,14 +168,14 @@ export default function CheckoutPage() {
     return () => document.body.classList.remove("page--checkout");
   }, []);
 
-  return (
-    <main className="site-main container my-4">
-      <div className="d-flex justify-content-between align-items-center">
-        <h1 className="h4 m-0">Completar compra</h1>
-        <div className="fw-semibold">
-          Total a pagar: <span className="badge text-bg-primary fs-6">{money(total)}</span>
+    return (
+      <main className="site-main container my-4">
+        <div className="d-flex justify-content-between align-items-center">
+          <h1 className="h4 m-0">Completar compra</h1>
+          <div className="fw-semibold">
+            Total a pagar: <span className="badge text-bg-primary fs-6">{money(total)}</span>
+          </div>
         </div>
-      </div>
 
       <div className="row g-4 mt-2">
         <section className="col-12">
@@ -187,7 +186,7 @@ export default function CheckoutPage() {
           <CheckoutAddressForm form={form} setField={setField} />
           <div className="d-flex flex-wrap gap-2 mt-4">
             <button className="btn btn-success" disabled={!items.length} onClick={pagarAhora}>
-              Pagar ahora {money(total)}
+              Pagar con Mercado Pago
             </button>
             <button className="btn btn-outline-secondary" onClick={() => navigate("/carrito")}>
               Volver al carrito

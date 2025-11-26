@@ -49,6 +49,13 @@ export default function AuthMenu() {
 
   const name = getDisplayName(profile);
   const email = profile?.email || "";
+  const avatarUrl = (profile?.avatarUrl || "").trim();
+
+  const Avatar = () => (
+    <div className={`auth-avatar${avatarUrl ? " auth-avatar--image" : ""}`} aria-hidden="true">
+      {avatarUrl ? <img src={avatarUrl} alt="" /> : getInitial(profile)}
+    </div>
+  );
 
   return (
     <div className="header-auth d-flex align-items-center gap-2">
@@ -59,20 +66,24 @@ export default function AuthMenu() {
           title="Ir al panel administrador"
           onClick={() => navigate("/admin")}
         >
-          <div className="auth-avatar" aria-hidden="true">{getInitial(profile)}</div>
+          <Avatar />
           <div className="auth-meta">
             <div className="auth-name" title={name}>{name}</div>
             <div className="auth-email" title={email}>{email}</div>
           </div>
         </button>
       ) : (
-        <div className="auth-chip d-flex align-items-center">
-          <div className="auth-avatar" aria-hidden="true">{getInitial(profile)}</div>
+        <Link
+          to="/perfil"
+          className="auth-chip auth-chip--link d-flex align-items-center"
+          title="Ver y editar mi perfil"
+        >
+          <Avatar />
           <div className="auth-meta">
             <div className="auth-name" title={name}>{name}</div>
             <div className="auth-email" title={email}>{email}</div>
           </div>
-        </div>
+        </Link>
       )}
 
       <button

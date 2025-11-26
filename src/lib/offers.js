@@ -44,10 +44,16 @@ export function getOfferInfo(p = {}, overlayById = null) {
     pct = Math.round((1 - salePrice / effectiveBase) * 100);
   } else if (pct > 0 && pct < 100) {
     const effectiveBase = Math.max(compare, basePrice);
-    salePrice = Math.round(effectiveBase * (1 - pct / 100));
+    salePrice = Math.max(1, Math.round(effectiveBase * (1 - pct / 100)));
   } else if (compare > basePrice && basePrice > 0) {
     salePrice = basePrice;
     pct = Math.round((1 - salePrice / compare) * 100);
+  }
+
+  // Limites: pct max 99% y precio mínimo $1
+  pct = Math.max(0, Math.min(99, pct));
+  if (salePrice > 0 && salePrice < 1) {
+    salePrice = 1;
   }
 
   let expired = false;

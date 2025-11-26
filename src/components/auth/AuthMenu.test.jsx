@@ -68,6 +68,9 @@ describe("Testing AuthMenu", () => {
     expect(screen.getByText("Ash Ketchum")).toBeInTheDocument();
     expect(screen.getByText("ash@poke.com")).toBeInTheDocument();
 
+    const profileLink = screen.getByRole("link", { name: /ver y editar mi perfil/i });
+    expect(profileLink).toHaveAttribute("href", "/perfil");
+
     const logoutBtn = screen.getByRole("button", { name: /cerrar sesión/i });
     fireEvent.click(logoutBtn);
 

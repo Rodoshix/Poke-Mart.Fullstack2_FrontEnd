@@ -16,7 +16,6 @@ export function useCheckoutForm() {
     region: "",
     comuna: "",
     notas: "",
-    paymentMethod: "credit",
   });
 
   const setField = (k, v) => setForm((f) => ({ ...f, [k]: v }));
@@ -65,7 +64,6 @@ export function useCheckoutForm() {
       region: "",
       comuna: "",
       notas: "",
-      paymentMethod: "credit",
     });
 
   const setRegion = (region) => {
@@ -88,7 +86,6 @@ export function useCheckoutForm() {
     if (!form.calle.trim()) errors.push("La calle/dirección es obligatoria.");
     if (!form.region.trim()) errors.push("Selecciona una región.");
     if (!form.comuna.trim()) errors.push("Selecciona una comuna.");
-    if (!form.paymentMethod) errors.push("Selecciona un método de pago.");
 
     return errors;
   };
