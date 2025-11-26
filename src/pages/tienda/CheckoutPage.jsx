@@ -116,7 +116,7 @@ export default function CheckoutPage() {
             cantidad: Math.max(1, Number(item.qty) || 0),
           })),
         },
-        { auth: true },
+        { auth: false },
       );
 
       const preferenceId = preference?.preferenceId || preference?.id;

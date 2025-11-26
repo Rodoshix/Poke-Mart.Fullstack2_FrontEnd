@@ -7,3 +7,11 @@ export async function createMercadoPagoPreference(payload, { auth = true } = {})
     auth,
   });
 }
+
+export async function confirmMercadoPagoPayment(payload) {
+  return apiFetch("/api/v1/payments/mp/confirm", {
+    method: "POST",
+    body: payload,
+    auth: false,
+  });
+}

@@ -1,6 +1,9 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "@/assets/styles/checkout.css";
+
+import * as cartStore from "@/lib/cartStore";
+import { confirmMercadoPagoPayment } from "@/services/paymentApi.js";
 
 const MONTH_FORMATTER = new Intl.DateTimeFormat("es-CL", { month: "long" });
 const DAY_FORMATTER = new Intl.DateTimeFormat("es-CL", { day: "numeric" });
@@ -34,16 +37,79 @@ const CheckoutSuccessPage = () => {
   const location = useLocation();
 
   const order = useMemo(() => readLastOrder(), [location?.key]);
+  const [confirmation, setConfirmation] = useState({
+    loading: false,
+    status: order?.status || null,
+    orderId: order?.id || null,
+    paymentId: null,
+    error: null,
+  });
+
   const deliveryWindow = formatDeliveryRange(order?.estimated);
-  const orderIdLabel = order?.id || order?.preferenceId || "en proceso";
+  const orderIdLabel = confirmation.orderId || order?.id || order?.preferenceId || "en proceso";
 
   useEffect(() => {
-    if (!order) {
+    const search = new URLSearchParams(location.search);
+    const paymentId = search.get("payment_id") || search.get("paymentId");
+    const preferenceId = search.get("preference_id") || search.get("preferenceId") || order?.preferenceId;
+    const externalReference = search.get("external_reference") || search.get("externalReference");
+    if (!paymentId) return;
+
+    let canceled = false;
+    const confirm = async () => {
+      setConfirmation((prev) => ({ ...prev, loading: true, error: null }));
+      try {
+        const res = await confirmMercadoPagoPayment({
+          paymentId: Number(paymentId),
+          preferenceId,
+          externalReference,
+        });
+        if (canceled) return;
+
+        if (res?.status === "approved" && res?.orderId) {
+          cartStore.clearCart();
+          window.dispatchEvent(new Event("cart:updated"));
+          const snapshot = {
+            ...(order || {}),
+            id: res.orderId,
+            preferenceId: res.preferenceId || preferenceId || order?.preferenceId,
+            paymentMethod: "Mercado Pago",
+          };
+          sessionStorage.setItem("pm_lastOrder", JSON.stringify(snapshot));
+        }
+
+        setConfirmation((prev) => ({
+          ...prev,
+          loading: false,
+          status: res?.status || prev.status,
+          orderId: res?.orderId || prev.orderId,
+          paymentId: res?.paymentId || prev.paymentId,
+          error: null,
+        }));
+      } catch (err) {
+        if (canceled) return;
+        setConfirmation((prev) => ({
+          ...prev,
+          loading: false,
+          error: err?.message || "No pudimos confirmar tu pago. Intenta recargar.",
+        }));
+      }
+    };
+    confirm();
+    return () => {
+      canceled = true;
+    };
+  }, [location.search, order]);
+
+  useEffect(() => {
+    const search = new URLSearchParams(location.search);
+    const hasPayment = search.get("payment_id") || search.get("paymentId");
+    if (!order && !hasPayment) {
       const timeout = setTimeout(() => navigate("/catalogo", { replace: true }), 3500);
       return () => clearTimeout(timeout);
     }
     return undefined;
-  }, [navigate, order]);
+  }, [navigate, order, location.search]);
 
   if (!order) {
     return (
@@ -82,6 +148,17 @@ const CheckoutSuccessPage = () => {
           </p>
         </div>
       </div>
+
+      {confirmation.loading && (
+        <div className="alert alert-info my-3" role="status">
+          Confirmando tu pago con Mercado Pago...
+        </div>
+      )}
+      {confirmation.error && (
+        <div className="alert alert-warning my-3" role="alert">
+          {confirmation.error}
+        </div>
+      )}
 
       <section className="checkout-result__content">
         <article className="checkout-result__card">
