@@ -79,4 +79,17 @@ describe("Testing ProductTable", () => {
     expect(screen.getByAltText("Great Ball")).toHaveAttribute("src", "resolved/url.png");
     expect(screen.getByText("S")).toHaveClass("admin-product-table__placeholder");
   });
+
+  it("CP-ProductTable4: Deshabilita edición en modo solo lectura", () => {
+    const products = [
+      { id: 11, nombre: "Poke Ball", stock: 8, precio: 1290, imagen: "", active: true },
+    ];
+
+    renderWithRouter(<ProductTable products={products} readOnly />);
+
+    const editLink = screen.getByRole("link", { name: "Editar" });
+    expect(editLink).toHaveClass("disabled");
+    expect(editLink).toHaveAttribute("aria-disabled", "true");
+    expect(editLink).toHaveAttribute("tabindex", "-1");
+  });
 });

@@ -2,12 +2,6 @@
 // src/components/checkout/CheckoutAddressForm.jsx
 import { REGIONES } from "@/data/regiones";
 
-const PAYMENT_OPTIONS = [
-  { value: "credit", label: "Tarjeta de crédito" },
-  { value: "debit", label: "Tarjeta de débito" },
-  { value: "transfer", label: "Transferencia bancaria" },
-];
-
 export default function CheckoutAddressForm({ form, setField }) {
   return (
     <div className="card">
@@ -61,27 +55,6 @@ export default function CheckoutAddressForm({ form, setField }) {
           <div className="col-12">
             <label className="form-label">Indicaciones (opcional)</label>
             <textarea className="form-control" rows={3} placeholder="Ej: Entre calles, color del edificio, no tiene timbre…" value={form.notas} onChange={(e) => setField("notas", e.target.value)} />
-          </div>
-        </div>
-
-        <h2 className="h6 mt-4">Método de pago</h2>
-        <div className="row g-3">
-          <div className="col-12">
-            <div className="d-flex flex-column gap-2">
-              {PAYMENT_OPTIONS.map((option) => (
-                <label key={option.value} className="form-check form-check-inline align-items-center">
-                  <input
-                    className="form-check-input me-2"
-                    type="radio"
-                    name="checkout-payment-method"
-                    value={option.value}
-                    checked={form.paymentMethod === option.value}
-                    onChange={(event) => setField("paymentMethod", event.target.value)}
-                  />
-                  <span className="form-check-label">{option.label}</span>
-                </label>
-              ))}
-            </div>
           </div>
         </div>
       </div>
