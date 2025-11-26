@@ -11,6 +11,7 @@ export default function Field({
   as = "input",
   options = [],
   className = "",
+  disabled = false,
 }) {
   return (
     <label className={`registro__field ${className}`}>
@@ -22,6 +23,7 @@ export default function Field({
           value={value}
           onChange={onChange}
           required={required}
+          disabled={disabled}
         >
           {options.map((opt) =>
             typeof opt === "string" ? (
@@ -41,6 +43,7 @@ export default function Field({
           onChange={onChange}
           onBlur={onBlur}
           required={required}
+          disabled={disabled}
         />
       )}
     </label>

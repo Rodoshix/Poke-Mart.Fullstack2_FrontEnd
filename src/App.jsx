@@ -18,6 +18,7 @@ import CheckoutPage from "@/pages/tienda/CheckoutPage";
 import CheckoutSuccessPage from "@/pages/tienda/CheckoutSuccessPage.jsx";
 import CheckoutErrorPage from "@/pages/tienda/CheckoutErrorPage.jsx";
 import CategoriaPage from "@/pages/tienda/CategoriaPage.jsx";
+import ProfilePage from "@/pages/tienda/ProfilePage.jsx";
 
 import AdminLayout from "@/pages/admin/AdminLayout.jsx";
 import AdminDashboard from "@/pages/admin/AdminDashboard.jsx";
@@ -66,6 +67,19 @@ const AdminRoute = () => {
   }
 
   return <AdminLayout />;
+};
+
+const ClientRoute = ({ children }) => {
+  const location = useLocation();
+  const { session, profile } = useAuthSession();
+  const role = (profile?.role || "").toLowerCase();
+  if (!session || !profile) {
+    return <Navigate to="/login" replace state={{ redirect: location.pathname }} />;
+  }
+  if (role === "admin" || role === "vendedor") {
+    return <Navigate to="/admin" replace />;
+  }
+  return children;
 };
 
 const App = () => {
@@ -120,6 +134,14 @@ const App = () => {
         <Route path="compra/error" element={<CheckoutErrorPage />} />
         <Route path="categoria" element={<CategoriaPage />} />
         <Route path="categoria/:slug" element={<CategoriaPage />} />
+        <Route
+          path="perfil"
+          element={(
+            <ClientRoute>
+              <ProfilePage />
+            </ClientRoute>
+          )}
+        />
         <Route path="404" element={<NotFound />} />
         <Route path="*" element={<Navigate to="/404" replace />} />
       </Route>

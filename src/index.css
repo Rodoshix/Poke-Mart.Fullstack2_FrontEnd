@@ -59,6 +59,10 @@ button.auth-chip {
 .auth-chip--link {
   cursor: pointer;
   transition: box-shadow 180ms ease, transform 180ms ease;
+  text-decoration: none;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
 }
 
 .auth-chip--link:hover {
@@ -84,6 +88,20 @@ button.auth-chip {
   font-size: 14px;
   line-height: 1;
   flex: 0 0 28px;
+}
+
+.auth-avatar.auth-avatar--image {
+  padding: 0;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+
+.auth-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
 }
 
 .auth-meta {
