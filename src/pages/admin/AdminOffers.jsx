@@ -66,7 +66,16 @@ const AdminOffers = () => {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm((prev) => {
+      if (name === "discountPct") {
+        if (value === "") return { ...prev, discountPct: "" };
+        const parsed = Number(value);
+        if (!Number.isFinite(parsed)) return { ...prev, discountPct: prev.discountPct ?? "" };
+        const limited = Math.min(99, Math.max(1, Math.floor(parsed)));
+        return { ...prev, discountPct: limited };
+      }
+      return { ...prev, [name]: value };
+    });
   };
 
   const handleCategoryChange = (event) => {
@@ -88,11 +97,19 @@ const AdminOffers = () => {
       if (!form.productId || !form.discountPct) {
         throw new Error("Producto y descuento son obligatorios.");
       }
+      const pct = Number(form.discountPct);
+      if (!Number.isFinite(pct) || pct <= 0) {
+        throw new Error("El descuento debe estar entre 1 y 99%.");
+      }
+      if (pct > 99) {
+        throw new Error("El descuento máximo permitido es 99%.");
+      }
+      const payload = { ...form, productId: Number(form.productId), discountPct: pct };
       if (form.id) {
-        const updated = await updateAdminOffer(form.id, form);
+        const updated = await updateAdminOffer(form.id, payload);
         setMessage(`Oferta actualizada para ${updated.productName || "producto"}.`);
       } else {
-        const created = await createAdminOffer(form);
+        const created = await createAdminOffer(payload);
         setMessage(`Oferta creada para ${created.productName || "producto"}.`);
       }
       const data = await fetchAdminOffers();
