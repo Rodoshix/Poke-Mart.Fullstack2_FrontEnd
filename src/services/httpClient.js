@@ -5,6 +5,8 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080
 
 const defaultHeaders = {
   "Content-Type": "application/json",
+  // Ngrok muestra un banner anti-abuso si el header no está presente; lo enviamos siempre porque es inofensivo para otros hosts.
+  "ngrok-skip-browser-warning": "true",
 };
 
 async function parseResponse(response) {
@@ -18,7 +20,7 @@ async function parseResponse(response) {
 }
 
 export async function apiFetch(path, { method = "GET", headers, body, auth = false } = {}) {
-  const url = path.startsWith("http") ? path : `${API_BASE_URL}${path}`;
+  const url = path.startsWith("http") ? path : `http://localhost:8080${path}`;
   let resolvedHeaders = { ...defaultHeaders, ...(headers || {}) };
 
   if (auth) {

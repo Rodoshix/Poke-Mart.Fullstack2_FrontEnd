@@ -154,6 +154,10 @@
   background: linear-gradient(135deg, #7f1d1d, #dc2626);
 }
 
+.checkout-result__header--pending {
+  background: linear-gradient(135deg, #1d4ed8, #0ea5e9);
+}
+
 .checkout-result__icon {
   width: 56px;
   height: 56px;

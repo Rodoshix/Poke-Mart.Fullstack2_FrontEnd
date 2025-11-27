@@ -12,4 +12,8 @@ export default defineConfig({
     setupFiles: "./src/setupTests.js"
   },
   resolve: { alias: { "@": path.resolve(__dirname, "src") } },
+  server: {
+    host: true,
+    allowedHosts: ["localhost", "127.0.0.1", ".ngrok-free.dev"]
+  }
 });

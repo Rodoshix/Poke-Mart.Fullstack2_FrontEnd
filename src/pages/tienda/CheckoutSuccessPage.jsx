@@ -50,9 +50,27 @@ const CheckoutSuccessPage = () => {
 
   useEffect(() => {
     const search = new URLSearchParams(location.search);
+    const statusParam = (search.get("status") || search.get("collection_status") || "").toLowerCase();
     const paymentId = search.get("payment_id") || search.get("paymentId");
     const preferenceId = search.get("preference_id") || search.get("preferenceId") || order?.preferenceId;
     const externalReference = search.get("external_reference") || search.get("externalReference");
+
+    if (statusParam === "pending" || statusParam === "in_process") {
+      navigate("/compra/pendiente", {
+        replace: true,
+        state: { message: ["Tu pago est\u00e1 pendiente de confirmaci\u00f3n."] },
+      });
+      return;
+    }
+
+    if (statusParam === "failure" || statusParam === "rejected" || statusParam === "cancelled") {
+      navigate("/compra/error", {
+        replace: true,
+        state: { message: ["Mercado Pago no pudo completar tu pago."] },
+      });
+      return;
+    }
+
     if (!paymentId) return;
 
     let canceled = false;
@@ -78,6 +96,22 @@ const CheckoutSuccessPage = () => {
           sessionStorage.setItem("pm_lastOrder", JSON.stringify(snapshot));
         }
 
+        if (res?.status === "pending") {
+          navigate("/compra/pendiente", {
+            replace: true,
+            state: { message: ["Tu pago est\u00e1 pendiente de confirmaci\u00f3n."] },
+          });
+          return;
+        }
+
+        if (res?.status === "rejected") {
+          navigate("/compra/error", {
+            replace: true,
+            state: { message: ["Tu pago fue rechazado o cancelado."] },
+          });
+          return;
+        }
+
         setConfirmation((prev) => ({
           ...prev,
           loading: false,
@@ -99,7 +133,7 @@ const CheckoutSuccessPage = () => {
     return () => {
       canceled = true;
     };
-  }, [location.search, order]);
+  }, [location.search, order, navigate]);
 
   useEffect(() => {
     const search = new URLSearchParams(location.search);

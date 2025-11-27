@@ -17,6 +17,7 @@ import OffersPage from "@/pages/tienda/OffersPage.jsx";
 import CheckoutPage from "@/pages/tienda/CheckoutPage";
 import CheckoutSuccessPage from "@/pages/tienda/CheckoutSuccessPage.jsx";
 import CheckoutErrorPage from "@/pages/tienda/CheckoutErrorPage.jsx";
+import CheckoutPendingPage from "@/pages/tienda/CheckoutPendingPage.jsx";
 import CategoriaPage from "@/pages/tienda/CategoriaPage.jsx";
 import ProfilePage from "@/pages/tienda/ProfilePage.jsx";
 
@@ -132,6 +133,7 @@ const App = () => {
         <Route path="compra" element={<CheckoutPage />} />
         <Route path="compra/exito" element={<CheckoutSuccessPage />} />
         <Route path="compra/error" element={<CheckoutErrorPage />} />
+        <Route path="compra/pendiente" element={<CheckoutPendingPage />} />
         <Route path="categoria" element={<CategoriaPage />} />
         <Route path="categoria/:slug" element={<CategoriaPage />} />
         <Route
