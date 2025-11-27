@@ -87,6 +87,19 @@
   color: rgba(247, 249, 255, 0.8);
 }
 
+.registro__email-example {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: 0.35rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
 .registro__input {
   width: 100%;
   border-radius: 16px;

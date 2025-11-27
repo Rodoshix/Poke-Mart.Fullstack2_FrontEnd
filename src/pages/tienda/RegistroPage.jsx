@@ -135,12 +135,17 @@ export default function RegistroPage() {
               required
             />
             <Field
-              label="Correo electrónico"
+              label={<>
+                  Correo electronico{" "}
+                  <span className="registro__email-example">
+                    <strong>usuario@correo.com</strong>
+                  </span>
+                </>}
               name="email"
               type="email"
               value={form.email}
               onChange={(e) => setField("email", e.target.value)}
-              placeholder="usuario@duoc.cl"
+              placeholder="usuario@correo.com"
               required
             />
           </div>
