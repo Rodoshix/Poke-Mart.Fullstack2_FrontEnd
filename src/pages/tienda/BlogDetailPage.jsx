@@ -10,8 +10,9 @@ import BlogActions from "@/components/blog/BlogActions";
 import PageBorders from "@/components/layout/PageBorders";
 import LoaderOverlay from "@/components/common/LoaderOverlay.jsx";
 import { useBlogDetail } from "@/hooks/useBlogDetail.js";
+import { backgroundLogo } from "@/assets/images.js";
 
-const BG_SIDE = "/src/assets/img/background-logo.png";
+const BG_SIDE = backgroundLogo;
 
 function paragraphsFromBlog(blog) {
   if (blog?.contenido) {

@@ -71,6 +71,14 @@
   min-height: 100vh;
   transition: transform 240ms ease;
   z-index: 950;
+  max-height: 100vh;
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.admin-sidebar::-webkit-scrollbar {
+  display: none;
 }
 
 .admin-sidebar__brand {
@@ -1824,6 +1832,17 @@
   outline: none;
   border-color: rgba(20, 54, 132, 0.6);
   box-shadow: 0 0 0 4px rgba(30, 73, 182, 0.15);
+}
+
+.admin-user-form__phone {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 10px;
+}
+
+.admin-user-form__input--phone-code {
+  min-width: 120px;
+  text-align: center;
 }
 
 .admin-user-form__errors {

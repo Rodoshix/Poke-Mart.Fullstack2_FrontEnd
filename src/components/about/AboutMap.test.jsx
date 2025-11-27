@@ -2,6 +2,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import AboutMap from "./AboutMap";
+import { aboutMap } from "@/assets/images.js";
 
 describe("Testing AboutMap", () => {
   it("CP-Map1: Renderiza heading e imagen con valores por defecto", () => {
@@ -9,18 +10,15 @@ describe("Testing AboutMap", () => {
 
     const heading = screen.getByRole("heading", {
       level: 3,
-      name: /cómo llegar/i,
+      name: /c\u00f3mo llegar/i,
     });
     expect(heading).toBeInTheDocument();
 
     const img = screen.getByRole("img", {
-      name: /mapa de ubicación de poké mart — sucursal central/i,
+      name: /mapa de ubicaci\u00f3n de pok\u00e9 mart/i,
     });
-    expect(img).toHaveAttribute("src", "/src/assets/img/mapa-pokemart.png");
-    expect(img).toHaveAttribute(
-      "alt",
-      "Mapa de ubicación de Poké Mart — Sucursal Central"
-    );
+    expect(img).toHaveAttribute("src", aboutMap);
+    expect(img).toHaveAttribute("alt", "Mapa de ubicación de Poké Mart – Sucursal Central");
     expect(img).toHaveAttribute("loading", "lazy");
     expect(img).toHaveAttribute("decoding", "async");
   });
@@ -35,7 +33,7 @@ describe("Testing AboutMap", () => {
     );
 
     expect(
-      screen.getByRole("heading", { level: 3, name: /ubicación/i })
+      screen.getByRole("heading", { level: 3, name: /ubicaci\u00f3n/i })
     ).toBeInTheDocument();
 
     const img = screen.getByRole("img", { name: /mapa personalizado/i });
@@ -43,17 +41,13 @@ describe("Testing AboutMap", () => {
     expect(img).toHaveAttribute("alt", "Mapa personalizado");
   });
 
-  it("CP-Map3: Estructura de clases: wrapper, frame y img anidada", () => {
+  it("CP-Map3: Estructura de clases: wrapper, frame e imagen", () => {
     const { container } = render(<AboutMap />);
 
-    const wrapper = container.querySelector(
-      "div.about-map.d-flex.flex-column"
-    );
+    const wrapper = container.querySelector("div.about-map.d-flex.flex-column");
     expect(wrapper).toBeInTheDocument();
 
-    const frame = wrapper?.querySelector(
-      "div.about-map__frame.rounded.overflow-hidden"
-    );
+    const frame = wrapper?.querySelector("div.about-map__frame.rounded.overflow-hidden");
     expect(frame).toBeInTheDocument();
 
     const headingEl = wrapper?.querySelector("h3.about-map__heading.h4");
@@ -67,7 +61,7 @@ describe("Testing AboutMap", () => {
     const { container } = render(<AboutMap />);
     const frame = container.querySelector("div.about-map__frame");
     const img = screen.getByRole("img", {
-      name: /poké mart — sucursal central/i,
+      name: /pok\u00e9 mart/i,
     });
 
     expect(frame).toBeInTheDocument();

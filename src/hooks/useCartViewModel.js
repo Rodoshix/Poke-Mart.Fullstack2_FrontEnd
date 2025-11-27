@@ -4,10 +4,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import * as cartStore from "@/lib/cartStore";
 import useProductsData from "@/hooks/useProductsData.js";
 import { resolveImg } from "@/utils/resolveImg";
+import { productFallback } from "@/assets/images.js";
 
 const SHIPPING_THRESHOLD = 1000;
 const SHIPPING_COST = 4990;
-const FALLBACK_IMAGE = "/src/assets/img/tienda/productos/poke-Ball.png";
+const FALLBACK_IMAGE = productFallback;
 
 const clamp = (value, min, max) => {
   const n = Number.isFinite(value) ? value : 0;
