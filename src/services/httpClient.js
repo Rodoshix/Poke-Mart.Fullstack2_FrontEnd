@@ -39,6 +39,10 @@ export async function apiFetch(path, { method = "GET", headers, body, auth = fal
       delete options.headers["Content-Type"];
     }
   }
+  // Evitar preflight en GET: no enviar Content-Type si no hay body
+  if (method?.toUpperCase() === "GET") {
+    delete options.headers["Content-Type"];
+  }
 
   const response = await fetch(url, options);
   const data = await parseResponse(response);
