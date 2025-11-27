@@ -4,8 +4,9 @@ import { Link } from "react-router-dom";
 import { resolveImg } from "@/utils/resolveImg";
 import { money } from "@/utils/money";
 import { getOfferInfo } from "@/lib/offers";
+import { productFallback } from "@/assets/images.js";
 
-const PLACEHOLDER = "/src/assets/img/tienda/productos/poke-Ball.png";
+const PLACEHOLDER = productFallback;
 
 export const ProductCard = ({ product }) => {
   const href = `/producto/${encodeURIComponent(product.id)}`;

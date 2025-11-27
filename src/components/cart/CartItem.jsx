@@ -1,6 +1,8 @@
 // usado en CartPage.jsx
 // src/components/cart/CartItem.jsx
-const FALLBACK_IMAGE = "/src/assets/img/tienda/productos/poke-Ball.png";
+import { productFallback } from "@/assets/images.js";
+
+const FALLBACK_IMAGE = productFallback;
 
 export default function CartItem({ item, onInc, onDec, onChangeQty, onRemove }) {
   const max = Math.max(1, Number.isFinite(item.stock) ? item.stock : item.qty);

@@ -4,6 +4,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getAuth, getProfile } from "@/components/auth/session.js";
 import { showCartGuardModal, CartGuardModal } from "@/components/auth/CartGuardModal.jsx";
+import { logoPoke } from "@/assets/images.js";
 
 import { getCount } from "@/lib/cartStore";
 
@@ -56,7 +57,7 @@ export const Header = () => {
           <Link className="site-nav__brand navbar-brand d-flex align-items-center" to="/">
             <img
               className="site-nav__logo me-2"
-              src="/src/assets/img/poke-mark-logo.png"
+              src={logoPoke}
               alt="Logo Poké Mart"
               width="32"
               height="32"

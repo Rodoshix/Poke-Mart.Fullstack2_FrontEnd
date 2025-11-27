@@ -1,6 +1,7 @@
 // usado por ContactoPage.jsx
 // src/components/contact/ContactMap.jsx
-const MAP_IMG = "/src/assets/img/tienda/world/pokemon_galar_map.png";
+import { mapGalar } from "@/assets/images.js";
+const MAP_IMG = mapGalar;
 
 export default function ContactMap({ src = MAP_IMG, alt = "Mapa del mundo Pokémon" }) {
   return (

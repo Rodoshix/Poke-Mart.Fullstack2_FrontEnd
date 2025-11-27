@@ -2,6 +2,7 @@
 // src/hooks/useCatalog.js
 import { useEffect, useMemo, useState } from "react";
 import useProductsData from "@/hooks/useProductsData.js";
+import { placeholderImg } from "@/assets/images.js";
 
 const normalize = (p = {}) => {
   const offer = p.oferta ?? p.offer;
@@ -15,7 +16,7 @@ const normalize = (p = {}) => {
     precioBase,
     oferta: offer,
     stock: Number(p.stock ?? 0),
-    imagen: p.imagen || "/src/assets/img/placeholder.png",
+    imagen: p.imagen || placeholderImg,
   };
 };
 

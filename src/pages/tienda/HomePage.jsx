@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import useProductsData from "@/hooks/useProductsData.js";
 import "@/assets/styles/home.css";
 import LoaderOverlay from "@/components/common/LoaderOverlay.jsx";
+import { mapGalar, mapSinnoh, mapJohto } from "@/assets/images.js";
 
 import { HeroCarousel } from "@/components/home/HeroCarousel.jsx";
 import { ProductCard } from "@/components/catalog/ProductCard.jsx";
@@ -23,9 +24,9 @@ const HomePage = () => {
   const products = useProductsData();
 
   const slides = useMemo(() => ([
-    { src: "/src/assets/img/tienda/world/pokemon_galar_map.png",  alt: "Región de Galar para explorar" },
-    { src: "/src/assets/img/tienda/world/Pokemon_sinnoh_map.png", alt: "Región de Sinnoh para explorar" },
-    { src: "/src/assets/img/tienda/world/pokemon_worldmap2.png",  alt: "Región de Johto para explorar" },
+    { src: mapGalar,  alt: "Región de Galar para explorar" },
+    { src: mapSinnoh, alt: "Región de Sinnoh para explorar" },
+    { src: mapJohto,  alt: "Región de Johto para explorar" },
   ]), []);
 
   useEffect(() => {
