@@ -55,8 +55,7 @@ export function validateEmail(email) {
   if (!EMAIL_DOMAINS.includes(domain.toLowerCase())) {
     return {
       valid: false,
-      message:
-        "Solo se aceptan correos de dominios duoc.cl, profesor.duoc.cl, gmail(.com/.es/.cl), hotmail(.com/.es/.cl), outlook(.com/.es/.cl), yahoo(.com/.es/.cl) o correo.com.",
+      message: "Solo se aceptan correos de dominios validos como gmail, hotmail, outlook, yahoo.",
     };
   }
   return { valid: true };

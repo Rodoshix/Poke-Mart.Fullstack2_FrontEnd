@@ -71,6 +71,14 @@
   min-height: 100vh;
   transition: transform 240ms ease;
   z-index: 950;
+  max-height: 100vh;
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.admin-sidebar::-webkit-scrollbar {
+  display: none;
 }
 
 .admin-sidebar__brand {
