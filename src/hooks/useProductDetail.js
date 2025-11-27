@@ -5,8 +5,9 @@ import useProductsData from "@/hooks/useProductsData.js";
 import { addItem, getAvailableStock } from "@/lib/cartStore";
 import { resolveImg } from "@/utils/resolveImg";
 import { getOfferInfo } from "@/lib/offers";
+import { productFallback } from "@/assets/images.js";
 
-const PLACEHOLDER = "/src/assets/img/tienda/productos/poke-Ball.png";
+const PLACEHOLDER = productFallback;
 const MAX_QTY = 99;
 const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 

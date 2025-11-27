@@ -1,9 +1,10 @@
 // usado por NosotrosPage.jsx
 // src/components/about/AboutMap.jsx
+import { aboutMap } from "@/assets/images.js";
 export default function AboutMap({
   heading = "Cómo llegar",
-  src = "/src/assets/img/mapa-pokemart.png",
-  alt = "Mapa de ubicación de Poké Mart — Sucursal Central",
+  src = aboutMap,
+  alt = "Mapa de ubicación de Poké Mart – Sucursal Central",
 }) {
   return (
     <div className="about-map flex-grow-1 d-flex flex-column">

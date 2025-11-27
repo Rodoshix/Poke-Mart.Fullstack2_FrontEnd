@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { productFallback } from "@/assets/images.js";
 
 const hoisted = vi.hoisted(() => ({
   money: vi.fn((value) => `$${value}`),
@@ -75,6 +76,6 @@ describe("Testing OfferCard", () => {
 
     const image = screen.getByAltText("Pikachu Plush");
     fireEvent.error(image);
-    expect(image).toHaveAttribute("src", "/src/assets/img/tienda/productos/poke-Ball.png");
+    expect(image).toHaveAttribute("src", productFallback);
   });
 });

@@ -3,6 +3,7 @@ import { render, screen, fireEvent, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ProductCard } from "./ProductCard";
+import { productFallback } from "@/assets/images.js";
 
 vi.mock("@/utils/resolveImg", () => ({
   resolveImg: vi.fn((p) => `RESOLVED:${p}`),
@@ -14,7 +15,7 @@ vi.mock("@/utils/money", () => ({
 import { resolveImg } from "@/utils/resolveImg";
 import { money } from "@/utils/money";
 
-const PLACEHOLDER = "/src/assets/img/tienda/productos/poke-Ball.png";
+const PLACEHOLDER_URL = productFallback;
 
 const baseProduct = {
   id: "A-01/��",
@@ -60,7 +61,7 @@ describe("Testing ProductCard", () => {
 
     fireEvent.error(img);
 
-    expect(img.getAttribute("src")).toContain(PLACEHOLDER);
+    expect(img.getAttribute("src")).toContain(PLACEHOLDER_URL);
   });
 
   it("CP-PC3: Si no hay categoría muestra 'Sin categoria' como fallback", () => {

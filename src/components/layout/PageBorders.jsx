@@ -1,6 +1,8 @@
 // src/components/common/PageBorders.jsx
+import { backgroundLogo } from "@/assets/images.js";
+
 export default function PageBorders({
-  src = "/src/assets/img/background-logo.png",
+  src = backgroundLogo,
   leftClass = "left-border",
   rightClass = "right-border",
 }) {

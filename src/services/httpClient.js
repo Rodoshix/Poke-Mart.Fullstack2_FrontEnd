@@ -1,7 +1,6 @@
 import { ensureFreshSession } from "@/services/authService.js";
 import { clearAuth } from "@/components/auth/session";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+import { API_BASE_URL } from "@/services/apiConfig.js";
 
 const defaultHeaders = {
   "Content-Type": "application/json",
@@ -39,6 +38,10 @@ export async function apiFetch(path, { method = "GET", headers, body, auth = fal
     if (isForm) {
       delete options.headers["Content-Type"];
     }
+  }
+  // Evitar preflight en GET: no enviar Content-Type si no hay body
+  if (method?.toUpperCase() === "GET") {
+    delete options.headers["Content-Type"];
   }
 
   const response = await fetch(url, options);

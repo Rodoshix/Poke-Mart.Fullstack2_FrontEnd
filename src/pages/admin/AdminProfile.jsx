@@ -19,24 +19,40 @@ const generateToken = () =>
     ? crypto.randomUUID()
     : Math.random().toString(36).slice(2);
 
-const createInitialState = (user) => ({
-  id: user?.id ?? null,
-  username: user?.username ?? "",
-  password: "",
-  passwordConfirm: "",
-  role: (user?.role ?? "admin") || "admin",
-  nombre: user?.nombre ?? "",
-  apellido: user?.apellido ?? "",
-  run: user?.run ?? "",
-  fechaNacimiento: user?.fechaNacimiento ?? "",
-  region: user?.region ?? "",
-  comuna: user?.comuna ?? "",
-  direccion: user?.direccion ?? "",
-  email: user?.email ?? "",
-  registeredAt: user?.registeredAt ?? new Date().toISOString(),
-  avatarUrl: user?.avatarUrl ?? "",
-  telefono: user?.telefono ?? "",
-});
+const splitTelefono = (telefonoRaw) => {
+  const fallbackCode = "+56";
+  if (!telefonoRaw) return { telefonoCodigo: fallbackCode, telefonoNumero: "" };
+  const digits = String(telefonoRaw).replace(/\s+/g, "");
+  if (digits.startsWith("+")) {
+    const code = digits.slice(0, 3).match(/^\+\d{1,4}/)?.[0] ?? fallbackCode;
+    const number = digits.slice(code.length);
+    return { telefonoCodigo: code, telefonoNumero: number };
+  }
+  return { telefonoCodigo: fallbackCode, telefonoNumero: digits };
+};
+
+const createInitialState = (user) => {
+  const { telefonoCodigo, telefonoNumero } = splitTelefono(user?.telefono);
+  return {
+    id: user?.id ?? null,
+    username: user?.username ?? "",
+    password: "",
+    passwordConfirm: "",
+    role: (user?.role ?? "admin") || "admin",
+    nombre: user?.nombre ?? "",
+    apellido: user?.apellido ?? "",
+    run: user?.run ?? "",
+    fechaNacimiento: user?.fechaNacimiento ?? "",
+    region: user?.region ?? "",
+    comuna: user?.comuna ?? "",
+    direccion: user?.direccion ?? "",
+    email: user?.email ?? "",
+    registeredAt: user?.registeredAt ?? new Date().toISOString(),
+    avatarUrl: user?.avatarUrl ?? "",
+    telefonoCodigo,
+    telefonoNumero,
+  };
+};
 
 const AdminProfile = () => {
   const { session, profile } = useAuthSession();
@@ -172,6 +188,8 @@ const AdminProfile = () => {
       comuna,
       direccion,
       email,
+      telefonoCodigo,
+      telefonoNumero,
     } = formState;
 
     if (!username.trim()) validationErrors.push("El nombre de usuario es obligatorio.");
@@ -196,6 +214,11 @@ const AdminProfile = () => {
 
     const emailValidation = validateEmail(norm.email(email));
     if (!emailValidation.valid) validationErrors.push(emailValidation.message);
+
+    const telNum = String(telefonoNumero || "").replace(/\D/g, "");
+    if (!telefonoCodigo) validationErrors.push("Selecciona el codigo de pais.");
+    if (!telNum) validationErrors.push("El telefono es obligatorio.");
+    else if (telNum.length < 7 || telNum.length > 12) validationErrors.push("Ingresa un telefono valido (7 a 12 digitos).");
 
     return validationErrors;
   };
@@ -228,7 +251,7 @@ const AdminProfile = () => {
         direccion: formState.direccion.replace(/\s+/g, " ").trim(),
         email: norm.email(formState.email),
         avatarUrl: formState.avatarUrl,
-        telefono: formState.telefono,
+        telefono: `${formState.telefonoCodigo || "+56"}${(formState.telefonoNumero || "").replace(/\D/g, "")}`,
       };
 
       const updated = await updateAdminUser(user.id, payload);
@@ -360,15 +383,28 @@ const AdminProfile = () => {
               <label className="admin-user-form__label" htmlFor="admin-phone">
                 Telefono
               </label>
-              <input
-                id="admin-phone"
-                name="telefono"
-                type="tel"
-                className="admin-user-form__input"
-                value={formState.telefono}
-                onChange={handleChange}
-                placeholder="+56912345678"
-              />
+              <div className="admin-user-form__phone">
+                <select
+                  id="admin-phone-code"
+                  name="telefonoCodigo"
+                  className="admin-user-form__input admin-user-form__input--phone-code"
+                  value={formState.telefonoCodigo}
+                  onChange={handleChange}
+                >
+                  <option value="+56">+56 (Chile)</option>
+                  <option value="+1">+1 (USA)</option>
+                  <option value="+34">+34 (Espa�a)</option>
+                </select>
+                <input
+                  id="admin-phone-number"
+                  name="telefonoNumero"
+                  type="tel"
+                  className="admin-user-form__input"
+                  value={formState.telefonoNumero}
+                  onChange={(e) => handleChange({ target: { name: "telefonoNumero", value: e.target.value.replace(/\D/g, "") } })}
+                  placeholder="912345678"
+                />
+              </div>
             </div>
 
             <div className="admin-user-form__group">

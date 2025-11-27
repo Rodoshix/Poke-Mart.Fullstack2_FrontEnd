@@ -1,13 +1,14 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import ContactMap from "./ContactMap.jsx";
+import { mapGalar } from "@/assets/images.js";
 
 describe("Testing ContactMap", () => {
   it("CP-ContactMap1: Renderiza el mapa con valores por defecto", () => {
     render(<ContactMap />);
 
     const img = screen.getByAltText("Mapa del mundo Pokémon");
-    expect(img).toHaveAttribute("src", "/src/assets/img/tienda/world/pokemon_galar_map.png");
+    expect(img).toHaveAttribute("src", mapGalar);
     expect(img).toHaveClass("contacto-figure__img");
   });
 

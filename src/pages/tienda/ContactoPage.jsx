@@ -7,8 +7,6 @@ import ContactMap from "@/components/contact/ContactMap";
 import ContactInfoCard from "@/components/contact/ContactInfoCard";
 import PageBorders from "@/components/layout/PageBorders";
 
-const BG = "/src/assets/img/background-logo.png";
-
 export default function ContactoPage() {
   useEffect(() => {
     document.body.classList.add("page--contacto");

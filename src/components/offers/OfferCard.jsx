@@ -3,8 +3,9 @@
 import { Link } from "react-router-dom";
 import { money } from "@/utils/money";
 import { countdown } from "@/lib/offers";
+import { productFallback } from "@/assets/images.js";
 
-const FALLBACK = "/src/assets/img/tienda/productos/poke-Ball.png";
+const FALLBACK = productFallback;
 
 export default function OfferCard({ product }) {
   const out = product.stock <= 0;

@@ -1,6 +1,5 @@
 import { getAuth, setAuth, clearAuth } from "@/components/auth/session";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+import { API_BASE_URL } from "@/services/apiConfig.js";
 
 const defaultHeaders = {
   "Content-Type": "application/json",

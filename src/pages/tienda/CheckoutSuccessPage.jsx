@@ -4,10 +4,11 @@ import "@/assets/styles/checkout.css";
 
 import * as cartStore from "@/lib/cartStore";
 import { confirmMercadoPagoPayment } from "@/services/paymentApi.js";
+import { productFallback } from "@/assets/images.js";
 
 const MONTH_FORMATTER = new Intl.DateTimeFormat("es-CL", { month: "long" });
 const DAY_FORMATTER = new Intl.DateTimeFormat("es-CL", { day: "numeric" });
-const FALLBACK_IMAGE = "/src/assets/img/tienda/productos/poke-Ball.png";
+const FALLBACK_IMAGE = productFallback;
 
 const readLastOrder = () => {
   try {

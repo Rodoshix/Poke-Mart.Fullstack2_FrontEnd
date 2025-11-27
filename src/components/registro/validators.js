@@ -53,7 +53,10 @@ export function validateEmail(email) {
   const [local, domain] = String(email).split("@");
   if (!local || !domain) return { valid: false, message: "El correo debe contener @." };
   if (!EMAIL_DOMAINS.includes(domain.toLowerCase())) {
-    return { valid: false, message: "Solo se aceptan correos duoc.cl, profesor.duoc.cl, gmail.com." };
+    return {
+      valid: false,
+      message: "Solo se aceptan correos de dominios validos como gmail, hotmail, outlook, yahoo.",
+    };
   }
   return { valid: true };
 }

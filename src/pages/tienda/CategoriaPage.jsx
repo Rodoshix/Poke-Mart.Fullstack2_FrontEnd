@@ -9,6 +9,7 @@ import CategorySidebar from "@/components/catalog/CategorySidebar.jsx";
 import SortToolbar from "@/components/catalog/SortToolbar.jsx";
 import useProductsData from "@/hooks/useProductsData.js";
 import LoaderOverlay from "@/components/common/LoaderOverlay.jsx";
+import { placeholderImg } from "@/assets/images.js";
 
 const PAGE_SIZE = 12;
 
@@ -24,7 +25,7 @@ const normalize = (p = {}) => {
     precioBase,
     oferta: offer,
     stock: Number(p.stock ?? 0),
-    imagen: p.imagen || "/src/assets/img/placeholder.png",
+    imagen: p.imagen || placeholderImg,
   };
 };
 
