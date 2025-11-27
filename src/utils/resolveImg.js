@@ -1,7 +1,11 @@
 import { productFallback, placeholderImg } from "@/assets/images.js";
 import { resolveApiBaseUrl } from "@/services/apiConfig.js";
 
-const assetModules = import.meta.glob("../assets/**/*", { eager: true, import: "default" });
+// Solo archivos de imagen, evitar incluir images.js en el glob
+const assetModules = import.meta.glob("../assets/**/*.{png,jpg,jpeg,webp,gif,svg}", {
+  eager: true,
+  import: "default",
+});
 const assetMap = Object.entries(assetModules).reduce((acc, [key, url]) => {
   const normalized = key.replace(/\\/g, "/").replace(/^\.\.\/?/, "/src/");
   acc[normalized] = url;
