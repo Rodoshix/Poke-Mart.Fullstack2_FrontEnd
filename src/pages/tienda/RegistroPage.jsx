@@ -135,12 +135,7 @@ export default function RegistroPage() {
               required
             />
             <Field
-              label={<>
-                  Correo electronico{" "}
-                  <span className="registro__email-example">
-                    <strong>usuario@correo.com</strong>
-                  </span>
-                </>}
+              label="Correo electronico"
               name="email"
               type="email"
               value={form.email}

@@ -16,7 +16,7 @@ const useUserValidation = ({ formState, isNew, existingUsers = [] }) =>
         email: norm.email(formState.email),
         password: formState.password,
         passwordConfirm: formState.passwordConfirm,
-        telefono: formState.telefono.trim(),
+        telefono: `${formState.telefonoCodigo}${(formState.telefonoNumero || "").replace(/\D/g, "")}`,
       };
       const issues = validateRegistration(existingUsers, data);
       return Array.isArray(issues) ? issues.map((issue) => issue.message) : [];
@@ -33,7 +33,8 @@ const useUserValidation = ({ formState, isNew, existingUsers = [] }) =>
     const comuna = formState.comuna.trim();
     const direccion = formState.direccion.trim();
     const email = formState.email.trim();
-    const telefono = formState.telefono.trim();
+    const telefonoCodigo = (formState.telefonoCodigo || "").trim();
+    const telefonoNumero = (formState.telefonoNumero || "").trim();
     const password = formState.password;
     const passwordConfirm = formState.passwordConfirm;
 
@@ -47,7 +48,9 @@ const useUserValidation = ({ formState, isNew, existingUsers = [] }) =>
     if (!comuna) validationErrors.push("La comuna es requerida.");
     if (!direccion) validationErrors.push("La direccion es requerida.");
     if (!email) validationErrors.push("El correo electronico es requerido.");
-    if (!telefono) validationErrors.push("El telefono es requerido.");
+    if (!telefonoCodigo) validationErrors.push("El codigo de telefono es requerido.");
+    const phoneDigits = telefonoNumero.replace(/\D+/g, "");
+    if (!phoneDigits) validationErrors.push("El telefono es requerido.");
 
     if (password.trim() && !passwordConfirm.trim()) {
       validationErrors.push("Confirma la nueva contrasena.");
@@ -62,9 +65,8 @@ const useUserValidation = ({ formState, isNew, existingUsers = [] }) =>
     const emailValidation = validateEmail(norm.email(email));
     if (!emailValidation.valid) validationErrors.push(emailValidation.message);
 
-    const phoneDigits = telefono.replace(/\D+/g, "");
-    if (phoneDigits && phoneDigits.length < 8) {
-      validationErrors.push("Ingresa un telefono valido (min 8 digitos).");
+    if (phoneDigits && phoneDigits.length < 7) {
+      validationErrors.push("Ingresa un telefono valido (min 7 digitos).");
     }
 
     return validationErrors;
