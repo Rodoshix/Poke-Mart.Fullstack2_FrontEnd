@@ -11,6 +11,7 @@ import { formatRun, getComunasByRegion, norm, validateEmail, validateRun } from 
 import useAuthSession from "@/hooks/useAuthSession";
 import { fetchProfile, updateProfile } from "@/services/profileApi";
 import { setAuth } from "@/components/auth/session";
+import PageBorders from "@/components/layout/PageBorders";
 
 const DEFAULT_CODE = "+56";
 const MAX_AVATAR_SIZE = 2 * 1024 * 1024; // 2MB
@@ -260,6 +261,7 @@ export default function ProfilePage() {
 
   return (
     <main className="perfil" role="main">
+      <PageBorders />
       <section className="perfil__wrapper" aria-labelledby="perfilTitle">
         <header className="perfil__header">
           <div>

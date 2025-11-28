@@ -29,6 +29,7 @@ export function getOfferInfo(p = {}, overlayById = null) {
   let endsAt = p.ofertaFin ?? p.ofertaHasta ?? p.saleEndsAt ?? p.endsAt ?? null;
 
   const compare = Math.max(num(p.precioAnterior ?? p.compareAtPrice ?? 0), basePrice);
+  const effectiveBase = Math.max(compare, basePrice);
 
   const idKey = String(p.id ?? "");
   if (overlayById?.has(idKey)) {
@@ -39,21 +40,23 @@ export function getOfferInfo(p = {}, overlayById = null) {
   }
 
   // Resolver precio/pct coherentes
-  if (salePrice > 0 && salePrice < Math.max(basePrice, compare)) {
-    const effectiveBase = Math.max(compare, basePrice);
+  if (salePrice > 0 && salePrice < effectiveBase) {
     pct = Math.round((1 - salePrice / effectiveBase) * 100);
   } else if (pct > 0 && pct < 100) {
-    const effectiveBase = Math.max(compare, basePrice);
-    salePrice = Math.max(1, Math.round(effectiveBase * (1 - pct / 100)));
+    const pctForPrice = Math.max(0, Math.min(99, pct));
+    const minFromPct = pctForPrice === 99 ? 10 : 1;
+    salePrice = Math.max(minFromPct, Math.round(effectiveBase * (1 - pctForPrice / 100)));
+    pct = pctForPrice;
   } else if (compare > basePrice && basePrice > 0) {
     salePrice = basePrice;
     pct = Math.round((1 - salePrice / compare) * 100);
   }
 
-  // Limites: pct max 99% y precio mínimo $1
+  // Limites: pct max 99% y precio minimo $1 ($10 si es 99%)
   pct = Math.max(0, Math.min(99, pct));
-  if (salePrice > 0 && salePrice < 1) {
-    salePrice = 1;
+  const minSalePrice = pct === 99 ? 10 : 1;
+  if (salePrice > 0 && salePrice < minSalePrice) {
+    salePrice = minSalePrice;
   }
 
   let expired = false;

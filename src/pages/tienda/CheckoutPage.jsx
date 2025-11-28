@@ -101,6 +101,11 @@ export default function CheckoutPage() {
 
       const preference = await createMercadoPagoPreference(
         {
+          title: "Compra Poke Mart",
+          currency: "CLP",
+          backUrl:
+            (typeof window !== "undefined" ? window.location.origin : "https://poke-mart-ecommerce.netlify.app") +
+            "/compra/exito",
           nombre: form.nombre,
           apellido: form.apellido,
           correo: form.email || profile?.email || "",

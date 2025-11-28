@@ -7,6 +7,7 @@ import OffersToolbar from "@/components/offers/OffersToolbar";
 import OfferCard from "@/components/offers/OfferCard";
 import OffersEmpty from "@/components/offers/OffersEmpty";
 import LoaderOverlay from "@/components/common/LoaderOverlay.jsx";
+import PageBorders from "@/components/layout/PageBorders";
 
 export default function OffersPage() {
   useEffect(() => {
@@ -18,6 +19,7 @@ export default function OffersPage() {
 
   return (
     <main className="site-main container py-4">
+      <PageBorders />
       <OffersToolbar sort={sort} onChange={setSort} />
 
       {loading ? (
