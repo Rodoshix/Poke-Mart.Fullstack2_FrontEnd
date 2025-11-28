@@ -192,227 +192,225 @@ const AdminBlogs = () => {
         </div>
       )}
 
-      <div className="admin-blogs__layout">
-        <div className="admin-blogs__form-card">
-          <h2 className="admin-offers__title">{editingId ? "Editar entrada" : "Nueva entrada"}</h2>
-          <p className="admin-offers__subtitle">Completa los datos y publica o guarda como borrador.</p>
+      <div className="admin-blogs__form-card">
+        <h2 className="admin-offers__title">{editingId ? "Editar entrada" : "Nueva entrada"}</h2>
+        <p className="admin-offers__subtitle">Completa los datos y publica o guarda como borrador.</p>
 
-          <form className="admin-blogs__form" onSubmit={handleSubmit}>
-            <div className="admin-offers__fields">
-              <div className="admin-offers__field">
-                <label className="admin-offers__label" htmlFor="titulo">Título</label>
-                <input
-                  id="titulo"
-                  name="titulo"
-                  className="admin-offers__input"
-                  value={form.titulo}
-                  onChange={handleChange}
-                  required
-                  maxLength={180}
-                />
-              </div>
-              <div className="admin-offers__field">
-                <label className="admin-offers__label" htmlFor="categoria">Categoría</label>
-                <input
-                  id="categoria"
-                  name="categoria"
-                  className="admin-offers__input"
-                  value={form.categoria}
-                  onChange={handleChange}
-                  maxLength={120}
-                />
-              </div>
-              <div className="admin-offers__field">
-                <label className="admin-offers__label" htmlFor="estado">Estado</label>
-                <select
-                  id="estado"
-                  name="estado"
-                  className="admin-offers__input"
-                  value={form.estado}
-                  onChange={handleChange}
-                >
-                  <option value="DRAFT">Borrador</option>
-                  <option value="PUBLISHED">Publicado</option>
-                </select>
-              </div>
-              <div className="admin-offers__field">
-                <label className="admin-offers__label" htmlFor="imagen">Imagen (URL o /uploads/...)</label>
-                <input
-                  id="imagen"
-                  name="imagen"
-                  className="admin-offers__input"
-                  value={form.imagen}
-                  onChange={handleChange}
-                  maxLength={500}
-                />
-              </div>
-              <div className="admin-offers__field">
-                <label className="admin-offers__label" htmlFor="etiquetas">Etiquetas (separadas por coma)</label>
-                <input
-                  id="etiquetas"
-                  name="etiquetas"
-                  className="admin-offers__input"
-                  value={form.etiquetas}
-                  onChange={handleChange}
-                  maxLength={500}
-                />
-              </div>
-            </div>
-
+        <form className="admin-blogs__form" onSubmit={handleSubmit}>
+          <div className="admin-offers__fields">
             <div className="admin-offers__field">
-              <label className="admin-offers__label" htmlFor="descripcion">Resumen</label>
-              <textarea
-                id="descripcion"
-                name="descripcion"
-                className="admin-offers__input"
-                rows={2}
-                value={form.descripcion}
-                onChange={handleChange}
-                maxLength={480}
-                required
-              />
-            </div>
-
-            <div className="admin-offers__field">
-              <label className="admin-offers__label" htmlFor="contenido">Contenido</label>
-              <textarea
-                id="contenido"
-                name="contenido"
-                className="admin-offers__input"
-                rows={5}
-                value={form.contenido}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="admin-offers__actions">
-              <button
-                type="submit"
-                className="admin-offers__btn admin-offers__btn--primary"
-                disabled={processingId === "form"}
-              >
-                {editingId ? "Actualizar" : "Crear"} blog
-              </button>
-              <button
-                type="button"
-                className="admin-offers__btn admin-offers__btn--ghost"
-                onClick={() => { setForm(emptyForm); setEditingId(null); }}
-              >
-                Limpiar
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <div className="admin-blogs__list-card">
-          <div className="admin-product-filters mb-3">
-            <div className="admin-product-filters__group">
-              <span className="admin-product-filters__label">Estado</span>
-              <select
-                className="admin-product-filters__select"
-                defaultValue=""
-                onChange={(e) => handleFiltersChange("estado", e.target.value)}
-              >
-                <option value="">Todos</option>
-                <option value="PUBLISHED">Publicados</option>
-                <option value="DRAFT">Borrador</option>
-              </select>
-            </div>
-            <div className="admin-product-filters__group">
-              <span className="admin-product-filters__label">Categoría</span>
-              <select
-                className="admin-product-filters__select"
-                defaultValue=""
-                onChange={(e) => handleFiltersChange("categoria", e.target.value)}
-              >
-                <option value="">Todas</option>
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </div>
-            <div className="admin-product-filters__group admin-product-filters__group--grow">
-              <span className="admin-product-filters__label">Buscar</span>
+              <label className="admin-offers__label" htmlFor="titulo">Título</label>
               <input
-                type="search"
-                className="admin-product-filters__input"
-                placeholder="Título o resumen"
-                onChange={(e) => handleFiltersChange("q", e.target.value)}
+                id="titulo"
+                name="titulo"
+                className="admin-offers__input"
+                value={form.titulo}
+                onChange={handleChange}
+                required
+                maxLength={180}
+              />
+            </div>
+            <div className="admin-offers__field">
+              <label className="admin-offers__label" htmlFor="categoria">Categoría</label>
+              <input
+                id="categoria"
+                name="categoria"
+                className="admin-offers__input"
+                value={form.categoria}
+                onChange={handleChange}
+                maxLength={120}
+              />
+            </div>
+            <div className="admin-offers__field">
+              <label className="admin-offers__label" htmlFor="estado">Estado</label>
+              <select
+                id="estado"
+                name="estado"
+                className="admin-offers__input"
+                value={form.estado}
+                onChange={handleChange}
+              >
+                <option value="DRAFT">Borrador</option>
+                <option value="PUBLISHED">Publicado</option>
+              </select>
+            </div>
+            <div className="admin-offers__field">
+              <label className="admin-offers__label" htmlFor="imagen">Imagen (URL o /uploads/...)</label>
+              <input
+                id="imagen"
+                name="imagen"
+                className="admin-offers__input"
+                value={form.imagen}
+                onChange={handleChange}
+                maxLength={500}
+              />
+            </div>
+            <div className="admin-offers__field">
+              <label className="admin-offers__label" htmlFor="etiquetas">Etiquetas (separadas por coma)</label>
+              <input
+                id="etiquetas"
+                name="etiquetas"
+                className="admin-offers__input"
+                value={form.etiquetas}
+                onChange={handleChange}
+                maxLength={500}
               />
             </div>
           </div>
 
-          {loading ? (
-            <LoaderOverlay text="Cargando blogs..." />
-          ) : (
-            <div className="admin-product-table admin-review-table admin-blogs__table">
-              <table className="admin-table admin-product-table__inner">
-                <thead>
-                  <tr>
-                    <th>Título</th>
-                    <th>Categoría</th>
-                    <th>Estado</th>
-                    <th>Publicado</th>
-                    <th>Actualizado</th>
-                    <th className="admin-product-table__actions-header">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredBlogs.length === 0 ? (
-                    <tr>
-                      <td colSpan={6} className="admin-table__empty">No hay blogs con esos filtros.</td>
-                    </tr>
-                  ) : (
-                    filteredBlogs.map((b) => (
-                      <tr key={b.id}>
-                        <td>
-                          <div className="admin-blog__title">
-                            <strong>{b.titulo}</strong>
-                            <div className="admin-table__cell--mono">/{b.slug}</div>
-                          </div>
-                        </td>
-                        <td>{b.categoria || "Sin categoría"}</td>
-                        <td>
-                          <span className={statusBadgeClass(b.estado)}>{statusLabel(b.estado)}</span>
-                        </td>
-                        <td>{formatDate(b.fechaPublicacion)}</td>
-                        <td>{formatDateTime(b.actualizadoEn || b.creadoEn)}</td>
-                        <td>
-                          <div className="admin-product-table__actions">
-                            <button
-                              type="button"
-                              className="admin-product-table__action"
-                              onClick={() => handleEdit(b)}
-                              disabled={processingId === b.id}
-                            >
-                              Editar
-                            </button>
-                            <button
-                              type="button"
-                              className="admin-product-table__action admin-product-table__action--secondary"
-                              onClick={() => handleStatusToggle(b)}
-                              disabled={processingId === b.id}
-                            >
-                              {b.estado === "PUBLISHED" ? "Despublicar" : "Publicar"}
-                            </button>
-                            <button
-                              type="button"
-                              className="admin-product-table__action admin-product-table__action--danger"
-                              onClick={() => handleDelete(b.id)}
-                              disabled={processingId === b.id}
-                            >
-                              Eliminar
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          )}
+          <div className="admin-offers__field">
+            <label className="admin-offers__label" htmlFor="descripcion">Resumen</label>
+            <textarea
+              id="descripcion"
+              name="descripcion"
+              className="admin-offers__input"
+              rows={2}
+              value={form.descripcion}
+              onChange={handleChange}
+              maxLength={480}
+              required
+            />
+          </div>
+
+          <div className="admin-offers__field">
+            <label className="admin-offers__label" htmlFor="contenido">Contenido</label>
+            <textarea
+              id="contenido"
+              name="contenido"
+              className="admin-offers__input"
+              rows={5}
+              value={form.contenido}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="admin-offers__actions">
+            <button
+              type="submit"
+              className="admin-offers__btn admin-offers__btn--primary"
+              disabled={processingId === "form"}
+            >
+              {editingId ? "Actualizar" : "Crear"} blog
+            </button>
+            <button
+              type="button"
+              className="admin-offers__btn admin-offers__btn--ghost"
+              onClick={() => { setForm(emptyForm); setEditingId(null); }}
+            >
+              Limpiar
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div className="admin-blogs__list-card">
+        <div className="admin-product-filters mb-3">
+          <div className="admin-product-filters__group">
+            <span className="admin-product-filters__label">Estado</span>
+            <select
+              className="admin-product-filters__select"
+              defaultValue=""
+              onChange={(e) => handleFiltersChange("estado", e.target.value)}
+            >
+              <option value="">Todos</option>
+              <option value="PUBLISHED">Publicados</option>
+              <option value="DRAFT">Borrador</option>
+            </select>
+          </div>
+          <div className="admin-product-filters__group">
+            <span className="admin-product-filters__label">Categoría</span>
+            <select
+              className="admin-product-filters__select"
+              defaultValue=""
+              onChange={(e) => handleFiltersChange("categoria", e.target.value)}
+            >
+              <option value="">Todas</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+          </div>
+          <div className="admin-product-filters__group admin-product-filters__group--grow">
+            <span className="admin-product-filters__label">Buscar</span>
+            <input
+              type="search"
+              className="admin-product-filters__input"
+              placeholder="Título o resumen"
+              onChange={(e) => handleFiltersChange("q", e.target.value)}
+            />
+          </div>
         </div>
+
+        {loading ? (
+          <LoaderOverlay text="Cargando blogs..." />
+        ) : (
+          <div className="admin-product-table admin-review-table admin-blogs__table">
+            <table className="admin-table admin-product-table__inner">
+              <thead>
+                <tr>
+                  <th>Título</th>
+                  <th>Categoría</th>
+                  <th>Estado</th>
+                  <th>Publicado</th>
+                  <th>Actualizado</th>
+                  <th className="admin-product-table__actions-header">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredBlogs.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="admin-table__empty">No hay blogs con esos filtros.</td>
+                  </tr>
+                ) : (
+                  filteredBlogs.map((b) => (
+                    <tr key={b.id}>
+                      <td>
+                        <div className="admin-blog__title">
+                          <strong>{b.titulo}</strong>
+                          <div className="admin-table__cell--mono">/{b.slug}</div>
+                        </div>
+                      </td>
+                      <td>{b.categoria || "Sin categoría"}</td>
+                      <td>
+                        <span className={statusBadgeClass(b.estado)}>{statusLabel(b.estado)}</span>
+                      </td>
+                      <td>{formatDate(b.fechaPublicacion)}</td>
+                      <td>{formatDateTime(b.actualizadoEn || b.creadoEn)}</td>
+                      <td>
+                        <div className="admin-product-table__actions">
+                          <button
+                            type="button"
+                            className="admin-product-table__action"
+                            onClick={() => handleEdit(b)}
+                            disabled={processingId === b.id}
+                          >
+                            Editar
+                          </button>
+                          <button
+                            type="button"
+                            className="admin-product-table__action admin-product-table__action--secondary"
+                            onClick={() => handleStatusToggle(b)}
+                            disabled={processingId === b.id}
+                          >
+                            {b.estado === "PUBLISHED" ? "Despublicar" : "Publicar"}
+                          </button>
+                          <button
+                            type="button"
+                            className="admin-product-table__action admin-product-table__action--danger"
+                            onClick={() => handleDelete(b.id)}
+                            disabled={processingId === b.id}
+                          >
+                            Eliminar
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </section>
   );

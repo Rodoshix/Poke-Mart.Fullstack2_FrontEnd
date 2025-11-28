@@ -1,5 +1,12 @@
 /* src/assets/styles/tienda/ofertas.css */
-.page--ofertas { background: #f6f8fb; }
+.page--ofertas {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(111, 172, 255, 0.14), transparent 28%),
+    radial-gradient(circle at 82% 12%, rgba(255, 184, 122, 0.18), transparent 30%),
+    radial-gradient(circle at 70% 70%, rgba(99, 102, 241, 0.12), transparent 32%),
+    #f6f8fb;
+  min-height: 100vh;
+}
 
 .offer-card {
   background: #fff;
