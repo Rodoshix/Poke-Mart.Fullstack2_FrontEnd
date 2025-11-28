@@ -16,20 +16,26 @@ const AdminReviews = () => {
   const [processingId, setProcessingId] = useState(null);
   const [filterCat, setFilterCat] = useState("");
   const [filterProduct, setFilterProduct] = useState("");
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [total, setTotal] = useState(0);
+  const PAGE_SIZE = 20;
 
-  const filteredReviews = reviews.filter((r) => {
-    const okCat = !filterCat || r.category === filterCat;
-    const okProd = !filterProduct || String(r.productId) === filterProduct;
-    return okCat && okProd;
-  });
-
-  const load = async () => {
+  const load = async (nextPage = 0, nextCat = filterCat, nextProduct = filterProduct) => {
     setLoading(true);
     setError("");
     setMessage("");
     try {
-      const data = await fetchAdminReviews();
-      setReviews(Array.isArray(data) ? data : []);
+      const data = await fetchAdminReviews({
+        page: nextPage,
+        size: PAGE_SIZE,
+        categoria: nextCat,
+        productoId: nextProduct,
+      });
+      setReviews(Array.isArray(data.items) ? data.items : []);
+      setTotalPages(Number(data.totalPages ?? 0));
+      setTotal(Number(data.total ?? 0));
+      setPage(Number(data.page ?? 0));
     } catch (err) {
       setError(err?.message || "No se pudieron cargar las reseñas.");
     } finally {
@@ -55,12 +61,6 @@ const AdminReviews = () => {
     return unique.sort((a, b) => (a.name || "").localeCompare(b.name || "", "es"));
   }, [reviews, filterCat]);
 
-  useEffect(() => {
-    if (!filterProduct) return;
-    const stillExists = productOptions.some((p) => String(p.id) === filterProduct);
-    if (!stillExists) setFilterProduct("");
-  }, [productOptions, filterProduct]);
-
   const handleDelete = async (id) => {
     const ok = window.confirm("¿Eliminar esta reseña?");
     if (!ok) return;
@@ -69,13 +69,28 @@ const AdminReviews = () => {
       await deleteAdminReview(id);
       setMessage("Reseña eliminada.");
       setError("");
-      await load();
+      await load(page);
     } catch (err) {
       setError(err?.message || "No se pudo eliminar la reseña.");
       setMessage("");
     } finally {
       setProcessingId(null);
     }
+  };
+
+  const handleFilterChange = (name, value) => {
+    if (name === "categoria") setFilterCat(value);
+    if (name === "producto") setFilterProduct(value);
+    const nextCat = name === "categoria" ? value : filterCat;
+    const nextProd = name === "producto" ? value : filterProduct;
+    setPage(0);
+    load(0, nextCat, nextProd);
+  };
+
+  const goToPage = (nextPage) => {
+    const target = Math.min(Math.max(0, nextPage), Math.max(totalPages - 1, 0));
+    setPage(target);
+    load(target);
   };
 
   return (
@@ -99,7 +114,7 @@ const AdminReviews = () => {
           <select
             className="admin-product-filters__select"
             value={filterCat}
-            onChange={(e) => setFilterCat(e.target.value)}
+            onChange={(e) => handleFilterChange("categoria", e.target.value)}
           >
             <option value="">Todas</option>
             {Array.from(new Set(reviews.map((r) => r.category).filter(Boolean)))
@@ -114,7 +129,7 @@ const AdminReviews = () => {
           <select
             className="admin-product-filters__select"
             value={filterProduct}
-            onChange={(e) => setFilterProduct(e.target.value)}
+            onChange={(e) => handleFilterChange("producto", e.target.value)}
           >
             <option value="">Todos</option>
             {productOptions.map((p) => (
@@ -142,14 +157,14 @@ const AdminReviews = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredReviews.length === 0 ? (
+              {reviews.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="admin-table__empty">
                     No hay reseñas registradas.
                   </td>
                 </tr>
               ) : (
-                filteredReviews.map((r) => (
+                reviews.map((r) => (
                   <tr key={r.id}>
                     <td className="admin-table__cell--mono">{r.id}</td>
                     <td>
@@ -159,7 +174,7 @@ const AdminReviews = () => {
                     </td>
                     <td>{r.category || "Sin categoría"}</td>
                     <td>{r.author || "Cliente"}</td>
-                    <td>{r.rating} ⭐</td>
+                    <td>{r.rating} ★</td>
                     <td>{formatDate(r.createdAt)}</td>
                     <td>{r.comment}</td>
                     <td>
@@ -179,6 +194,27 @@ const AdminReviews = () => {
               )}
             </tbody>
           </table>
+          <div className="admin-table__pagination">
+            <button
+              type="button"
+              className="admin-products__action-button"
+              onClick={() => goToPage(page - 1)}
+              disabled={page <= 0 || loading}
+            >
+              Anterior
+            </button>
+            <span className="admin-table__pagination-meta">
+              Página {page + 1} de {Math.max(totalPages, 1)} ({total} reseñas)
+            </span>
+            <button
+              type="button"
+              className="admin-products__action-button admin-products__action-button--primary"
+              onClick={() => goToPage(page + 1)}
+              disabled={page >= totalPages - 1 || loading}
+            >
+              Siguiente
+            </button>
+          </div>
         </div>
       )}
     </section>
