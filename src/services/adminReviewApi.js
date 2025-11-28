@@ -36,3 +36,8 @@ export async function fetchAdminReviews({ page = 0, size = 20, categoria = "", p
 export async function deleteAdminReview(id) {
   await apiFetch(`/api/v1/admin/reviews/${id}`, { method: "DELETE", auth: true });
 }
+
+export async function fetchAdminReviewCategories() {
+  const data = await apiFetch("/api/v1/admin/reviews/categories", { auth: true });
+  return Array.isArray(data) ? data : [];
+}

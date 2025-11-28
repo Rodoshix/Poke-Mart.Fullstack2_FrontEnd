@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { fetchAdminReviews, deleteAdminReview } from "@/services/adminReviewApi.js";
+import { fetchAdminReviews, deleteAdminReview, fetchAdminReviewCategories } from "@/services/adminReviewApi.js";
 import LoaderOverlay from "@/components/common/LoaderOverlay.jsx";
 
 const formatDate = (value) => {
@@ -10,6 +10,7 @@ const formatDate = (value) => {
 
 const AdminReviews = () => {
   const [reviews, setReviews] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -45,6 +46,9 @@ const AdminReviews = () => {
 
   useEffect(() => {
     load();
+    fetchAdminReviewCategories()
+      .then((cats) => setCategories(Array.isArray(cats) ? cats : []))
+      .catch(() => setCategories([]));
   }, []);
 
   const productOptions = useMemo(() => {
@@ -117,8 +121,8 @@ const AdminReviews = () => {
             onChange={(e) => handleFilterChange("categoria", e.target.value)}
           >
             <option value="">Todas</option>
-            {Array.from(new Set(reviews.map((r) => r.category).filter(Boolean)))
-              .sort((a, b) => a.localeCompare(b, "es"))
+            {categories
+              .filter(Boolean)
               .map((cat) => (
                 <option key={cat} value={cat}>{cat}</option>
               ))}
