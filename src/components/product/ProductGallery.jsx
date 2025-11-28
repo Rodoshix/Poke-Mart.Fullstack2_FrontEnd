@@ -1,6 +1,8 @@
 // usado por ProductDetailPage.jsx
 // src/components/product/ProductGallery.jsx
-const PLACEHOLDER = "/src/assets/img/tienda/productos/poke-Ball.png";
+import { productFallback } from "@/assets/images.js";
+
+const PLACEHOLDER = productFallback;
 
 export default function ProductGallery({ images = [], mainSrc, onSelect, alt }) {
   return (

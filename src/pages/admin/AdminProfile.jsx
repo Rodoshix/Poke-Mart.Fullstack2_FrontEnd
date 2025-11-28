@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import useAuthSession from "@/hooks/useAuthSession.js";
-import { getUserById, updateUser } from "@/services/userService.js";
+import { fetchAdminUser, updateAdminUser } from "@/services/adminUserApi.js";
 import { setAuth } from "@/components/auth/session";
 import { REGIONES } from "@/data/regiones";
 import {
@@ -19,27 +19,68 @@ const generateToken = () =>
     ? crypto.randomUUID()
     : Math.random().toString(36).slice(2);
 
-const createInitialState = (user) => ({
-  id: user?.id ?? null,
-  username: user?.username ?? "",
-  password: "",
-  passwordConfirm: "",
-  role: (user?.role ?? "admin") || "admin",
-  nombre: user?.nombre ?? "",
-  apellido: user?.apellido ?? "",
-  run: user?.run ?? "",
-  fechaNacimiento: user?.fechaNacimiento ?? "",
-  region: user?.region ?? "",
-  comuna: user?.comuna ?? "",
-  direccion: user?.direccion ?? "",
-  email: user?.email ?? "",
-  registeredAt: user?.registeredAt ?? new Date().toISOString(),
-  avatarUrl: user?.avatarUrl ?? "",
-});
+const splitTelefono = (telefonoRaw) => {
+  const fallbackCode = "+56";
+  if (!telefonoRaw) return { telefonoCodigo: fallbackCode, telefonoNumero: "" };
+  const digits = String(telefonoRaw).replace(/\s+/g, "");
+  if (digits.startsWith("+")) {
+    const code = digits.slice(0, 3).match(/^\+\d{1,4}/)?.[0] ?? fallbackCode;
+    const number = digits.slice(code.length);
+    return { telefonoCodigo: code, telefonoNumero: number };
+  }
+  return { telefonoCodigo: fallbackCode, telefonoNumero: digits };
+};
+
+const createInitialState = (user) => {
+  const { telefonoCodigo, telefonoNumero } = splitTelefono(user?.telefono);
+  return {
+    id: user?.id ?? null,
+    username: user?.username ?? "",
+    password: "",
+    passwordConfirm: "",
+    role: (user?.role ?? "admin") || "admin",
+    nombre: user?.nombre ?? "",
+    apellido: user?.apellido ?? "",
+    run: user?.run ?? "",
+    fechaNacimiento: user?.fechaNacimiento ?? "",
+    region: user?.region ?? "",
+    comuna: user?.comuna ?? "",
+    direccion: user?.direccion ?? "",
+    email: user?.email ?? "",
+    registeredAt: user?.registeredAt ?? new Date().toISOString(),
+    avatarUrl: user?.avatarUrl ?? "",
+    telefonoCodigo,
+    telefonoNumero,
+  };
+};
 
 const AdminProfile = () => {
   const { session, profile } = useAuthSession();
-  const user = useMemo(() => (profile ? getUserById(profile.id) : null), [profile]);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!profile?.id) {
+      setUser(null);
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    fetchAdminUser(profile.id)
+      .then((data) => {
+        if (!cancelled) setUser(data);
+      })
+      .catch(() => {
+        if (!cancelled) setUser(null);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [profile?.id]);
 
   const [formState, setFormState] = useState(() => createInitialState(user));
   const [errors, setErrors] = useState([]);
@@ -147,6 +188,8 @@ const AdminProfile = () => {
       comuna,
       direccion,
       email,
+      telefonoCodigo,
+      telefonoNumero,
     } = formState;
 
     if (!username.trim()) validationErrors.push("El nombre de usuario es obligatorio.");
@@ -172,6 +215,11 @@ const AdminProfile = () => {
     const emailValidation = validateEmail(norm.email(email));
     if (!emailValidation.valid) validationErrors.push(emailValidation.message);
 
+    const telNum = String(telefonoNumero || "").replace(/\D/g, "");
+    if (!telefonoCodigo) validationErrors.push("Selecciona el codigo de pais.");
+    if (!telNum) validationErrors.push("El telefono es obligatorio.");
+    else if (telNum.length < 7 || telNum.length > 12) validationErrors.push("Ingresa un telefono valido (7 a 12 digitos).");
+
     return validationErrors;
   };
 
@@ -192,7 +240,7 @@ const AdminProfile = () => {
     try {
       const payload = {
         username: formState.username.trim(),
-        password: formState.password.trim() || user.password || "",
+        password: formState.password.trim() || undefined,
         role: user.role,
         nombre: formState.nombre.trim(),
         apellido: formState.apellido.trim(),
@@ -202,11 +250,11 @@ const AdminProfile = () => {
         comuna: formState.comuna.trim(),
         direccion: formState.direccion.replace(/\s+/g, " ").trim(),
         email: norm.email(formState.email),
-        registeredAt: user.registeredAt,
         avatarUrl: formState.avatarUrl,
+        telefono: `${formState.telefonoCodigo || "+56"}${(formState.telefonoNumero || "").replace(/\D/g, "")}`,
       };
 
-      const updated = updateUser(user.id, payload);
+      const updated = await updateAdminUser(user.id, payload);
       setFormState(createInitialState(updated));
       setErrors([]);
       setStatusMessage("Tu perfil se actualizó correctamente.");
@@ -246,6 +294,16 @@ const AdminProfile = () => {
       setIsSaving(false);
     }
   };
+
+  if (loading) {
+    return (
+      <section className="admin-paper admin-profile">
+        <div className="admin-page-header">
+          <h1 className="admin-page-title">Cargando perfil...</h1>
+        </div>
+      </section>
+    );
+  }
 
   if (!user) {
     return (
@@ -319,6 +377,34 @@ const AdminProfile = () => {
                 disabled
                 readOnly
               />
+            </div>
+
+            <div className="admin-user-form__group">
+              <label className="admin-user-form__label" htmlFor="admin-phone">
+                Telefono
+              </label>
+              <div className="admin-user-form__phone">
+                <select
+                  id="admin-phone-code"
+                  name="telefonoCodigo"
+                  className="admin-user-form__input admin-user-form__input--phone-code"
+                  value={formState.telefonoCodigo}
+                  onChange={handleChange}
+                >
+                  <option value="+56">+56 (Chile)</option>
+                  <option value="+1">+1 (USA)</option>
+                  <option value="+34">+34 (Espa�a)</option>
+                </select>
+                <input
+                  id="admin-phone-number"
+                  name="telefonoNumero"
+                  type="tel"
+                  className="admin-user-form__input"
+                  value={formState.telefonoNumero}
+                  onChange={(e) => handleChange({ target: { name: "telefonoNumero", value: e.target.value.replace(/\D/g, "") } })}
+                  placeholder="912345678"
+                />
+              </div>
             </div>
 
             <div className="admin-user-form__group">

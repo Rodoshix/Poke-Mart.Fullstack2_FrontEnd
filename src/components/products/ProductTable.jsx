@@ -33,7 +33,7 @@ const resolveProductImage = (imagePath) => {
   return resolveImg(imagePath);
 };
 
-const ProductTable = ({ products }) => (
+const ProductTable = ({ products, onToggleActive, onDelete, processingId, readOnly = false }) => (
   <div className="admin-product-table">
     <table className="admin-table admin-product-table__inner">
       <thead>
@@ -43,6 +43,7 @@ const ProductTable = ({ products }) => (
           <th scope="col">Nombre</th>
           <th scope="col">Stock</th>
           <th scope="col">Precio</th>
+          <th scope="col">Estado</th>
           <th scope="col" className="admin-product-table__actions-header">
             Acciones
           </th>
@@ -51,13 +52,14 @@ const ProductTable = ({ products }) => (
       <tbody>
         {products.length === 0 ? (
           <tr>
-            <td colSpan={6} className="admin-table__empty">
+            <td colSpan={7} className="admin-table__empty">
               No hay productos para mostrar con los filtros seleccionados.
             </td>
           </tr>
         ) : (
           products.map((product) => {
             const imageSrc = resolveProductImage(product.imagen);
+            const isProcessing = processingId === product.id;
             return (
               <tr key={product.id}>
                 <td>
@@ -76,9 +78,43 @@ const ProductTable = ({ products }) => (
                 <td>{product.stock}</td>
                 <td>{currencyFormatter.format(product.precio)}</td>
                 <td>
-                  <Link to={`/admin/productos/${product.id}/editar`} className="admin-product-table__action">
-                    Editar
-                  </Link>
+                  <span className={`badge ${product.active ? "text-bg-success" : "text-bg-secondary"}`}>
+                    {product.active ? "Activo" : "Inactivo"}
+                  </span>
+                </td>
+                <td>
+                  <div className="admin-product-table__actions">
+                    <Link
+                      to={`/admin/productos/${product.id}/editar`}
+                      className={`admin-product-table__action${readOnly ? " disabled" : ""}`}
+                      aria-disabled={readOnly ? "true" : undefined}
+                      tabIndex={readOnly ? -1 : undefined}
+                      title={readOnly ? "Solo administradores pueden editar productos" : "Editar producto"}
+                      onClick={(e) => readOnly && e.preventDefault()}
+                    >
+                      Editar
+                    </Link>
+                    {typeof onToggleActive === "function" && (
+                      <button
+                        type="button"
+                        className="admin-product-table__action"
+                        onClick={() => onToggleActive(product.id, !product.active)}
+                        disabled={isProcessing || readOnly}
+                      >
+                        {product.active ? "Desactivar" : "Activar"}
+                      </button>
+                    )}
+                    {typeof onDelete === "function" && (
+                      <button
+                        type="button"
+                        className="admin-product-table__action admin-product-table__action--danger"
+                        onClick={() => onDelete(product.id)}
+                        disabled={isProcessing || readOnly}
+                      >
+                        Eliminar
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             );

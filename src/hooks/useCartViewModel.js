@@ -4,10 +4,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import * as cartStore from "@/lib/cartStore";
 import useProductsData from "@/hooks/useProductsData.js";
 import { resolveImg } from "@/utils/resolveImg";
+import { productFallback } from "@/assets/images.js";
 
 const SHIPPING_THRESHOLD = 1000;
 const SHIPPING_COST = 4990;
-const FALLBACK_IMAGE = "/src/assets/img/tienda/productos/poke-Ball.png";
+const FALLBACK_IMAGE = productFallback;
 
 const clamp = (value, min, max) => {
   const n = Number.isFinite(value) ? value : 0;
@@ -32,19 +33,23 @@ export function useCartViewModel() {
       const price = Number(raw.price ?? prod?.precio ?? 0);
       const stock = Number(prod?.stock ?? raw.stock ?? raw.qty ?? 0);
       const name = prod?.nombre ?? raw.name ?? "Producto";
-      const image = resolveImg(prod?.imagen ?? raw.image ?? FALLBACK_IMAGE);
+      const srcImage = prod?.imagen ?? raw.image ?? "";
+      const image = srcImage ? resolveImg(srcImage) : FALLBACK_IMAGE;
       const descripcion = prod?.descripcion ?? "";
+      const offer = prod?.oferta ?? raw._offer ?? null;
+      const basePrice = Number(prod?.precioBase ?? offer?.base ?? offer?.basePrice ?? price);
 
       return {
         id,
         qty: Number(raw.qty ?? 0),
         price,
+        basePrice,
         stock,
         name,
         image,
         descripcion,
         product: prod,
-        _offer: raw._offer ?? null,
+        _offer: offer,
       };
     });
     setItems(enriched);

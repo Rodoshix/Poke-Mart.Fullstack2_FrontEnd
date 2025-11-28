@@ -1,5 +1,31 @@
 /* src/assets/styles/tienda/ofertas.css */
-.page--ofertas { background: #f6f8fb; }
+.page--ofertas {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(111, 172, 255, 0.14), transparent 28%),
+    radial-gradient(circle at 82% 12%, rgba(255, 184, 122, 0.18), transparent 30%),
+    radial-gradient(circle at 70% 70%, rgba(99, 102, 241, 0.12), transparent 32%),
+    #f6f8fb;
+  min-height: 100vh;
+}
+
+.left-border, .right-border {
+  position: fixed;
+  top: 0;
+  height: 100dvh;
+  width: clamp(72px, 11vw, 220px);
+  object-fit: cover;
+  z-index: -1;
+  pointer-events: none;
+}
+.left-border { left: 0; }
+.right-border { right: 0; transform: scaleX(-1); }
+
+.site-main { position: relative; z-index: 1; }
+
+@media (max-width: 991.98px){
+  .left-border, .right-border{ display: none; }
+  .site-main{ padding-inline: 1rem; }
+}
 
 .offer-card {
   background: #fff;

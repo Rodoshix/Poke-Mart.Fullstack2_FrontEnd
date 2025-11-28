@@ -124,6 +124,7 @@
   box-shadow: var(--pm-shadow-sm);
   transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
   background: var(--pm-surface);
+  overflow: hidden;
 }
 .page--catalog .card:hover {
   transform: translateY(-2px);
@@ -150,6 +151,40 @@
 .page--catalog .card small,
 .page--catalog .text-muted {
   color: var(--pm-muted) !important;
+}
+
+.page--catalog .product-card__pricing {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.page--catalog .product-card__prices-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  align-items: baseline;
+  max-width: 100%;
+}
+
+.page--catalog .product-card__old-price {
+  word-break: break-word;
+}
+
+.page--catalog .product-card__price {
+  line-height: 1.2;
+}
+
+.page--catalog .product-card__discount {
+  padding: 0.18rem 0.5rem;
+  border-radius: 999px;
+  line-height: 1.1;
+  font-weight: 700;
+  white-space: nowrap;
+  align-self: flex-start;
 }
 
 /* precio destacado */

@@ -1,18 +1,10 @@
 // usado por el CheckoutPage.jsx
 // src/hooks/useCheckoutForm.js
 import { useEffect, useState } from "react";
-import usersData from "@/data/users.json";
 import { getAuth, getProfile } from "@/components/auth/session";
 import { REGIONES } from "@/data/regiones";
 
 const first = (...vals) => vals.find((v) => v !== undefined && v !== null && String(v).trim() !== "") ?? "";
-
-function extractUsers(data) {
-  if (!data) return [];
-  if (Array.isArray(data.users)) return data.users;
-  if (Array.isArray(data) && data.length && Array.isArray(data[0]?.users)) return data[0].users;
-  return [];
-}
 
 export function useCheckoutForm() {
   const [form, setForm] = useState({
@@ -24,40 +16,17 @@ export function useCheckoutForm() {
     region: "",
     comuna: "",
     notas: "",
-    paymentMethod: "credit",
   });
 
   const setField = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
-  // Prefill desde sesión + users.json
+  // Prefill desde sesión
   useEffect(() => {
     const auth = getAuth();
     const profile = getProfile();
     if (!auth || !profile) return;
 
-    let base = profile;
-    try {
-      const list = extractUsers(usersData);
-      const keyUser = String(profile.username || "").toLowerCase();
-      const keyMail = String(profile.email || profile.correo || "").toLowerCase();
-
-      let extra =
-        list.find(
-          (u) =>
-            (u.username && String(u.username).toLowerCase() === keyUser && keyUser) ||
-            (u.email && String(u.email).toLowerCase() === keyMail && keyMail)
-        ) || null;
-
-      if (!extra && profile.nombre && profile.apellido) {
-        extra = list.find(
-          (u) =>
-            String(u.nombre || "").toLowerCase() === String(profile.nombre).toLowerCase() &&
-            String(u.apellido || "").toLowerCase() === String(profile.apellido).toLowerCase()
-        ) || null;
-      }
-
-      if (extra) base = { ...extra, ...base };
-    } catch { /* ignore */ }
+    const base = profile;
 
     const envio =
       base.envio || base.shipping || base.direccionEnvio || base.direcciónEnvio ||
@@ -85,32 +54,47 @@ export function useCheckoutForm() {
     }));
   }, []);
 
-  function validate() {
-    const errs = [];
-    if (!form.nombre.trim()) errs.push("El nombre es requerido.");
-    if (!form.apellido.trim()) errs.push("El apellido es requerido.");
-    if (!form.email.trim() || !form.email.includes("@")) errs.push("El correo es inválido.");
-    if (!form.calle.trim()) errs.push("La calle/dirección es requerida.");
+  const resetForm = () =>
+    setForm({
+      nombre: "",
+      apellido: "",
+      email: "",
+      calle: "",
+      departamento: "",
+      region: "",
+      comuna: "",
+      notas: "",
+    });
 
-    const regionEntry = REGIONES.find((r) => r.region === form.region);
-    if (!form.region.trim()) {
-      errs.push("Debes ingresar una región.");
-    } else if (!regionEntry) {
-      errs.push("La región ingresada no existe.");
+  const setRegion = (region) => {
+    setField("region", region);
+    const regionObj = REGIONES.find((r) => r.region === region);
+    if (!regionObj) {
+      setField("comuna", "");
+    } else if (!regionObj.comunas.some((c) => c === form.comuna)) {
+      setField("comuna", regionObj.comunas[0] ?? "");
     }
+  };
 
-    if (!form.comuna.trim()) {
-      errs.push("Debes ingresar una comuna.");
-    } else if (regionEntry && !regionEntry.comunas.includes(form.comuna)) {
-      errs.push("La comuna no pertenece a la región ingresada.");
-    }
+  const validate = () => {
+    const errors = [];
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!["credit", "debit", "transfer"].includes(form.paymentMethod)) {
-      errs.push("Selecciona un método de pago válido.");
-    }
+    if (!form.nombre.trim()) errors.push("El nombre es obligatorio.");
+    if (!form.apellido.trim()) errors.push("El apellido es obligatorio.");
+    if (!form.email.trim() || !emailRegex.test(form.email.trim())) errors.push("Ingresa un correo válido.");
+    if (!form.calle.trim()) errors.push("La calle/dirección es obligatoria.");
+    if (!form.region.trim()) errors.push("Selecciona una región.");
+    if (!form.comuna.trim()) errors.push("Selecciona una comuna.");
 
-    return errs;
-  }
+    return errors;
+  };
 
-  return { form, setField, validate };
+  return {
+    form,
+    setField,
+    setRegion,
+    resetForm,
+    validate,
+  };
 }

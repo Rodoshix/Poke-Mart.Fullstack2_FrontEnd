@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import AdminSidebar from "@/components/layout/AdminSidebar.jsx";
 import AdminTopbar from "@/components/layout/AdminTopbar.jsx";
 import AdminFooter from "@/components/layout/AdminFooter.jsx";
@@ -10,14 +10,36 @@ const DESKTOP_BREAKPOINT = 992;
 
 const isDesktopViewport = () => (typeof window === "undefined" ? true : window.innerWidth >= DESKTOP_BREAKPOINT);
 
+const sellerAllowedPath = (pathname = "") => {
+  if (!pathname.startsWith("/admin")) return false;
+  if (pathname === "/admin" || pathname === "/admin/") return false;
+  if (pathname.startsWith("/admin/ordenes")) return true;
+  if (pathname.startsWith("/admin/productos")) {
+    const disallowedProductPaths = [
+      "/admin/productos/nuevo",
+      "/admin/productos/criticos",
+      "/admin/productos/reportes",
+    ];
+    return !disallowedProductPaths.some((prefix) => pathname.startsWith(prefix));
+  }
+  if (pathname.startsWith("/admin/ofertas")) return true;
+  if (pathname.startsWith("/admin/resenas")) return false; // solo admin
+  return false;
+};
+
 const AdminLayout = () => {
   const { session, profile } = useAuthSession();
-  const isAdmin = !!session && !!profile && (profile.role || "").toLowerCase() === "admin";
+  const location = useLocation();
+  const role = (profile?.role || "").toLowerCase();
+  const hasSession = !!session && !!profile;
+  const isAdmin = hasSession && role === "admin";
+  const isSeller = hasSession && role === "vendedor";
+  const isAuthorized = isAdmin || isSeller;
   const [isDesktop, setIsDesktop] = useState(() => isDesktopViewport());
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => isDesktopViewport());
 
   useEffect(() => {
-    if (!isAdmin || typeof window === "undefined") return;
+    if (!isAuthorized || typeof window === "undefined") return;
     const handleResize = () => {
       const desktop = isDesktopViewport();
       setIsDesktop(desktop);
@@ -26,10 +48,10 @@ const AdminLayout = () => {
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [isAdmin]);
+  }, [isAuthorized]);
 
   useEffect(() => {
-    if (!isAdmin || typeof document === "undefined") return;
+    if (!isAuthorized || typeof document === "undefined") return;
 
     const previousPadding = document.body.style.paddingTop;
     const previousBackground = document.body.style.background;
@@ -41,7 +63,7 @@ const AdminLayout = () => {
       document.body.style.paddingTop = previousPadding;
       document.body.style.background = previousBackground;
     };
-  }, [isAdmin]);
+  }, [isAuthorized]);
 
   const handleToggleSidebar = () => {
     if (isDesktop) return;
@@ -53,8 +75,12 @@ const AdminLayout = () => {
     setIsSidebarOpen(false);
   };
 
-  if (!isAdmin) {
+  if (!hasSession || !isAuthorized) {
     return <Navigate to="/" replace />;
+  }
+
+  if (isSeller && !sellerAllowedPath(location.pathname || "")) {
+    return <Navigate to="/admin/ordenes" replace />;
   }
 
   return (
@@ -62,7 +88,7 @@ const AdminLayout = () => {
       {!isDesktop && isSidebarOpen && (
         <button className="admin-shell__overlay" type="button" onClick={handleHideSidebar} aria-label="Cerrar menú" />
       )}
-      <AdminSidebar isOpen={isSidebarOpen} onHide={handleHideSidebar} />
+      <AdminSidebar isOpen={isSidebarOpen} onHide={handleHideSidebar} role={role} />
       <div className="admin-shell__content">
         <AdminTopbar onToggleSidebar={handleToggleSidebar} />
         <main className="admin-main">

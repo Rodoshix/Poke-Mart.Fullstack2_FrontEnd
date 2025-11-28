@@ -70,6 +70,11 @@
   gap: 1.25rem;
 }
 
+.registro__row--telefono {
+  grid-template-columns: 140px 1fr;
+  align-items: end;
+}
+
 .registro__field {
   display: flex;
   flex-direction: column;
@@ -81,6 +86,7 @@
   font-weight: 500;
   color: rgba(247, 249, 255, 0.8);
 }
+
 
 .registro__input {
   width: 100%;
@@ -116,6 +122,10 @@
 .registro__input--select option {
   color: #1a1f36;
   background: #ffffff;
+}
+
+.registro__field--codigo .registro__input {
+  text-align: center;
 }
 
 .registro__btn {

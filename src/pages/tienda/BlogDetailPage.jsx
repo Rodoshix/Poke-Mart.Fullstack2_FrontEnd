@@ -7,61 +7,76 @@ import BlogMedia from "@/components/blog/BlogMedia";
 import BlogMeta from "@/components/blog/BlogMeta";
 import BlogTags from "@/components/blog/BlogTags";
 import BlogActions from "@/components/blog/BlogActions";
-import { useBlogById } from "@/hooks/useBlogById";
 import PageBorders from "@/components/layout/PageBorders";
+import LoaderOverlay from "@/components/common/LoaderOverlay.jsx";
+import { useBlogDetail } from "@/hooks/useBlogDetail.js";
+import { backgroundLogo } from "@/assets/images.js";
 
-const BG_SIDE = "/src/assets/img/background-logo.png";
+const BG_SIDE = backgroundLogo;
 
-function extraParagraphs(b) {
-  const base = b?.descripcion || "";
-  const frags = [
-    base,
-    "Explora más a fondo las recomendaciones de nuestro equipo Poké Mart para que tu próxima travesía sea más cómoda y segura.",
-    "Recuerda complementar estas sugerencias con tu estilo personal y la región que planeas visitar. Cada entrenador tiene necesidades únicas.",
-  ];
-  if (Array.isArray(b?.etiquetas) && b.etiquetas.length) {
-    frags.push(`Etiquetas clave: ${b.etiquetas.map((t) => `#${t}`).join(", ")}.`);
+function paragraphsFromBlog(blog) {
+  if (blog?.contenido) {
+    return blog.contenido
+      .split(/\r?\n\r?\n|\r?\n/)
+      .map((p) => p.trim())
+      .filter(Boolean);
   }
-  return frags.filter((s, i, arr) => s && s.trim() && arr.indexOf(s) === i);
+  if (blog?.descripcion) {
+    return [blog.descripcion].filter(Boolean);
+  }
+  return [];
 }
 
 export default function BlogDetailPage() {
-  const { id } = useParams();
-  const { blog, notFound } = useBlogById(id);
+  const { slug } = useParams();
+  const { blog, loading, error, notFound } = useBlogDetail(slug);
 
-  if (notFound) return <BlogNotFound bgSide={BG_SIDE} />;
+  if (notFound && !loading) return <BlogNotFound bgSide={BG_SIDE} />;
 
-  const paragraphs = extraParagraphs(blog);
+  const paragraphs = paragraphsFromBlog(blog);
+  const metaFecha = blog?.fechaPublicacion || blog?.fecha;
 
   return (
     <>
       <PageBorders />
 
       <main className="site-main blog-detail container py-5">
-        <BlogBreadcrumb title={blog?.titulo || "Detalle"} />
+        {loading && <LoaderOverlay text="Cargando publicación..." />}
 
-        <article className="blog-entry" aria-live="polite">
-          <BlogMedia imagen={blog?.imagen} alt={blog?.titulo} />
-
-          <div className="blog-entry__body">
-            <BlogMeta fecha={blog?.fecha} categoria={blog?.categoria} />
-
-            <h1 className="blog-entry__title">{blog?.titulo}</h1>
-
-            {blog?.descripcion ? (
-              <p className="blog-entry__lead">{blog.descripcion}</p>
-            ) : null}
-
-            <div className="blog-entry__content">
-              {paragraphs.map((p, i) => (
-                <p key={i}>{p}</p>
-              ))}
-            </div>
-
-            <BlogTags etiquetas={blog?.etiquetas} />
-            <BlogActions />
+        {error && !loading && (
+          <div className="alert alert-danger" role="alert">
+            {error}
           </div>
-        </article>
+        )}
+
+        {blog && !loading && (
+          <>
+            <BlogBreadcrumb title={blog?.titulo || "Detalle"} />
+
+            <article className="blog-entry" aria-live="polite">
+              <BlogMedia imagen={blog?.imagen} alt={blog?.titulo} />
+
+              <div className="blog-entry__body">
+                <BlogMeta fecha={metaFecha} categoria={blog?.categoria} />
+
+                <h1 className="blog-entry__title">{blog?.titulo}</h1>
+
+                {blog?.descripcion ? (
+                  <p className="blog-entry__lead">{blog.descripcion}</p>
+                ) : null}
+
+                <div className="blog-entry__content">
+                  {paragraphs.map((p, i) => (
+                    <p key={i}>{p}</p>
+                  ))}
+                </div>
+
+                <BlogTags etiquetas={blog?.etiquetas} />
+                <BlogActions />
+              </div>
+            </article>
+          </>
+        )}
       </main>
     </>
   );

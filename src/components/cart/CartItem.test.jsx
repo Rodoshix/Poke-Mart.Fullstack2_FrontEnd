@@ -2,6 +2,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import CartItem from "./CartItem";
+import { productFallback } from "@/assets/images.js";
 
 const moneyLike = /\$\s*[\d.]+/; // evita flakiness por locale
 
@@ -166,6 +167,6 @@ describe("Testing CartItem", () => {
     expect(img).toHaveAttribute("src", "/img/404.png");
 
     fireEvent.error(img);
-    expect(img).toHaveAttribute("src", "/src/assets/img/tienda/productos/poke-Ball.png");
+    expect(img).toHaveAttribute("src", productFallback);
   });
 });

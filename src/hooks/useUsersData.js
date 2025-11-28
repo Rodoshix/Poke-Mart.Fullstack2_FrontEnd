@@ -1,40 +1,34 @@
 import { useEffect, useState } from "react";
-import {
-  getAllUsers,
-  subscribeToUserChanges,
-  REGISTERED_USER_STORAGE_KEY,
-  USER_STORAGE_KEY,
-} from "@/services/userService.js";
+import { fetchAdminUsers } from "@/services/adminUserApi.js";
 
 const useUsersData = () => {
-  const [users, setUsers] = useState(() => getAllUsers());
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const refresh = () => setUsers(getAllUsers());
-    const unsubscribe = subscribeToUserChanges(refresh);
-
-    if (typeof window === "undefined") {
-      return unsubscribe;
-    }
-
-    const handleStorage = (event) => {
-      if (
-        event.key === null ||
-        event.key === USER_STORAGE_KEY ||
-        event.key === REGISTERED_USER_STORAGE_KEY
-      ) {
-        refresh();
+    let cancelled = false;
+    const load = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const data = await fetchAdminUsers();
+        if (!cancelled) setUsers(Array.isArray(data) ? data : []);
+      } catch {
+        if (!cancelled) {
+          setUsers([]);
+          setError("No se pudieron cargar los usuarios");
+        }
       }
+      if (!cancelled) setLoading(false);
     };
-
-    window.addEventListener("storage", handleStorage);
+    load();
     return () => {
-      unsubscribe();
-      window.removeEventListener("storage", handleStorage);
+      cancelled = true;
     };
   }, []);
 
-  return users;
+  return Object.assign(users, { loading, error });
 };
 
 export default useUsersData;

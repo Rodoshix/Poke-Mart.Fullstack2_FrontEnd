@@ -3,6 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import useProductsData from "@/hooks/useProductsData.js";
 import "@/assets/styles/home.css";
+import LoaderOverlay from "@/components/common/LoaderOverlay.jsx";
+import { mapGalar, mapSinnoh, mapJohto } from "@/assets/images.js";
 
 import { HeroCarousel } from "@/components/home/HeroCarousel.jsx";
 import { ProductCard } from "@/components/catalog/ProductCard.jsx";
@@ -17,26 +19,33 @@ const pickFeatured = (data) => {
 
 const HomePage = () => {
   const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [dataReady, setDataReady] = useState(false);
+  const [minDelayPassed, setMinDelayPassed] = useState(false);
   const products = useProductsData();
 
   const slides = useMemo(() => ([
-    { src: "/src/assets/img/tienda/world/pokemon_galar_map.png",  alt: "Región de Galar para explorar" },
-    { src: "/src/assets/img/tienda/world/Pokemon_sinnoh_map.png", alt: "Región de Sinnoh para explorar" },
-    { src: "/src/assets/img/tienda/world/pokemon_worldmap2.png",  alt: "Región de Johto para explorar" },
+    { src: mapGalar,  alt: "Región de Galar para explorar" },
+    { src: mapSinnoh, alt: "Región de Sinnoh para explorar" },
+    { src: mapJohto,  alt: "Región de Johto para explorar" },
   ]), []);
 
   useEffect(() => {
     let alive = true;
-    setLoading(true);
-    const t = setTimeout(() => {
+    setDataReady(false);
+    setMinDelayPassed(false);
+
+    const delayTimer = setTimeout(() => setMinDelayPassed(true), 3000);
+    const dataTimer = setTimeout(() => {
       if (!alive) return;
       const destacados = pickFeatured(products || []);
       setItems(destacados);
-      setLoading(false);
+      setDataReady(true);
     }, 120);
-    return () => { alive = false; clearTimeout(t); };
+
+    return () => { alive = false; clearTimeout(delayTimer); clearTimeout(dataTimer); };
   }, [products]);
+
+  const showLoader = !minDelayPassed || !dataReady;
 
   return (
     <main className="site-main">
@@ -66,13 +75,17 @@ const HomePage = () => {
         </header>
 
         <div className="product-grid__list row g-4" aria-live="polite">
-          {loading && <div className="col-12 text-muted">Cargando destacados…</div>}
-
-          {!loading && items.map(p => (
-            <div key={p.id} className="product-grid__item col-12 col-sm-6 col-md-4 col-lg-3">
-              <ProductCard product={p} />
+          {showLoader ? (
+            <div className="col-12">
+              <LoaderOverlay text="Cargando destacados..." />
             </div>
-          ))}
+          ) : (
+            items.map(p => (
+              <div key={p.id} className="product-grid__item col-12 col-sm-6 col-md-4 col-lg-3">
+                <ProductCard product={p} />
+              </div>
+            ))
+          )}
         </div>
       </section>
     </main>

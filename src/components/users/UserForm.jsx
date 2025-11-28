@@ -54,11 +54,15 @@ const UserForm = ({ initialUser, onSubmit, onCancel, submitLabel = "Guardar", is
         fechaNacimiento: formState.fechaNacimiento.trim(),
         region: formState.region.trim(),
         comuna: formState.comuna.trim(),
-        direccion: formState.direccion.replace(/\s+/g, " ").trim(),
-        email: formState.email.trim(),
+        direccion: (formState.direccion || "").replace(/\s+/g, " ").trim(),
+        email: (formState.email || "").trim(),
+        telefono: `${formState.telefonoCodigo || "+56"}${(formState.telefonoNumero || "").replace(/\D/g, "")}`,
+        active: formState.active,
         registeredAt:
           initialUser?.registeredAt ?? formState.registeredAt ?? new Date().toISOString(),
       };
+      if (!formState.telefonoNumero) delete payload.telefono;
+      if (payload.active === undefined) delete payload.active;
 
       try {
         await onSubmit(payload);

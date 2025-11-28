@@ -6,6 +6,8 @@ import { useOffers } from "@/hooks/useOffers";
 import OffersToolbar from "@/components/offers/OffersToolbar";
 import OfferCard from "@/components/offers/OfferCard";
 import OffersEmpty from "@/components/offers/OffersEmpty";
+import LoaderOverlay from "@/components/common/LoaderOverlay.jsx";
+import PageBorders from "@/components/layout/PageBorders";
 
 export default function OffersPage() {
   useEffect(() => {
@@ -13,19 +15,22 @@ export default function OffersPage() {
     return () => document.body.classList.remove("page--ofertas");
   }, []);
 
-  const { sort, setSort, items, hasItems, addToCart } = useOffers();
+  const { sort, setSort, items, hasItems, loading } = useOffers();
 
   return (
     <main className="site-main container py-4">
+      <PageBorders />
       <OffersToolbar sort={sort} onChange={setSort} />
 
-      {!hasItems ? (
+      {loading ? (
+        <LoaderOverlay text="Cargando ofertas..." />
+      ) : !hasItems ? (
         <OffersEmpty />
       ) : (
         <section className="row g-3">
           {items.map((p) => (
             <div key={p.id} className="col-6 col-md-4 col-lg-3">
-              <OfferCard product={p} onAdd={addToCart} />
+              <OfferCard product={p} />
             </div>
           ))}
         </section>

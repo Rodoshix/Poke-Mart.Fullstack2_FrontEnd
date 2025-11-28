@@ -15,14 +15,41 @@ const buildInitialState = (initialUser) => ({
   comuna: initialUser?.comuna ?? "",
   direccion: initialUser?.direccion ?? "",
   email: initialUser?.email ?? "",
+  telefonoCodigo: "+56",
+  telefonoNumero: "",
   registeredAt: initialUser?.registeredAt ?? new Date().toISOString(),
+  active: initialUser?.active ?? true,
 });
 
 const useUserFormState = ({ initialUser, isNew }) => {
-  const [formState, setFormState] = useState(() => buildInitialState(initialUser));
+  const [formState, setFormState] = useState(() => {
+    const state = buildInitialState(initialUser);
+    if (initialUser?.telefono) {
+      const raw = String(initialUser.telefono).trim();
+      const codeMatch = raw.match(/^\+\d{1,4}/);
+      if (codeMatch) {
+        state.telefonoCodigo = codeMatch[0];
+        state.telefonoNumero = raw.slice(codeMatch[0].length);
+      } else {
+        state.telefonoNumero = raw;
+      }
+    }
+    return state;
+  });
 
   useEffect(() => {
-    setFormState(buildInitialState(initialUser));
+    const next = buildInitialState(initialUser);
+    if (initialUser?.telefono) {
+      const raw = String(initialUser.telefono).trim();
+      const codeMatch = raw.match(/^\+\d{1,4}/);
+      if (codeMatch) {
+        next.telefonoCodigo = codeMatch[0];
+        next.telefonoNumero = raw.slice(codeMatch[0].length);
+      } else {
+        next.telefonoNumero = raw;
+      }
+    }
+    setFormState(next);
   }, [initialUser]);
 
   const handleChange = useCallback((event) => {

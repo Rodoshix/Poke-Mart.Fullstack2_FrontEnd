@@ -1,6 +1,6 @@
 // src/pages/tienda/ProductDetailPage.jsx
-import { useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import PageBorders from "@/components/layout/PageBorders";
 import "@/assets/styles/product-detail.css";
 
@@ -12,11 +12,14 @@ import ProductBuyBox from "@/components/product/ProductBuyBox";
 import { RelatedProducts } from "@/components/catalog/RelatedProducts.jsx";
 import { Reviews } from "@/components/reviews/Reviews.jsx";
 
-import reviewsData from "@/data/reviews.json";
-import useProductsData from "@/hooks/useProductsData.js";
+import { useProductReviews } from "@/hooks/useProductReviews.js";
+import useAuthSession from "@/hooks/useAuthSession.js";
+import LoaderOverlay from "@/components/common/LoaderOverlay.jsx";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
+  const { session } = useAuthSession();
+  const [delayLoader, setDelayLoader] = useState(true);
 
   const {
     product,
@@ -29,22 +32,22 @@ export default function ProductDetailPage() {
     addToCart,
     related,
   } = useProductDetail(id);
-  const products = useProductsData();
+  const { items: reviews, addReview } = useProductReviews(id);
+  const canReview = Boolean(session);
 
-  const reviewKey = useMemo(() => {
-    const arr = Array.isArray(products) ? products : [];
-    const idx = arr.findIndex((p) => String(p.id) === String(id));
-    return idx >= 0 ? String(idx + 1) : null;
-  }, [products, id]);
-
-  const reviews = useMemo(() => {
-    if (!reviewKey) return [];
-    const list =
-      reviewsData && typeof reviewsData === "object" ? reviewsData[reviewKey] : [];
-    return Array.isArray(list) ? list : [];
-  }, [reviewKey]);
+  useEffect(() => {
+    const t = setTimeout(() => setDelayLoader(false), 3000);
+    return () => clearTimeout(t);
+  }, []);
 
   if (!product) {
+    if (delayLoader) {
+      return (
+        <main className="container py-5">
+          <LoaderOverlay text="Cargando producto..." />
+        </main>
+      );
+    }
     return (
       <main className="container py-5">
         <h2 className="mb-2">Ups…</h2>
@@ -76,6 +79,8 @@ export default function ProductDetailPage() {
           <ProductBuyBox
             name={product.nombre}
             price={product.precio}
+            basePrice={product.precioBase}
+            offer={product.oferta}
             description={product.descripcion}
             available={available}
             qty={qty}
@@ -85,8 +90,7 @@ export default function ProductDetailPage() {
         </section>
 
         <RelatedProducts items={related} />
-        {/* Pasamos el array resuelto para evitar el banner de clave faltante */}
-        <Reviews reviews={reviews} />
+        <Reviews reviews={reviews} onSubmit={addReview} canReview={canReview} />
       </main>
     </>
   );
