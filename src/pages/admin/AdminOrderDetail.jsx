@@ -28,6 +28,8 @@ const AdminOrderDetail = () => {
   const isAdmin = role === "admin";
 
   const orders = useOrdersData();
+  const loading = orders?.loading ?? false;
+  const loadError = orders?.error ?? "";
   const order = useMemo(() => {
     const list = Array.isArray(orders) ? orders : [];
     return list.find((item) => String(item.id) === String(orderId)) ?? null;
@@ -79,7 +81,7 @@ const AdminOrderDetail = () => {
         <div className="admin-page-header">
           <h1 className="admin-page-title">Detalle de orden</h1>
           <p className="admin-page-subtitle">
-            Consulta la información del pedido, estado del envío y los artículos asociados a la boleta seleccionada.
+            Consulta la informacion del pedido, estado del envio y los articulos asociados a la boleta seleccionada.
           </p>
         </div>
         <button type="button" className="admin-order-detail__back" onClick={handleBack}>
@@ -87,12 +89,22 @@ const AdminOrderDetail = () => {
         </button>
       </div>
 
-      {!order ? (
+      {loading ? (
+        <div className="admin-order-detail__empty" role="status">
+          <h2>Cargando orden...</h2>
+          <p>Estamos recuperando los datos del pedido.</p>
+        </div>
+      ) : loadError ? (
+        <div className="admin-order-detail__empty" role="alert">
+          <h2>No pudimos cargar la orden.</h2>
+          <p>{loadError}</p>
+        </div>
+      ) : !order ? (
         <div className="admin-order-detail__empty">
           <h2>No encontramos la orden solicitada.</h2>
           <p>
-            Verifica que el identificador sea correcto o regresa al listado de{" "}
-            <Link to="/admin/ordenes">órdenes</Link> para seleccionar otra boleta.
+            Verifica que el identificador sea correcto o regresa al listado de <Link to="/admin/ordenes">ordenes</Link>{" "}
+            para seleccionar otra boleta.
           </p>
         </div>
       ) : (
@@ -122,7 +134,7 @@ const AdminOrderDetail = () => {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="order-reference">Referencia de envío</label>
+                  <label htmlFor="order-reference">Referencia de envio</label>
                   <input
                     id="order-reference"
                     type="text"
