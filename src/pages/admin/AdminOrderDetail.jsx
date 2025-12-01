@@ -4,7 +4,7 @@ import OrderSummary from "@/components/orderDetail/OrderSummary.jsx";
 import OrderItems from "@/components/orderDetail/OrderItems.jsx";
 import useOrdersData from "@/hooks/useOrdersData.js";
 import useAuthSession from "@/hooks/useAuthSession.js";
-import { updateAdminOrder } from "@/services/orderApi.js";
+import { fetchAdminOrder, updateAdminOrder } from "@/services/orderApi.js";
 
 const formatDateTime = (value) => {
   if (!value) return "No disponible";
@@ -30,10 +30,40 @@ const AdminOrderDetail = () => {
   const orders = useOrdersData();
   const loading = orders?.loading ?? false;
   const loadError = orders?.error ?? "";
-  const order = useMemo(() => {
+  const listOrder = useMemo(() => {
     const list = Array.isArray(orders) ? orders : [];
     return list.find((item) => String(item.id) === String(orderId)) ?? null;
   }, [orders, orderId]);
+
+  const [orderDetail, setOrderDetail] = useState(null);
+  const [detailError, setDetailError] = useState("");
+  const [detailLoading, setDetailLoading] = useState(false);
+
+  const order = orderDetail || listOrder;
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!orderId) return undefined;
+    const load = async () => {
+      setDetailError("");
+      setDetailLoading(true);
+      try {
+        const data = await fetchAdminOrder(orderId);
+        if (!cancelled) setOrderDetail(data);
+      } catch (err) {
+        if (!cancelled) {
+          setOrderDetail(null);
+          setDetailError(err?.message || "No se pudo cargar la orden.");
+        }
+      } finally {
+        if (!cancelled) setDetailLoading(false);
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [orderId]);
 
   const [estado, setEstado] = useState(order?.status ?? "");
   const [notas, setNotas] = useState(order?.notes ?? order?.notas ?? order?.summary?.notes ?? "");
@@ -89,15 +119,15 @@ const AdminOrderDetail = () => {
         </button>
       </div>
 
-      {loading ? (
+      {loading || detailLoading ? (
         <div className="admin-order-detail__empty" role="status">
           <h2>Cargando orden...</h2>
           <p>Estamos recuperando los datos del pedido.</p>
         </div>
-      ) : loadError ? (
+      ) : !order && (loadError || detailError) ? (
         <div className="admin-order-detail__empty" role="alert">
           <h2>No pudimos cargar la orden.</h2>
-          <p>{loadError}</p>
+          <p>{detailError || loadError}</p>
         </div>
       ) : !order ? (
         <div className="admin-order-detail__empty">
