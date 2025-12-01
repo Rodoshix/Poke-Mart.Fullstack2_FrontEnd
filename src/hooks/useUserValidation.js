@@ -16,6 +16,8 @@ const useUserValidation = ({ formState, isNew, existingUsers = [] }) =>
         email: norm.email(formState.email),
         password: formState.password,
         passwordConfirm: formState.passwordConfirm,
+        telefonoCodigo: (formState.telefonoCodigo || "").trim(),
+        telefonoNumero: (formState.telefonoNumero || "").trim(),
         telefono: `${formState.telefonoCodigo}${(formState.telefonoNumero || "").replace(/\D/g, "")}`,
       };
       const issues = validateRegistration(existingUsers, data);
