@@ -50,7 +50,7 @@ const OrderTable = ({ orders }) => (
               <OrderBadge status={order.status} />
             </td>
             <td>
-              <Link to={`/admin/ordenes/${order.id}`} className="admin-order-table__action">
+              <Link to={`/admin/ordenes/${order.backendId ?? order.id}`} className="admin-order-table__action">
                 Ver detalle
               </Link>
             </td>

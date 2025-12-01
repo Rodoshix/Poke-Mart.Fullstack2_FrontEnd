@@ -27,6 +27,7 @@ describe("Testing OrderTable", () => {
     const orders = [
       {
         id: "ORD-01",
+        backendId: 101,
         createdAt: "2024-01-20T10:30:00Z",
         customer: "Ash Ketchum",
         total: 19990,
@@ -34,6 +35,7 @@ describe("Testing OrderTable", () => {
       },
       {
         id: "ORD-02",
+        backendId: 102,
         createdAt: null,
         customer: "Misty",
         total: null,
@@ -47,8 +49,8 @@ describe("Testing OrderTable", () => {
     expect(screen.getByText("Ash Ketchum")).toBeInTheDocument();
     expect(screen.getAllByTestId("order-badge")).toHaveLength(2);
     const links = screen.getAllByRole("link", { name: "Ver detalle" });
-    expect(links[0]).toHaveAttribute("href", "/admin/ordenes/ORD-01");
-    expect(links[1]).toHaveAttribute("href", "/admin/ordenes/ORD-02");
+    expect(links[0]).toHaveAttribute("href", "/admin/ordenes/101");
+    expect(links[1]).toHaveAttribute("href", "/admin/ordenes/102");
     expect(screen.getByText(/Sin fecha/)).toBeInTheDocument();
   });
 

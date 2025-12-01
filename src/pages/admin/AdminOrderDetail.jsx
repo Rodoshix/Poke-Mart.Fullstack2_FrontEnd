@@ -32,7 +32,7 @@ const AdminOrderDetail = () => {
   const loadError = orders?.error ?? "";
   const listOrder = useMemo(() => {
     const list = Array.isArray(orders) ? orders : [];
-    return list.find((item) => String(item.id) === String(orderId)) ?? null;
+    return list.find((item) => String(item.id) === String(orderId) || String(item.backendId) === String(orderId)) ?? null;
   }, [orders, orderId]);
 
   const [orderDetail, setOrderDetail] = useState(null);
@@ -43,12 +43,14 @@ const AdminOrderDetail = () => {
 
   useEffect(() => {
     let cancelled = false;
-    if (!orderId) return undefined;
+    const targetId =
+      listOrder?.backendId ?? (Number.isFinite(Number(orderId)) ? Number(orderId) : null);
+    if (!targetId) return undefined;
     const load = async () => {
       setDetailError("");
       setDetailLoading(true);
       try {
-        const data = await fetchAdminOrder(orderId);
+        const data = await fetchAdminOrder(targetId);
         if (!cancelled) setOrderDetail(data);
       } catch (err) {
         if (!cancelled) {
@@ -63,7 +65,7 @@ const AdminOrderDetail = () => {
     return () => {
       cancelled = true;
     };
-  }, [orderId]);
+  }, [orderId, listOrder]);
 
   const [estado, setEstado] = useState(order?.status ?? "");
   const [notas, setNotas] = useState(order?.notes ?? order?.notas ?? order?.summary?.notes ?? "");
