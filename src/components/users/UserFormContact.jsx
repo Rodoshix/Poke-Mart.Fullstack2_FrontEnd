@@ -2,7 +2,7 @@ const UserFormContact = ({ formState, onChange }) => (
   <>
     <div className="admin-user-form__group">
       <label className="admin-user-form__label" htmlFor="user-email">
-        Correo electronico
+        Correo electrónico
       </label>
       <input
         id="user-email"
@@ -17,7 +17,7 @@ const UserFormContact = ({ formState, onChange }) => (
 
     <div className="admin-user-form__group">
       <label className="admin-user-form__label" htmlFor="user-phone">
-        Telefono
+        Teléfono
       </label>
       <div className="admin-user-form__phone">
         <select
@@ -29,7 +29,7 @@ const UserFormContact = ({ formState, onChange }) => (
         >
           <option value="+56">+56 (Chile)</option>
           <option value="+1">+1 (USA)</option>
-          <option value="+34">+34 (Espana)</option>
+          <option value="+34">+34 (España)</option>
         </select>
         <input
           id="user-phone-number"
@@ -58,7 +58,7 @@ const UserFormContact = ({ formState, onChange }) => (
         disabled
       />
       <small className="text-muted d-block mt-1">
-        La fecha de registro se asigna automaticamente y no puede modificarse.
+        La fecha de registro se asigna automáticamente y no puede modificarse.
       </small>
     </div>
   </>

@@ -77,6 +77,7 @@ export default function AuthMenu() {
           to="/perfil"
           className="auth-chip auth-chip--link d-flex align-items-center"
           title="Ver y editar mi perfil"
+          aria-label="Ver y editar mi perfil"
         >
           <Avatar />
           <div className="auth-meta">
